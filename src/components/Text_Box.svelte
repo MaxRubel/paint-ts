@@ -137,6 +137,10 @@
 >
 
 <style>
+  textarea {
+    background-color: red;
+  }
+
   .text-box {
     position: absolute;
     display: flex;
@@ -144,7 +148,6 @@
     justify-content: center;
     background-color: transparent;
     border: none;
-    padding: 5px;
     min-width: 100px;
     min-height: 20px;
     color: lightgray;
@@ -154,6 +157,7 @@
     transition: box-shadow 0.3s ease;
     text-align: center;
     border: 3px solid rgb(113, 113, 113);
+    padding-top: 20px;
   }
 
   .text-box:hover {
@@ -163,7 +167,7 @@
   .text-box:focus,
   .text-box:active {
     outline: none;
-    border: 1px solid rgb(113, 113, 113);
+    border: 3px solid rgb(113, 113, 113);
   }
 
   .non-selectable {
