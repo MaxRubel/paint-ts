@@ -12,11 +12,13 @@
   } from "../stores/migmaStore";
   import Marker from "./graphics/Marker.svelte";
   import TextIcon from "./graphics/TextIcon.svelte";
-  import { event_state_store } from "../stores/eventState";
+  import { event_state_store, locked_store } from "../stores/eventState";
   import CursorPointer from "./graphics/CursorPointer.svelte";
   import { theme_store } from "../stores/eventState";
   import type { TextBoxType, RectangleType } from "../utils/types/app_types";
   import Rectangle from "./graphics/Rectangle.svelte";
+  import Lock from "./graphics/Lock.svelte";
+  import Unlock from "./graphics/Unlock.svelte";
 
   let points: any[] = [];
   let paths: any[] = [];
@@ -42,27 +44,30 @@
 
   let fillColor = mode === "light" ? "black" : "rgb(143, 143, 143)";
 
+  let locked = true;
+
   const unsubcribe = textBoxesStore.subscribe(
     (value: { [key: string]: TextBoxType }) => {
       textBoxes = value;
     },
   );
 
-  const unsubcribe2 = event_state_store.subscribe((value) => {
+  const unsubcribe2 = event_state_store.subscribe((value: string) => {
     event_state = value;
   });
 
-  const unsubscribe3 = theme_store.subscribe((value) => {
+  const unsubscribe3 = theme_store.subscribe((value: string) => {
     mode = value;
+  });
+
+  const unsubscribe4 = locked_store.subscribe((value: boolean) => {
+    locked = value;
   });
 
   $: {
     switch (event_state) {
       case "createTextBox":
         cursor = "text";
-        break;
-      case "typing":
-        cursor = "test";
         break;
       case "drawing":
         cursor = "crosshair";
@@ -86,12 +91,12 @@
   };
 
   function handle_delete() {
-    if (event_state === "typing") return;
+    if (event_state.includes("typing")) return;
     deleteTextBox(selected);
   }
 
   function handleKeyup(e: KeyboardEvent) {
-    if (event_state === "typing") return;
+    if (event_state.includes("typing")) return;
     switch (e.key) {
       case "p":
         handle_drawing_mode();
@@ -123,6 +128,7 @@
     unsubcribe();
     unsubcribe2();
     unsubscribe3();
+    unsubscribe4();
 
     if (timeoutId) {
       clearTimeout(timeoutId);
@@ -271,7 +277,11 @@
 
   let timeoutId: number;
 
-  function handleSmootches() {
+  function handleLock(): void {
+    locked ? locked_store.set(false) : locked_store.set(true);
+  }
+
+  function handleSmootches(): void {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -281,7 +291,8 @@
     }, 2600);
   }
 
-  function handle_textbox_mode() {
+  //----bottom-tool-bar-------------------
+  function handle_textbox_mode(): void {
     if (event_state === "createTextBox") {
       event_state_store.set("arrow");
     } else {
@@ -289,7 +300,7 @@
     }
   }
 
-  function handle_drawing_mode() {
+  function handle_drawing_mode(): void {
     if (event_state === "drawing") {
       event_state_store.set("arrow");
     } else {
@@ -297,17 +308,16 @@
     }
   }
 
-  function handle_new_rectangle() {
+  function handle_new_rectangle(): void {
     event_state_store.set("rectangle-draw");
   }
 
-  function handle_arrow_mode() {
+  function handle_arrow_mode(): void {
     event_state_store.set("arrow");
   }
 
   function handleSelect(e: CustomEvent<string>) {
     if (e.detail) {
-      Rectangle;
       const [_, id] = e.detail.split("&");
       selected = id;
     } else {
@@ -324,9 +334,17 @@
       <button on:click={handleDark}>
         {mode === "light" ? "Dark" : "Light"}
       </button>
+      <button on:click={handleLock}>
+        {#if locked}
+          <Lock />
+        {:else}
+          <Unlock />
+        {/if}
+      </button>
       <button on:click={handleSmootches}>Smooches</button>
     </div>
-    <div class="second-row">
+    <div class="second-row" style="color: white">
+      {event_state}
       <button
         on:click={handle_arrow_mode}
         style="background-color: {event_state === 'arrow' ? '#9096ff' : ''}"
@@ -339,7 +357,7 @@
       >
         <Marker />
       </button>
-      {#if event_state === "createTextBox" || event_state === "typing"}
+      {#if event_state === "createTextBox" || event_state.includes("typing")}
         <button
           on:click={handle_textbox_mode}
           style="background-color:  #9096ff"
@@ -364,8 +382,8 @@
   </div>
   <div class="canvas-container">
     {#if catSmootch}
-      smooch
-      <img src="/smooch.webp" alt="" class="full-size image" />
+      High5
+      <img src="/high5.webp" alt="" class="full-size image" />
     {/if}
     {#each Object.values(textBoxes) as textBox (textBox.id)}
       <TextBox data={textBox} {updateTextBox} on:select={handleSelect} />
@@ -392,8 +410,8 @@
   }
 
   .image {
-    filter: brightness(70%);
-    z-index: 500;
+    /* filter: brightness(70%); */
+    z-index: 1000;
   }
 
   .tool-bar {
