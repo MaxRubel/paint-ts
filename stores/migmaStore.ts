@@ -3,27 +3,30 @@ import { writable } from "svelte/store";
 import { v4 as uuidv4 } from 'uuid';
 import { locked_store } from "./eventState";
 import { get } from "svelte/store";
+import type { TextBoxType } from "../utils/types/app_types";
 
 
 export const textBoxesStore = writable({})
 
 
 export function createNewTextBox(e: MouseEvent, boxHeight: number, boxWidth: number) {
-  const newKey = uuidv4();
+  const newKey: string = uuidv4();
   let x = 0
   let y = 0
 
   if (get(locked_store)) {
-    x = Math.round((e.clientX - 166) / 20) * 20;
-    y = Math.round((e.clientY - 50) / 20) * 20;
+    x = Math.round((e.clientX - 133) / 20) * 20;
+    y = Math.round((e.clientY - 40) / 20) * 20;
   } else {
-    x = e.clientX - 166
-    y = e.clientY
+    x = e.clientX - 133
+    y = e.clientY - 40
   }
-  const newBox = {
+  const newBox: TextBoxType = {
     id: newKey,
     text: "",
-    x, y
+    x, y,
+    height: 80,
+    width: 240
   };
 
   textBoxesStore.update(boxes => ({
@@ -32,7 +35,7 @@ export function createNewTextBox(e: MouseEvent, boxHeight: number, boxWidth: num
   }));
 }
 
-export function updateTextBox(id, updates) {
+export function updateTextBox(id: string, updates: object) {
   textBoxesStore.update(boxes => {
     if (boxes[id]) {
       boxes[id] = { ...boxes[id], ...updates };
@@ -41,7 +44,7 @@ export function updateTextBox(id, updates) {
   });
 }
 
-export function clearAllTextBoxes() {
+export function clearAllTextBoxes(): void {
   textBoxesStore.update(() => {
     return {}
   })
