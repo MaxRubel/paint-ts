@@ -94,6 +94,9 @@
     if (isDragging) {
       textareaElement.blur();
     }
+    if (eventState === "drawing") {
+      event_state_store.set("arrow");
+    }
   }
 
   function handleMouseMove(event: MouseEvent): void {
@@ -240,8 +243,6 @@
     document.removeEventListener("mousemove", handleExpanding);
     document.removeEventListener("mouseup", stopExpanding);
   }
-
-  function handleHidden(): void {}
 
   $: {
     if (eventState.includes("typing")) {

@@ -1,7 +1,5 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { getSvgPathFromStroke } from "../utils/getSvgPathFromStroke";
-  import { getStroke } from "perfect-freehand";
   import TextBox from "./components/Text_Box.svelte";
   import {
     createNewTextBox,
@@ -10,25 +8,19 @@
     clearAllTextBoxes,
     deleteTextBox,
   } from "../stores/migmaStore";
-  import Marker from "./graphics/Marker.svelte";
-  import TextIcon from "./graphics/TextIcon.svelte";
   import { event_state_store, locked_store } from "../stores/eventState";
-  import CursorPointer from "./graphics/CursorPointer.svelte";
   import { theme_store } from "../stores/eventState";
-  import type { TextBoxType, RectangleType } from "../utils/types/app_types";
-  import Rectangle from "./graphics/Rectangle.svelte";
-  import Lock from "./graphics/Lock.svelte";
-  import Unlock from "./graphics/Unlock.svelte";
+  import type { TextBoxType } from "../utils/types/app_types";
   import { DrawRectangle } from "../utils/drawRectangle";
   import {
     DrawBrushStroke,
     EndBrushStroke,
     ReDrawBrushStrokes,
   } from "../utils/drawBrushStroke";
+  import ToolBar from "./components/ToolBar.svelte";
 
   let mode = "dark";
   let catSmootch = false;
-
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
   let size = 7;
@@ -36,21 +28,13 @@
   let cursor = "arrow";
   let event_state = "arrow";
   let selected: string | null;
-
-  let rectData: RectangleType;
-
   let xStart = 0;
   let yStart = 0;
-
-  let fillColor = mode === "light" ? "black" : "rgb(143, 143, 143)";
-
   let locked = true;
 
-  const unsubcribe = textBoxesStore.subscribe(
-    (value: { [key: string]: TextBoxType }) => {
-      textBoxes = value;
-    },
-  );
+  const unsubcribe = textBoxesStore.subscribe((value) => {
+    textBoxes = value;
+  });
 
   const unsubcribe2 = event_state_store.subscribe((value: string) => {
     event_state = value;
@@ -64,6 +48,7 @@
     locked = value;
   });
 
+  //handle cursor type:
   $: {
     switch (event_state) {
       case "createTextBox":
@@ -125,52 +110,52 @@
   });
 
   onDestroy(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+
     unsubcribe();
     unsubcribe2();
     unsubscribe3();
     unsubscribe4();
 
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
     window.removeEventListener("resize", resizeCanvas);
     window.removeEventListener("keyup", handleKeyup);
     canvas?.removeEventListener("click", handleClick);
   });
 
-  function resizeCanvas() {
+  function resizeCanvas(): void {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     redrawCanvas();
   }
 
-  function redrawCanvas() {
+  function redrawCanvas(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     ReDrawBrushStrokes(ctx);
   }
 
-  function handleClear() {
+  function handleClear(): void {
     textBoxes = {};
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     clearAllTextBoxes();
   }
 
-  function handleUndo() {
+  function handleUndo(): void {
     redrawCanvas();
   }
 
-  function handlePointerDown(e: PointerEvent) {
+  function handlePointerDown(e: PointerEvent): void {
     if (event_state === "drawing") {
       DrawBrushStroke(ctx, size, e);
     }
-    if (event_state === "rectangle-draw") {
-      //start pos of rectangle
+    if (event_state === "rectangle-draw" || event_state === "selecting") {
       xStart = e.clientX;
       yStart = e.clientY;
     }
   }
 
-  function handlePointerUp() {
+  function handlePointerUp(): void {
     if (event_state === "rectangle-draw") {
       //finish the rectangle drawing
     }
@@ -180,7 +165,7 @@
   }
 
   function handlePointerMove(e: PointerEvent) {
-    if (e.buttons !== 1) return;
+    if (e.buttons !== 1) return; //stop right click from drawing
     if (event_state === "drawing") {
       DrawBrushStroke(ctx, size, e);
     }
@@ -189,7 +174,7 @@
     }
   }
 
-  function handleDark() {
+  function handleDark(): void {
     if (mode === "light") {
       theme_store.set("dark");
     } else {
@@ -250,63 +235,20 @@
 </script>
 
 <main>
-  <div class="tool-bar">
-    <div class="top-row">
-      <button on:click={handleUndo}>Undo</button>
-      <button on:click={handleClear}>Clear</button>
-      <button on:click={handleDark}>
-        {mode === "light" ? "Dark" : "Light"}
-      </button>
-      <button on:click={handleLock}>
-        {#if locked}
-          <Lock />
-        {:else}
-          <Unlock />
-        {/if}
-      </button>
-      <button on:click={handleSmootches}>Smooches</button>
-    </div>
-    <div class="second-row" style="color: white">
-      {event_state}
-      <button
-        on:click={handle_arrow_mode}
-        style="background-color: {event_state === 'arrow' ? '#9096ff' : ''}"
-      >
-        <CursorPointer />
-      </button>
-      <button
-        on:click={handle_drawing_mode}
-        style="background-color: {event_state === 'drawing' ? '#9096ff' : ''}"
-      >
-        <Marker />
-      </button>
-      {#if event_state === "createTextBox" || event_state.includes("typing")}
-        <button
-          on:click={handle_textbox_mode}
-          style="background-color:  #9096ff"
-        >
-          <TextIcon />
-        </button>
-      {:else}
-        <button on:click={handle_textbox_mode}>
-          <TextIcon />
-        </button>
-      {/if}
-
-      <button
-        on:click={handle_new_rectangle}
-        style="background-color: {event_state === 'rectangle-draw'
-          ? '#9096ff'
-          : ''}"
-      >
-        <Rectangle />
-      </button>
-    </div>
-  </div>
+  <ToolBar
+    {handleUndo}
+    {handle_arrow_mode}
+    {handle_drawing_mode}
+    {handle_new_rectangle}
+    {handle_textbox_mode}
+    {handleClear}
+    {handleDark}
+    {handleLock}
+    {handleSmootches}
+  />
   <div class="canvas-container">
     {#if catSmootch}
-      High5
-      <img src="/high5.webp" alt="" class="full-size image" />
+      <img src="/high5.webp" alt="meh" class="image" />
     {/if}
     {#each Object.values(textBoxes) as textBox (textBox.id)}
       <TextBox data={textBox} {updateTextBox} on:select={handleSelect} />
@@ -333,24 +275,12 @@
   }
 
   .image {
-    /* filter: brightness(70%); */
-    z-index: 1000;
-  }
-
-  .tool-bar {
+    filter: brightness(70%);
     position: fixed;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: center;
-    gap: 8px;
-    top: 9px;
-    left: 0;
-    width: 100%;
-    height: 100px;
+    top: 40px;
+    left: 40px;
     z-index: 1000;
-    box-sizing: border-box;
-    background-color: rgba(0, 0, 0, 0.288);
+    height: 50vh;
   }
 
   .full-size {
