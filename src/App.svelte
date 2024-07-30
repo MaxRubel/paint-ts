@@ -19,18 +19,18 @@
   import Rectangle from "./graphics/Rectangle.svelte";
   import Lock from "./graphics/Lock.svelte";
   import Unlock from "./graphics/Unlock.svelte";
+  import { DrawRectangle } from "../utils/drawRectangle";
+  import {
+    DrawBrushStroke,
+    EndBrushStroke,
+    ReDrawBrushStrokes,
+  } from "../utils/drawBrushStroke";
 
-  let points: any[] = [];
-  let paths: any[] = [];
-  let moves: any[] = [];
   let mode = "dark";
-  let pathData;
   let catSmootch = false;
 
-  let start = 0;
-  let end: number | null = null;
   let canvas: any;
-  let ctx: any;
+  let ctx: CanvasRenderingContext2D;
   let size = 7;
   let textBoxes: { [key: string]: TextBoxType };
   let cursor = "arrow";
@@ -146,45 +146,22 @@
 
   function redrawCanvas() {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
-    paths.forEach((path: any) => {
-      const canvasPath = new Path2D(path);
-      ctx.fillStyle = mode === "light" ? "black" : "rgb(143, 143, 143)";
-      ctx.fill(canvasPath);
-    });
+    ReDrawBrushStrokes(ctx);
   }
 
   function handleClear() {
-    paths = [];
-    points = [];
-    moves = [];
     textBoxes = {};
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     clearAllTextBoxes();
   }
 
   function handleUndo() {
-    if (moves.length === 0) return;
-
-    const lastMove = moves[moves.length - 1];
-    const amount = lastMove.end - lastMove.start;
-    const index = lastMove.start;
-
-    paths.splice(index - 1, amount + 2);
-    paths = paths;
-    moves.splice(moves.length - 1, 1);
-    moves = moves;
     redrawCanvas();
   }
 
   function handlePointerDown(e: PointerEvent) {
     if (event_state === "drawing") {
-      start = paths.length + 1;
-
-      if (e.target instanceof HTMLElement) {
-        e.target.setPointerCapture(e.pointerId);
-      }
-
-      points = [[e.clientX - 3, e.clientY - 3, e.pressure]];
+      DrawBrushStroke(ctx, size, e);
     }
     if (event_state === "rectangle-draw") {
       //start pos of rectangle
@@ -194,76 +171,21 @@
   }
 
   function handlePointerUp() {
-    end = paths.length - 1;
-    if (end >= start) {
-      moves = [...moves, { start, end }];
-    }
     if (event_state === "rectangle-draw") {
       //finish the rectangle drawing
+    }
+    if (event_state === "drawing") {
+      EndBrushStroke();
     }
   }
 
   function handlePointerMove(e: PointerEvent) {
     if (e.buttons !== 1) return;
     if (event_state === "drawing") {
-      points = [...points, [e.clientX - 3, e.clientY - 3, e.pressure]];
-      const stroke = getStroke(points, {
-        size: size,
-        thinning: 0.6,
-        smoothing: 1,
-        streamline: 0.0,
-      });
-      pathData = getSvgPathFromStroke(stroke);
-      paths = [...paths, pathData];
-
-      const canvasPath = new Path2D(pathData);
-      ctx.fillStyle = mode === "light" ? "black" : "rgb(143, 143, 143)";
-      ctx.fill(canvasPath);
+      DrawBrushStroke(ctx, size, e);
     }
     if (event_state === "rectangle-draw") {
-      const borderRadius = 10;
-      const xCurrent = e.clientX - canvas.offsetLeft;
-      const yCurrent = e.clientY - canvas.offsetTop;
-
-      let width = xCurrent - xStart;
-      let height = yCurrent - yStart;
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      let x = width < 0 ? xStart + width : xStart;
-      let y = height < 0 ? yStart + height : yStart;
-
-      width = Math.abs(width);
-      height = Math.abs(height);
-
-      let adjustedRadius = Math.min(borderRadius, width / 2, height / 2);
-
-      ctx.beginPath();
-      ctx.moveTo(x + adjustedRadius, y);
-      ctx.lineTo(x + width - adjustedRadius, y);
-      ctx.quadraticCurveTo(x + width, y, x + width, y + adjustedRadius);
-      ctx.lineTo(x + width, y + height - adjustedRadius);
-      ctx.quadraticCurveTo(
-        x + width,
-        y + height,
-        x + width - adjustedRadius,
-        y + height,
-      );
-      ctx.lineTo(x + adjustedRadius, y + height);
-      ctx.quadraticCurveTo(x, y + height, x, y + height - adjustedRadius);
-      ctx.lineTo(x, y + adjustedRadius);
-      ctx.quadraticCurveTo(x, y, x + adjustedRadius, y);
-      ctx.closePath();
-      ctx.stroke();
-      rectData = {
-        x: x,
-        y: y,
-        width: width,
-        height: height,
-        borderRadius: adjustedRadius,
-        color: fillColor,
-        fill: "transparent",
-      };
+      DrawRectangle(ctx, canvas, e, xStart, yStart);
     }
   }
 
