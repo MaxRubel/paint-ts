@@ -18,6 +18,7 @@
     ReDrawBrushStrokes,
   } from "../utils/drawBrushStroke";
   import ToolBar from "./components/ToolBar.svelte";
+  import DemoDrag from "../utils/demoDrag.svelte";
 
   let mode = "dark";
   let catSmootch = false;
@@ -246,6 +247,7 @@
     {handleLock}
     {handleSmootches}
   />
+
   <div class="canvas-container">
     {#if catSmootch}
       <img src="/high5.webp" alt="meh" class="image" />
