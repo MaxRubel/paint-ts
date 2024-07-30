@@ -25,6 +25,7 @@
   let hidden: boolean = true;
   let expand = "";
   let locked: boolean;
+  let textContainer: HTMLElement;
 
   const unsubcribe = theme_store.subscribe((value: string) => {
     theme = value;
@@ -61,7 +62,7 @@
     unsubscribe3();
   });
 
-  function handleInput(e: Event): void {
+  function handleChange(e: Event): void {
     const target = e.target as HTMLTextAreaElement;
 
     if (target) {
@@ -71,6 +72,7 @@
     } else {
       console.error("Event target is not an HTMLTextAreaElement");
     }
+    checkOverflow();
   }
 
   function handleKeydown(e: KeyboardEvent): void {
@@ -132,6 +134,7 @@
       textareaElement.selectionStart,
       textareaElement.selectionStart,
     );
+    checkOverflow();
   }
 
   function handleSingleClick() {
@@ -172,6 +175,18 @@
     startMouseY = e.clientY;
     document.addEventListener("mousemove", handleExpanding);
     document.addEventListener("mouseup", stopExpanding);
+  }
+
+  function checkOverflow() {
+    if (textContainer && textareaElement) {
+      if (textareaElement.scrollHeight > textareaElement.clientHeight) {
+        height = textareaElement.scrollHeight + 20;
+      }
+
+      if (textareaElement.scrollWidth > textareaElement.clientWidth) {
+        width = textareaElement.scrollWidth;
+      }
+    }
   }
 
   function handleExpanding(e: MouseEvent): void {
@@ -233,7 +248,6 @@
       width = newWidth;
       height = newHeight;
     }
-
     updateTextBox(id, { ...data, x, y, width, height });
   }
 
@@ -242,6 +256,7 @@
     isDragging = false;
     document.removeEventListener("mousemove", handleExpanding);
     document.removeEventListener("mouseup", stopExpanding);
+    setTimeout(checkOverflow, 0);
   }
 
   $: {
@@ -269,6 +284,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
   class="text-container"
+  bind:this={textContainer}
   style="top: {y}px; left: {x}px; cursor: {cursorStyle}; height: {height}px; width: {width}px;"
   class:non-selectable={!typing}
   class:no-select={!typing}
@@ -306,7 +322,7 @@
     class:active-background={expanding}
     style="cursor: {cursorStyle}; color: {fontColor}"
     id="textbox-{id}"
-    on:input={handleInput}
+    on:input={handleChange}
     on:click={handleSingleClick}
     on:keydown={handleKeydown}
     on:mousedown={handleMouseDown}
@@ -364,6 +380,30 @@
     top: -8px;
     left: -6px;
     cursor: nwse-resize;
+    background-color: rgb(113, 113, 113);
+  }
+
+  #left {
+    position: absolute;
+    height: 12px;
+    width: 12px;
+    z-index: 1000;
+    top: 50%;
+    transform: translateY(-50%);
+    left: -8px;
+    cursor: ew-resize;
+    background-color: rgb(113, 113, 113);
+  }
+
+  #right {
+    position: absolute;
+    height: 12px;
+    width: 12px;
+    z-index: 1000;
+    top: 50%;
+    transform: translateY(-50%);
+    right: -8px;
+    cursor: ew-resize;
     background-color: rgb(113, 113, 113);
   }
 

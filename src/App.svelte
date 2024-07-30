@@ -13,12 +13,12 @@
   import type { TextBoxType } from "../utils/types/app_types";
   import { DrawRectangle } from "../utils/drawRectangle";
   import {
+    ClearOldPathData,
     DrawBrushStroke,
     EndBrushStroke,
     ReDrawBrushStrokes,
   } from "../utils/drawBrushStroke";
   import ToolBar from "./components/ToolBar.svelte";
-  import DemoDrag from "../utils/demoDrag.svelte";
 
   let mode = "dark";
   let catSmootch = false;
@@ -67,7 +67,6 @@
     }
   }
 
-  clearAllTextBoxes;
   const handleClick = (e: MouseEvent) => {
     switch (event_state) {
       case "createTextBox":
@@ -137,9 +136,9 @@
   }
 
   function handleClear(): void {
-    textBoxes = {};
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     clearAllTextBoxes();
+    ClearOldPathData();
   }
 
   function handleUndo(): void {

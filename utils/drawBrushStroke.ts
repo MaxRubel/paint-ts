@@ -41,3 +41,7 @@ export function ReDrawBrushStrokes(ctx: CanvasRenderingContext2D) {
     ctx.fill(canvasPath);
   });
 }
+
+export function ClearOldPathData() {
+  paths = []
+}
