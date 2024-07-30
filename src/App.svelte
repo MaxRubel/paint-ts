@@ -19,6 +19,11 @@
     ReDrawBrushStrokes,
   } from "../utils/drawBrushStroke";
   import ToolBar from "./components/ToolBar.svelte";
+  import {
+    ClearSelectionRect,
+    DrawSelectBox,
+    initializeSelectBox,
+  } from "../utils/drawSelectBox";
 
   let mode = "dark";
   let catSmootch = false;
@@ -146,31 +151,45 @@
   }
 
   function handlePointerDown(e: PointerEvent): void {
-    if (event_state === "drawing") {
-      DrawBrushStroke(ctx, size, e);
-    }
-    if (event_state === "rectangle-draw" || event_state === "selecting") {
-      xStart = e.clientX;
-      yStart = e.clientY;
+    switch (event_state) {
+      case "drawing":
+        DrawBrushStroke(ctx, size, e);
+        break;
+      case "rectangle-draw":
+        xStart = e.clientX;
+        yStart = e.clientY;
+        break;
+      case "arrow":
+        xStart = e.clientX;
+        yStart = e.clientY;
+        initializeSelectBox(canvas);
+        break;
     }
   }
 
   function handlePointerUp(): void {
-    if (event_state === "rectangle-draw") {
-      //finish the rectangle drawing
-    }
-    if (event_state === "drawing") {
-      EndBrushStroke();
+    switch (event_state) {
+      case "drawing":
+        EndBrushStroke();
+        break;
+      case "arrow":
+        ClearSelectionRect();
+        console.log("delete rect");
     }
   }
 
   function handlePointerMove(e: PointerEvent) {
     if (e.buttons !== 1) return; //stop right click from drawing
-    if (event_state === "drawing") {
-      DrawBrushStroke(ctx, size, e);
-    }
-    if (event_state === "rectangle-draw") {
-      DrawRectangle(ctx, canvas, e, xStart, yStart);
+    switch (event_state) {
+      case "drawing":
+        DrawBrushStroke(ctx, size, e);
+        break;
+      case "rectangle-draw":
+        DrawRectangle(ctx, canvas, e, xStart, yStart);
+        break;
+      case "arrow":
+        DrawSelectBox(e, xStart, yStart);
+        break;
     }
   }
 
