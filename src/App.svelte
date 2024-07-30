@@ -118,10 +118,10 @@
 
   onMount(() => {
     ctx = canvas?.getContext("2d");
-    resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("keyup", handleKeyup);
     canvas?.addEventListener("click", handleClick);
+    resizeCanvas();
   });
 
   onDestroy(() => {
@@ -141,6 +141,7 @@
   function resizeCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    redrawCanvas();
   }
 
   function redrawCanvas() {

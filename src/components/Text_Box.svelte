@@ -9,7 +9,6 @@
   import { deleteTextBox } from "../../stores/migmaStore";
   import type { TextBoxType } from "../../utils/types/app_types";
   import { get } from "svelte/store";
-  import Lock from "../graphics/Lock.svelte";
 
   export let data: TextBoxType;
   export let updateTextBox: any;
@@ -84,12 +83,11 @@
   //---------Drag and Drop---------------------------
   function handleMouseDown(event: MouseEvent): void {
     if (!typing) {
+      event.preventDefault();
       isDragging = true;
       dragOffsetX = event.clientX - x;
       dragOffsetY = event.clientY - y;
-      event.preventDefault();
 
-      // Add these lines
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     }
@@ -175,6 +173,7 @@
 
   function handleExpanding(e: MouseEvent): void {
     if (!expanding) return;
+    event_state_store.set("arrow");
     const dx = e.clientX - startMouseX;
     const dy = e.clientY - startMouseY;
 
