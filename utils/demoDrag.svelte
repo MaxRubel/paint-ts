@@ -22,7 +22,6 @@
     //add event listener to listen for drag/mouse-movement and release:
     document.addEventListener("mousemove", handleMouseMove);
     document.addEventListener("mouseup", handleMouseUp);
-    console.log("hey");
   }
 
   function handleMouseMove(event) {
