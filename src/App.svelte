@@ -40,10 +40,11 @@
   let textBoxes: TextBoxType;
   let cursor = "arrow";
   let event_state = "arrow";
-  let selected: string | null;
+  let selected: string = "";
   let xStart = 0;
   let yStart = 0;
   let locked = true;
+  let textBoxArray: TextBoxType[] = [];
 
   const unsubcribe = textBoxesStore.subscribe((value) => {
     textBoxes = value;
@@ -251,7 +252,7 @@
       const [_, id] = e.detail.split("&");
       selected = id;
     } else {
-      selected = null;
+      selected = "";
     }
   }
 </script>
