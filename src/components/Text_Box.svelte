@@ -9,13 +9,14 @@
   import { createEventDispatcher } from "svelte";
   import { deleteTextBox } from "../../stores/migmaStore";
   import type { TextBoxType } from "../../utils/types/app_types";
-  import { get } from "svelte/store";
   import { ClearSelection } from "../../utils/clearSelection";
-
+  import { StartDragMany, DragMany } from "../../utils/dragMultiple";
   export let data: TextBoxType;
   export let updateTextBox: any;
 
-  let { x, y, height, width, id } = data;
+  $: ({ id, text, height, width } = data);
+  $: x = data.x;
+  $: y = data.y;
   let textareaElement: HTMLTextAreaElement;
   let isDragging = false;
   let dragOffsetX: number = 0;
@@ -30,6 +31,7 @@
   let textContainer: HTMLElement;
   let selected: HTMLTextAreaElement[] = [];
   let iAmSelected = false;
+
   const unsubcribe = theme_store.subscribe((value: string) => {
     theme = value;
   });
@@ -45,17 +47,6 @@
   const unsubscribe4 = selected_store.subscribe((value) => {
     selected = value;
   });
-
-  $: {
-    if (eventState.includes("typing")) {
-      const [_, eventId] = eventState.split("&");
-      if (eventId === id) {
-        typing = true;
-      }
-    } else {
-      typing = false;
-    }
-  }
 
   const dispatch = createEventDispatcher();
 
@@ -107,10 +98,18 @@
     if (eventState === "drawing") {
       // event_state_store.set("arrow");
     }
+    if (eventState === "selected" && iAmSelected) {
+      StartDragMany(event);
+      isDragging = true;
+    }
   }
 
   function handleMouseMove(event: MouseEvent): void {
     if (!isDragging) return;
+    if (eventState === "selected") {
+      DragMany(event);
+      return;
+    }
 
     if (locked) {
       x = Math.round((event.clientX - dragOffsetX) / 20) * 20;
@@ -138,7 +137,11 @@
       );
       hidden = true;
     }
-    if (eventState !== "createTextBox" && eventState !== "selecting") {
+    if (
+      eventState !== "createTextBox" &&
+      eventState !== "selecting" &&
+      eventState !== "selected"
+    ) {
       event_state_store.set("arrow");
     }
     // dispatch("select", null);
@@ -192,6 +195,7 @@
 
   function handleExpandStart(e: MouseEvent): void {
     ClearSelection();
+    event_state_store.set("arrow");
     typing = false;
     const target = e.target as HTMLElement;
     expand = target.id;
@@ -282,7 +286,7 @@
   function handleMoueLeave(): void {
     if (eventState === "selected") {
       for (let i = 0; i < selected.length; i++) {
-        if (selected[i].id === `textbox-${id}`) {
+        if (selected[i].id === `textbox&${id}`) {
           return;
         }
       }
@@ -316,7 +320,7 @@
   }
 
   $: {
-    if (selected.some((item) => item.id === `textbox-${id}`)) {
+    if (selected.some((item) => item.id === `textbox&${id}`)) {
       hidden = false;
       iAmSelected = true;
     } else {
@@ -328,6 +332,17 @@
   $: {
     if (eventState === "createTextBox") {
       hidden = true;
+    }
+  }
+
+  $: {
+    if (eventState.includes("typing")) {
+      const [_, eventId] = eventState.split("&");
+      if (eventId === id) {
+        typing = true;
+      }
+    } else {
+      typing = false;
     }
   }
 </script>
@@ -374,7 +389,7 @@
     class:no-select={true}
     class:active-background={expanding}
     style="cursor: {cursorStyle}; color: {fontColor}"
-    id="textbox-{id}"
+    id="textbox&{id}"
     on:input={handleChange}
     on:click={handleSingleClick}
     on:keydown={handleKeydown}

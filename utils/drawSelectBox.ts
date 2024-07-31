@@ -100,7 +100,7 @@ export function DrawSelectBox(
   selected_store.set([])
 
   textBoxesInside.forEach((textBox) => {
-    const element: HTMLElement | null = document.getElementById(`textbox-${textBox.id}`);
+    const element: HTMLElement | null = document.getElementById(`textbox&${textBox.id}`);
     if (element) {
       selected_store.update(selected => [...selected, element]);
     }

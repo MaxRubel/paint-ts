@@ -53,7 +53,7 @@ export function clearAllTextBoxes(): void {
   });
 }
 
-export function deleteTextBox(id) {
+export function deleteTextBox(id: string) {
   textBoxesStore.update((boxes) => {
     const { [id]: deletedBox, ...remainingBoxes } = boxes;
     return remainingBoxes;
