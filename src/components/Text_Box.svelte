@@ -14,7 +14,7 @@
   export let data: TextBoxType;
   export let updateTextBox: any;
 
-  $: ({ id, text, height, width } = data);
+  let { id, text, height, width } = data;
   $: x = data.x;
   $: y = data.y;
   let textareaElement: HTMLTextAreaElement;
@@ -180,15 +180,32 @@
   let startMouseX = 0;
   let startMouseY = 0;
   let expanding = false;
+  let tooSmol = false;
 
   function checkOverflow() {
     if (textContainer && textareaElement) {
-      if (textareaElement.scrollHeight > textareaElement.clientHeight) {
-        height = textareaElement.scrollHeight + 20;
+      //auto horizontal expand
+      if (
+        typing &&
+        textareaElement.scrollHeight > textareaElement.clientHeight &&
+        width < window.innerWidth * 0.5
+      ) {
+        width = width + 50;
+        return;
       }
-
-      if (textareaElement.scrollWidth > textareaElement.clientWidth) {
-        width = textareaElement.scrollWidth;
+      //vertical expand
+      if (textareaElement.scrollHeight > textareaElement.clientHeight) {
+        if (expanding) {
+          tooSmol = true;
+          // height = textareaElement.scrollHeight + 20;
+          return;
+        } else {
+          height = textareaElement.scrollHeight + 20;
+          tooSmol = false;
+          return;
+        }
+      } else {
+        tooSmol = false;
       }
     }
   }
@@ -212,6 +229,7 @@
 
   function handleExpanding(e: MouseEvent): void {
     if (!expanding) return;
+    event_state_store.set("expanding");
     const dx = e.clientX - startMouseX;
     const dy = e.clientY - startMouseY;
 
@@ -268,10 +286,12 @@
       width = newWidth;
       height = newHeight;
     }
+    checkOverflow();
     updateTextBox(id, { ...data, x, y, width, height });
   }
 
   function stopExpanding(): void {
+    event_state_store.set("arrow");
     expanding = false;
     isDragging = false;
     document.removeEventListener("mousemove", handleExpanding);
@@ -354,7 +374,9 @@
   style="top: {y}px; left: {x}px; cursor: {cursorStyle}; height: {height}px; width: {width}px;"
   class:non-selectable={!typing}
   class:no-select={!typing}
-  class:no-pointer={eventState === "selecting" || eventState === "drawing"}
+  class:no-pointer={eventState === "selecting" ||
+    eventState === "drawing" ||
+    eventState === "expanding"}
   class:iAmSelected
   on:focus={() => {
     hidden = false;
@@ -381,7 +403,9 @@
   <div id="bottom-center" class:hidden on:mousedown={handleExpandStart}></div>
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div id="bottom-right" class:hidden on:mousedown={handleExpandStart}></div>
-
+  {#if tooSmol}
+    <div class="too-smol" style="height: {height}px; width: {width}px"></div>
+  {/if}
   <textarea
     bind:this={textareaElement}
     class="text-box"
@@ -421,6 +445,14 @@
     /* overflow: hidden; */
     box-sizing: border-box;
     z-index: 100;
+  }
+
+  .too-smol {
+    background-color: rgba(231, 194, 192, 0.452);
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 500;
   }
 
   .text-box {

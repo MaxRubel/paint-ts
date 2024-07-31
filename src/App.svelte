@@ -44,7 +44,6 @@
   let xStart = 0;
   let yStart = 0;
   let locked = true;
-  let textBoxArray: TextBoxType[] = [];
 
   const unsubcribe = textBoxesStore.subscribe((value) => {
     textBoxes = value;
