@@ -1,4 +1,4 @@
-import { theme_store } from "../stores/eventState";
+import { selected_store, theme_store } from "../stores/eventState";
 import { get } from "svelte/store";
 import { textBoxesStore } from "../stores/migmaStore";
 import type { TextBoxType } from "./types/app_types";
@@ -9,8 +9,6 @@ interface TextBoxes {
 
 let overlayCanvas: HTMLCanvasElement | null = null;
 let isDrawing = false;
-// let startX = 0;
-// let startY = 0;
 
 export function initializeSelectBox(mainCanvas: HTMLCanvasElement): void {
   overlayCanvas = document.createElement("canvas");
@@ -99,10 +97,12 @@ export function DrawSelectBox(
     isComponentInRectangle(textBox, x, y, width, height),
   );
 
+  selected_store.set([])
+
   textBoxesInside.forEach((textBox) => {
-    const element = document.getElementById(`textbox-${textBox.id}`);
+    const element: HTMLElement | null = document.getElementById(`textbox-${textBox.id}`);
     if (element) {
-      element.focus();
+      selected_store.update(selected => [...selected, element]);
     }
   });
 }

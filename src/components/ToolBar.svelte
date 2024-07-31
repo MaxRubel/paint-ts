@@ -25,6 +25,7 @@
   let mode = "";
   let locked = true;
   let event_state = "";
+  let arrow = true;
 
   const unsubscribe = theme_store.subscribe((value) => {
     mode = value;
@@ -37,6 +38,18 @@
   const unsubscribe3 = event_state_store.subscribe((value) => {
     event_state = value;
   });
+
+  $: {
+    if (
+      event_state === "arrow" ||
+      event_state === "selecting" ||
+      event_state === "selected"
+    ) {
+      arrow = true;
+    } else {
+      arrow = false;
+    }
+  }
 
   onDestroy(() => {
     unsubscribe();
@@ -67,7 +80,7 @@
   <div class="second-row" style="color: white">
     <button
       on:click={handle_arrow_mode}
-      style="background-color: {event_state === 'arrow' ? '#9096ff' : ''}"
+      style="background-color: {arrow ? '#9096ff' : ''}"
     >
       <CursorPointer />
     </button>
@@ -116,8 +129,8 @@
   }
 
   .event-state {
-    position: absolute;
-    top: 80px;
+    position: fixed;
+    top: 100px;
     left: 50px;
     color: white;
   }
