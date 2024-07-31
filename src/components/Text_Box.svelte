@@ -3,12 +3,14 @@
   import {
     event_state_store,
     locked_store,
+    selected_store,
     theme_store,
   } from "../../stores/eventState";
   import { createEventDispatcher } from "svelte";
   import { deleteTextBox } from "../../stores/migmaStore";
   import type { TextBoxType } from "../../utils/types/app_types";
   import { get } from "svelte/store";
+  import { ClearSelection } from "../../utils/clearSelection";
 
   export let data: TextBoxType;
   export let updateTextBox: any;
@@ -26,7 +28,8 @@
   let expand = "";
   let locked: boolean;
   let textContainer: HTMLElement;
-
+  let selected: HTMLTextAreaElement[] = [];
+  let iAmSelected = false;
   const unsubcribe = theme_store.subscribe((value: string) => {
     theme = value;
   });
@@ -37,6 +40,10 @@
 
   const unsubscribe3 = locked_store.subscribe((value: boolean) => {
     locked = value;
+  });
+
+  const unsubscribe4 = selected_store.subscribe((value) => {
+    selected = value;
   });
 
   $: {
@@ -60,6 +67,7 @@
     unsubcribe();
     unsubcribe2();
     unsubscribe3();
+    unsubscribe4();
   });
 
   function handleChange(e: Event): void {
@@ -97,7 +105,7 @@
       textareaElement.blur();
     }
     if (eventState === "drawing") {
-      event_state_store.set("arrow");
+      // event_state_store.set("arrow");
     }
   }
 
@@ -123,10 +131,17 @@
   }
 
   function handleBlur() {
-    if (get(event_state_store) !== "createTextBox") {
+    if (eventState === "selecting") {
+      textareaElement.setSelectionRange(
+        textareaElement.selectionStart,
+        textareaElement.selectionStart,
+      );
+      hidden = true;
+    }
+    if (eventState !== "createTextBox" && eventState !== "selecting") {
       event_state_store.set("arrow");
     }
-    dispatch("select", null);
+    // dispatch("select", null);
     if (textareaElement.value === "") {
       deleteTextBox(id);
     }
@@ -153,6 +168,7 @@
 
   function handleFocus() {
     dispatch("select", `textbox&${id}`);
+    hidden = false;
   }
   let startX = 0;
   let startY = 0;
@@ -162,7 +178,20 @@
   let startMouseY = 0;
   let expanding = false;
 
+  function checkOverflow() {
+    if (textContainer && textareaElement) {
+      if (textareaElement.scrollHeight > textareaElement.clientHeight) {
+        height = textareaElement.scrollHeight + 20;
+      }
+
+      if (textareaElement.scrollWidth > textareaElement.clientWidth) {
+        width = textareaElement.scrollWidth;
+      }
+    }
+  }
+
   function handleExpandStart(e: MouseEvent): void {
+    ClearSelection();
     typing = false;
     const target = e.target as HTMLElement;
     expand = target.id;
@@ -177,21 +206,8 @@
     document.addEventListener("mouseup", stopExpanding);
   }
 
-  function checkOverflow() {
-    if (textContainer && textareaElement) {
-      if (textareaElement.scrollHeight > textareaElement.clientHeight) {
-        height = textareaElement.scrollHeight + 20;
-      }
-
-      if (textareaElement.scrollWidth > textareaElement.clientWidth) {
-        width = textareaElement.scrollWidth;
-      }
-    }
-  }
-
   function handleExpanding(e: MouseEvent): void {
     if (!expanding) return;
-    event_state_store.set("arrow");
     const dx = e.clientX - startMouseX;
     const dy = e.clientY - startMouseY;
 
@@ -259,12 +275,31 @@
     setTimeout(checkOverflow, 0);
   }
 
+  function handleMouseEnter(): void {
+    hidden = false;
+  }
+
+  function handleMoueLeave(): void {
+    if (eventState === "selected") {
+      for (let i = 0; i < selected.length; i++) {
+        if (selected[i].id === `textbox-${id}`) {
+          return;
+        }
+      }
+    }
+    if (!expanding) {
+      hidden = true;
+    }
+  }
+
   $: {
     if (eventState.includes("typing")) {
       const [_, eventId] = eventState.split("&");
       if (eventId === id) {
         cursorStyle = "text";
       }
+    } else if (eventState === "selecting") {
+      cursorStyle = "default";
     } else {
       cursorStyle = "grab";
     }
@@ -279,6 +314,22 @@
       fontColor = "black";
     }
   }
+
+  $: {
+    if (selected.some((item) => item.id === `textbox-${id}`)) {
+      hidden = false;
+      iAmSelected = true;
+    } else {
+      hidden = true;
+      iAmSelected = false;
+    }
+  }
+
+  $: {
+    if (eventState === "createTextBox") {
+      hidden = true;
+    }
+  }
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -288,14 +339,16 @@
   style="top: {y}px; left: {x}px; cursor: {cursorStyle}; height: {height}px; width: {width}px;"
   class:non-selectable={!typing}
   class:no-select={!typing}
-  on:mouseenter={() => {
+  class:no-pointer={eventState === "selecting" || eventState === "drawing"}
+  class:iAmSelected
+  on:focus={() => {
     hidden = false;
   }}
-  on:mouseleave={() => {
-    if (!expanding) {
-      hidden = true;
-    }
+  on:blur={() => {
+    hidden = true;
   }}
+  on:mouseenter={handleMouseEnter}
+  on:mouseleave={handleMoueLeave}
 >
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div id="top-left" class:hidden on:mousedown={handleExpandStart}></div>
@@ -317,8 +370,8 @@
   <textarea
     bind:this={textareaElement}
     class="text-box"
-    class:non-selectable={!typing}
-    class:no-select={!typing}
+    class:non-selectable={true}
+    class:no-select={true}
     class:active-background={expanding}
     style="cursor: {cursorStyle}; color: {fontColor}"
     id="textbox-{id}"
@@ -407,6 +460,10 @@
     background-color: rgb(113, 113, 113);
   }
 
+  .iAmSelected {
+    background-color: rgba(43, 43, 43, 0.636);
+  }
+
   #top-center {
     position: absolute;
     height: 12px;
@@ -489,5 +546,9 @@
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+  }
+
+  .no-pointer {
+    pointer-events: none;
   }
 </style>

@@ -1,26 +1,30 @@
-import { theme_store } from '../stores/eventState'
-import { get } from 'svelte/store';
+import { selected_store, theme_store } from "../stores/eventState";
+import { get } from "svelte/store";
+import { textBoxesStore } from "../stores/migmaStore";
+import type { TextBoxType } from "./types/app_types";
+
+interface TextBoxes {
+  [id: string]: TextBoxType;
+}
 
 let overlayCanvas: HTMLCanvasElement | null = null;
 let isDrawing = false;
-// let startX = 0;
-// let startY = 0;
 
 export function initializeSelectBox(mainCanvas: HTMLCanvasElement): void {
-  overlayCanvas = document.createElement('canvas');
-  overlayCanvas.style.position = 'absolute';
-  overlayCanvas.style.left = mainCanvas.offsetLeft + 'px';
-  overlayCanvas.style.top = mainCanvas.offsetTop + 'px';
+  overlayCanvas = document.createElement("canvas");
+  overlayCanvas.style.position = "absolute";
+  overlayCanvas.style.left = mainCanvas.offsetLeft + "px";
+  overlayCanvas.style.top = mainCanvas.offsetTop + "px";
   overlayCanvas.width = mainCanvas.width;
   overlayCanvas.height = mainCanvas.height;
-  overlayCanvas.style.pointerEvents = 'none';
+  overlayCanvas.style.pointerEvents = "none";
   mainCanvas.parentNode?.insertBefore(overlayCanvas, mainCanvas.nextSibling);
 }
 
 export function ClearSelectionRect(): void {
   isDrawing = false;
   if (overlayCanvas) {
-    const ctx = overlayCanvas.getContext('2d');
+    const ctx = overlayCanvas.getContext("2d");
     if (ctx) {
       ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
     }
@@ -35,11 +39,15 @@ export function removeOverlayCanvas(): void {
   overlayCanvas = null;
 }
 
-export function DrawSelectBox(e: PointerEvent, xStart: number, yStart: number): void {
+export function DrawSelectBox(
+  e: PointerEvent,
+  xStart: number,
+  yStart: number,
+): void {
   const borderRadius = 10;
   if (!overlayCanvas) {
-    console.error("no canvas initialized")
-    return
+    console.error("no canvas initialized");
+    return;
   }
   const xCurrent = e.clientX - overlayCanvas.offsetLeft;
   const yCurrent = e.clientY - overlayCanvas.offsetTop;
@@ -47,11 +55,11 @@ export function DrawSelectBox(e: PointerEvent, xStart: number, yStart: number): 
   let width = xCurrent - xStart;
   let height = yCurrent - yStart;
 
-  let color = get(theme_store) === 'dark' ? 'lightgray' : 'black';
-  const ctx = overlayCanvas.getContext('2d')
+  let color = get(theme_store) === "dark" ? "lightgray" : "black";
+  const ctx = overlayCanvas.getContext("2d");
   if (!ctx) {
-    console.error('no ctx found')
-    return
+    console.error("no ctx found");
+    return;
   }
   ctx.strokeStyle = color;
 
@@ -70,11 +78,46 @@ export function DrawSelectBox(e: PointerEvent, xStart: number, yStart: number): 
   ctx.lineTo(x + width - adjustedRadius, y);
   ctx.quadraticCurveTo(x + width, y, x + width, y + adjustedRadius);
   ctx.lineTo(x + width, y + height - adjustedRadius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - adjustedRadius, y + height);
+  ctx.quadraticCurveTo(
+    x + width,
+    y + height,
+    x + width - adjustedRadius,
+    y + height,
+  );
   ctx.lineTo(x + adjustedRadius, y + height);
   ctx.quadraticCurveTo(x, y + height, x, y + height - adjustedRadius);
   ctx.lineTo(x, y + adjustedRadius);
   ctx.quadraticCurveTo(x, y, x + adjustedRadius, y);
   ctx.closePath();
   ctx.stroke();
+
+  const textBoxes = get(textBoxesStore);
+
+  const textBoxesInside = Object.values(textBoxes).filter((textBox) =>
+    isComponentInRectangle(textBox, x, y, width, height),
+  );
+
+  selected_store.set([])
+
+  textBoxesInside.forEach((textBox) => {
+    const element: HTMLElement | null = document.getElementById(`textbox-${textBox.id}`);
+    if (element) {
+      selected_store.update(selected => [...selected, element]);
+    }
+  });
+}
+
+function isComponentInRectangle(
+  component: TextBoxType,
+  rectX: number,
+  rectY: number,
+  rectWidth: number,
+  rectHeight: number,
+): boolean {
+  return (
+    component.x < rectX + rectWidth &&
+    component.x + component.width > rectX &&
+    component.y < rectY + rectHeight &&
+    component.y + component.height > rectY
+  );
 }

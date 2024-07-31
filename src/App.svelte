@@ -8,7 +8,11 @@
     clearAllTextBoxes,
     deleteTextBox,
   } from "../stores/migmaStore";
-  import { event_state_store, locked_store } from "../stores/eventState";
+  import {
+    event_state_store,
+    locked_store,
+    selected_store,
+  } from "../stores/eventState";
   import { theme_store } from "../stores/eventState";
   import type { TextBoxType } from "../utils/types/app_types";
   import { DrawRectangle } from "../utils/drawRectangle";
@@ -24,13 +28,16 @@
     DrawSelectBox,
     initializeSelectBox,
   } from "../utils/drawSelectBox";
+  import handleCursor from "../utils/handleCursor";
+  import { ClearSelection } from "../utils/clearSelection";
+  import { get } from "svelte/store";
 
   let mode = "dark";
   let catSmootch = false;
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
   let size = 7;
-  let textBoxes: { [key: string]: TextBoxType };
+  let textBoxes: TextBoxType;
   let cursor = "arrow";
   let event_state = "arrow";
   let selected: string | null;
@@ -54,22 +61,8 @@
     locked = value;
   });
 
-  //handle cursor type:
   $: {
-    switch (event_state) {
-      case "createTextBox":
-        cursor = "text";
-        break;
-      case "drawing":
-        cursor = "crosshair";
-        break;
-      case "arrow":
-        cursor = "default";
-        break;
-      case "rectangle-draw":
-        cursor = "crosshair";
-        break;
-    }
+    cursor = handleCursor(event_state);
   }
 
   const handleClick = (e: MouseEvent) => {
@@ -151,7 +144,19 @@
   }
 
   function handlePointerDown(e: PointerEvent): void {
+    function startSelecting() {
+      xStart = e.clientX;
+      yStart = e.clientY;
+      event_state_store.set("selecting");
+      initializeSelectBox(canvas);
+    }
     switch (event_state) {
+      case "selected":
+        if ((e.target as HTMLElement)?.id === "main-canvas") {
+          ClearSelection();
+          startSelecting();
+        }
+        break;
       case "drawing":
         DrawBrushStroke(ctx, size, e);
         break;
@@ -160,21 +165,8 @@
         yStart = e.clientY;
         break;
       case "arrow":
-        xStart = e.clientX;
-        yStart = e.clientY;
-        initializeSelectBox(canvas);
+        startSelecting();
         break;
-    }
-  }
-
-  function handlePointerUp(): void {
-    switch (event_state) {
-      case "drawing":
-        EndBrushStroke();
-        break;
-      case "arrow":
-        ClearSelectionRect();
-        console.log("delete rect");
     }
   }
 
@@ -187,8 +179,23 @@
       case "rectangle-draw":
         DrawRectangle(ctx, canvas, e, xStart, yStart);
         break;
-      case "arrow":
+      case "selecting":
         DrawSelectBox(e, xStart, yStart);
+        break;
+    }
+  }
+
+  function handlePointerUp(e: any): void {
+    switch (event_state) {
+      case "drawing":
+        EndBrushStroke();
+        break;
+      case "selecting":
+        ClearSelectionRect();
+        event_state_store.set("selected");
+        if (get(selected_store).length === 0) {
+          event_state_store.set("arrow");
+        }
         break;
     }
   }
@@ -220,26 +227,22 @@
 
   //----bottom-tool-bar-------------------
   function handle_textbox_mode(): void {
-    if (event_state === "createTextBox") {
-      event_state_store.set("arrow");
-    } else {
-      event_state_store.set("createTextBox");
-    }
+    ClearSelection();
+    event_state_store.set("createTextBox");
   }
 
   function handle_drawing_mode(): void {
-    if (event_state === "drawing") {
-      event_state_store.set("arrow");
-    } else {
-      event_state_store.set("drawing");
-    }
+    ClearSelection();
+    event_state_store.set("drawing");
   }
 
   function handle_new_rectangle(): void {
+    ClearSelection();
     event_state_store.set("rectangle-draw");
   }
 
   function handle_arrow_mode(): void {
+    ClearSelection();
     event_state_store.set("arrow");
   }
 
@@ -274,6 +277,7 @@
       <TextBox data={textBox} {updateTextBox} on:select={handleSelect} />
     {/each}
     <canvas
+      id="main-canvas"
       style="cursor: {cursor}"
       class="full-size"
       class:light={mode === "light"}
