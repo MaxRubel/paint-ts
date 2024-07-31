@@ -75,7 +75,15 @@
 
   function handle_delete() {
     if (event_state.includes("typing")) return;
-    deleteTextBox(selected);
+    const selectedArray = get(selected_store);
+    if (selectedArray.length > 0) {
+      selectedArray.forEach((textElement) => {
+        const [_, id] = textElement.id.split("&");
+        deleteTextBox(id);
+        ClearSelection();
+        event_state_store.set("arrow");
+      });
+    } else deleteTextBox(selected);
   }
 
   function handleKeyup(e: KeyboardEvent) {
