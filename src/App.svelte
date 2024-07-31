@@ -62,7 +62,7 @@
   });
 
   $: {
-    cursor = handleCursor(event_state);
+    cursor = handleCursor(event_state, cursor);
   }
 
   const handleClick = (e: MouseEvent) => {
@@ -180,6 +180,7 @@
 
   function handlePointerMove(e: PointerEvent) {
     if (e.buttons !== 1) return; //stop right click from drawing
+
     switch (event_state) {
       case "drawing":
         DrawBrushStroke(ctx, size, e);
