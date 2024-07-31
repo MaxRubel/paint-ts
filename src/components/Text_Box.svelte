@@ -142,7 +142,7 @@
       eventState !== "selecting" &&
       eventState !== "selected"
     ) {
-      event_state_store.set("arrow");
+      if (!eventState.includes("expanding")) event_state_store.set("arrow");
     }
     // dispatch("select", null);
     if (textareaElement.value === "") {
@@ -225,11 +225,38 @@
     startMouseY = e.clientY;
     document.addEventListener("mousemove", handleExpanding);
     document.addEventListener("mouseup", stopExpanding);
+
+    switch (expand) {
+      case "top-left":
+        event_state_store.set("expanding-nw");
+        break;
+      case "top-right":
+        event_state_store.set("expanding-ne");
+        break;
+      case "bottom-left":
+        event_state_store.set("expanding-sw");
+        break;
+      case "bottom-right":
+        event_state_store.set("expanding-se");
+        break;
+      case "left":
+        event_state_store.set("expanding-w");
+        break;
+      case "right":
+        event_state_store.set("expanding-e");
+        break;
+      case "top-center":
+        event_state_store.set("expanding-n");
+        break;
+      case "bottom-center":
+        event_state_store.set("expanding-s");
+        break;
+    }
   }
 
   function handleExpanding(e: MouseEvent): void {
     if (!expanding) return;
-    event_state_store.set("expanding");
+
     const dx = e.clientX - startMouseX;
     const dy = e.clientY - startMouseY;
 
@@ -324,7 +351,7 @@
       }
     } else if (eventState === "selecting") {
       cursorStyle = "default";
-    } else {
+    } else if (!eventState.includes("expanding")) {
       cursorStyle = "grab";
     }
   }
@@ -376,7 +403,7 @@
   class:no-select={!typing}
   class:no-pointer={eventState === "selecting" ||
     eventState === "drawing" ||
-    eventState === "expanding"}
+    eventState.includes("expanding")}
   class:iAmSelected
   on:focus={() => {
     hidden = false;
@@ -431,6 +458,7 @@
     /* background-color: transparent; */
     resize: both;
     background-color: rgb(113, 113, 113);
+    overflow: hidden;
   }
 
   .hidden {
@@ -448,7 +476,7 @@
   }
 
   .too-smol {
-    background-color: rgba(231, 194, 192, 0.452);
+    background-color: rgba(231, 194, 192, 0);
     position: absolute;
     top: 0;
     left: 0;
