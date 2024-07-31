@@ -153,6 +153,7 @@
 
   function handleFocus() {
     dispatch("select", `textbox&${id}`);
+    hidden = false;
   }
   let startX = 0;
   let startY = 0;
@@ -288,6 +289,9 @@
   style="top: {y}px; left: {x}px; cursor: {cursorStyle}; height: {height}px; width: {width}px;"
   class:non-selectable={!typing}
   class:no-select={!typing}
+  on:focus={() => {
+    hidden = false;
+  }}
   on:mouseenter={() => {
     hidden = false;
   }}

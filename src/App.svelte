@@ -30,7 +30,7 @@
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
   let size = 7;
-  let textBoxes: { [key: string]: TextBoxType };
+  let textBoxes: TextBoxType;
   let cursor = "arrow";
   let event_state = "arrow";
   let selected: string | null;
