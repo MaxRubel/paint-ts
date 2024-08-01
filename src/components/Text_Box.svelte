@@ -17,7 +17,6 @@
   let { id, height, width } = data;
   $: x = data.x;
   $: y = data.y;
-  $: console.log("current pos is: ", { x, y });
 
   let textareaElement: HTMLTextAreaElement;
   let isDragging = false;
