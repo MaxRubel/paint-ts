@@ -18,6 +18,7 @@
   import {
     event_state_store,
     locked_store,
+    selected_store,
     theme_store,
   } from "../../stores/eventState";
   import { onDestroy } from "svelte";
@@ -26,6 +27,7 @@
   let locked = true;
   let event_state = "";
   let arrow = true;
+  let selected = [];
 
   const unsubscribe = theme_store.subscribe((value) => {
     mode = value;
@@ -37,6 +39,10 @@
 
   const unsubscribe3 = event_state_store.subscribe((value) => {
     event_state = value;
+  });
+
+  const unsubscribe4 = selected_store.subscribe((value) => {
+    selected = value;
   });
 
   $: {
@@ -55,12 +61,14 @@
     unsubscribe();
     unsubscribe2();
     unsubscribe3();
+    unsubscribe4();
   });
 </script>
 
 <div class="tool-bar">
   <div class="event-state">
-    {event_state}
+    <div><h3>{event_state}</h3></div>
+    <div>selected: {selected.length}</div>
   </div>
   <div class="top-row">
     <button on:click={handleUndo}>Undo</button>
@@ -130,8 +138,12 @@
 
   .event-state {
     position: fixed;
-    top: 100px;
+    text-align: left;
+    top: 90px;
     left: 50px;
     color: white;
+  }
+  h3 {
+    margin-bottom: 10px;
   }
 </style>

@@ -1,13 +1,13 @@
-function expandingCursors(event_state: string): string{
+function expandingCursors(event_state: string): string {
   let cursor = 'default'
-  const [_,type] = event_state.split("-")
-  if(type === 'n' || type === 's'){
+  const [_, type] = event_state.split("-")
+  if (type === 'n' || type === 's') {
     cursor = 'ns-resize'
-  } else if (type === 'w' || type === 'e'){
+  } else if (type === 'w' || type === 'e') {
     cursor = 'ew-resize'
-  } else if(type === 'nw' || type === 'se'){
+  } else if (type === 'nw' || type === 'se') {
     cursor = 'nwse-resize'
-  } else if(type === 'ne' || type === 'sw'){
+  } else if (type === 'ne' || type === 'sw') {
     cursor = 'nesw-resize'
   }
   return cursor
@@ -15,7 +15,7 @@ function expandingCursors(event_state: string): string{
 
 
 export default function handleCursor(event_state: string, cursor: string): string {
-  if(event_state.includes("expanding")){
+  if (event_state.includes("expanding")) {
     cursor = expandingCursors(event_state)
     return cursor
   }
@@ -27,6 +27,9 @@ export default function handleCursor(event_state: string, cursor: string): strin
       cursor = "crosshair";
       break;
     case "arrow":
+      cursor = "default";
+      break;
+    case "selected":
       cursor = "default";
       break;
     case "rectangle-draw":

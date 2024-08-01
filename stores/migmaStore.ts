@@ -5,7 +5,7 @@ import { locked_store } from "./eventState";
 import { get } from "svelte/store";
 import type { TextBoxType } from "../utils/types/app_types";
 
-interface TextBoxMap {
+export interface TextBoxMap {
   [key: string]: TextBoxType;
 }
 
