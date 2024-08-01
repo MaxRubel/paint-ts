@@ -14,7 +14,7 @@
   export let data: TextBoxType;
   export let updateTextBox: any;
 
-  let { id, text, height, width } = data;
+  let { id, height, width } = data;
   $: x = data.x;
   $: y = data.y;
   let textareaElement: HTMLTextAreaElement;
@@ -323,7 +323,7 @@
     isDragging = false;
     document.removeEventListener("mousemove", handleExpanding);
     document.removeEventListener("mouseup", stopExpanding);
-    setTimeout(checkOverflow, 0);
+    checkOverflow();
   }
 
   function handleMouseEnter(): void {

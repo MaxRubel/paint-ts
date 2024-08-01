@@ -14,7 +14,6 @@
     selected_store,
   } from "../stores/eventState";
   import { theme_store } from "../stores/eventState";
-  import type { TextBoxType } from "../utils/types/app_types";
   import { DrawRectangle } from "../utils/drawRectangle";
   import {
     ClearOldPathData,
@@ -31,13 +30,14 @@
   import handleCursor from "../utils/handleCursor";
   import { ClearSelection } from "../utils/clearSelection";
   import { get } from "svelte/store";
+  import type { TextBoxMap } from "../stores/migmaStore";
 
   let mode = "dark";
   let catSmootch = false;
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
   let size = 7;
-  let textBoxes: TextBoxType;
+  let textBoxes: TextBoxMap;
   let cursor = "arrow";
   let event_state = "arrow";
   let selected: string = "";

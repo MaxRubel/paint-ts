@@ -5,7 +5,11 @@ import { locked_store } from "./eventState";
 import { get } from "svelte/store";
 import type { TextBoxType } from "../utils/types/app_types";
 
-export const textBoxesStore = writable<TextBoxType>({});
+interface TextBoxMap {
+  [key: string]: TextBoxType;
+}
+
+export const textBoxesStore = writable<TextBoxMap>({});
 
 export function createNewTextBox(
   e: MouseEvent,
