@@ -1,5 +1,4 @@
 <script>
-  export let handleUndo;
   export let handleClear;
   export let handleDark;
   export let handleLock;
@@ -22,6 +21,7 @@
     theme_store,
   } from "../../stores/eventState";
   import { onDestroy } from "svelte";
+  import { HandleUndo } from "../../stores/undoStore";
 
   let mode = "";
   let locked = true;
@@ -71,7 +71,7 @@
     <div>selected: {selected.length}</div>
   </div>
   <div class="top-row">
-    <button on:click={handleUndo}>Undo</button>
+    <button on:click={HandleUndo}>Undo</button>
     <button on:click={handleClear}>Clear</button>
     <button on:click={handleDark}>
       {mode === "light" ? "Dark" : "Light"}

@@ -7,16 +7,18 @@
     theme_store,
   } from "../../stores/eventState";
   import { createEventDispatcher } from "svelte";
-  import { deleteTextBox } from "../../stores/migmaStore";
+  import { deleteTextBox } from "../../stores/textBoxStore";
   import type { TextBoxType } from "../../utils/types/app_types";
-  import { ClearSelection } from "../../utils/clearSelection";
   import { StartDragMany, DragMany } from "../../utils/dragMultiple";
+  import { AddUndoItem } from "../../stores/undoStore";
   export let data: TextBoxType;
   export let updateTextBox: any;
 
   let { id, height, width } = data;
   $: x = data.x;
   $: y = data.y;
+  $: console.log("current pos is: ", { x, y });
+
   let textareaElement: HTMLTextAreaElement;
   let isDragging = false;
   let dragOffsetX: number = 0;
@@ -31,6 +33,7 @@
   let textContainer: HTMLElement;
   let selected: HTMLTextAreaElement[] = [];
   let iAmSelected = false;
+  let typeStart = "";
 
   const unsubcribe = theme_store.subscribe((value: string) => {
     theme = value;
@@ -97,23 +100,21 @@
     if (eventState === "selected" && selected.length === 1) {
       selected_store.set([textareaElement]);
     }
-    // if (eventState === "arrow") {
-    //   selected_store.set([textareaElement]);
-    // }
     if (!typing) {
       event.preventDefault();
       isDragging = true;
       dragOffsetX = event.clientX - x;
       dragOffsetY = event.clientY - y;
 
+      AddUndoItem({
+        action: "draggedSingle",
+        data: { id, x, y },
+      });
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     }
     if (isDragging) {
       textareaElement.blur();
-    }
-    if (eventState === "drawing") {
-      // event_state_store.set("arrow");
     }
     if (eventState === "selected" && iAmSelected) {
       StartDragMany(event);
@@ -147,11 +148,11 @@
   }
 
   function handleBlur() {
+    textareaElement.setSelectionRange(
+      textareaElement.selectionStart,
+      textareaElement.selectionStart,
+    );
     if (eventState === "selecting") {
-      textareaElement.setSelectionRange(
-        textareaElement.selectionStart,
-        textareaElement.selectionStart,
-      );
       hidden = true;
     }
     if (
@@ -161,16 +162,20 @@
     ) {
       if (!eventState.includes("expanding")) {
         selected_store.set([textareaElement]);
-        // event_state_store.set("arrow");
       }
     }
     if (textareaElement.value === "") {
       deleteTextBox(id);
     }
-    textareaElement.setSelectionRange(
-      textareaElement.selectionStart,
-      textareaElement.selectionStart,
-    );
+    if (eventState.includes("typing")) {
+      AddUndoItem({
+        action: "typed",
+        data: {
+          id,
+          start: typeStart,
+        },
+      });
+    }
     checkOverflow();
   }
 
@@ -368,6 +373,7 @@
   }
 
   $: {
+    //handle cursor:
     if (eventState.includes("typing")) {
       const [_, eventId] = eventState.split("&");
       if (eventId === id) {
@@ -383,6 +389,7 @@
   let fontColor: string = "";
 
   $: {
+    //handle theme
     if (theme === "dark") {
       fontColor = "lightgray";
     } else {
@@ -397,10 +404,12 @@
   }
 
   $: {
+    //turn on typing mode
     if (eventState.includes("typing")) {
       const [_, eventId] = eventState.split("&");
       if (eventId === id) {
         typing = true;
+        typeStart = textareaElement.value;
       }
     } else {
       typing = false;

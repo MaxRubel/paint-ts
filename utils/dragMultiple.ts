@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { locked_store, selected_store } from "../stores/eventState";
-import { textBoxesStore, updateTextBox } from "../stores/migmaStore";
+import { textBoxesStore, updateTextBox } from "../stores/textBoxStore";
 
 let startX = 0;
 let startY = 0;

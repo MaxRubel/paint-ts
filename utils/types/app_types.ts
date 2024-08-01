@@ -16,3 +16,8 @@ export interface RectangleType {
   color: string;
   fill: string;
 }
+
+export interface UndoType {
+  action: string,
+  data: any
+}
