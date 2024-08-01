@@ -29,9 +29,9 @@ export function createNewTextBox(
   }
   const newBox: TextBoxType = {
     id: newKey,
+    type: 'textbox',
     text: "",
-    x,
-    y,
+    x, y,
     height: 80,
     width: 240,
   };
