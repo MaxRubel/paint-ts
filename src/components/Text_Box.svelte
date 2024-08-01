@@ -11,12 +11,14 @@
   import type { TextBoxType } from "../../utils/types/app_types";
   import { StartDragMany, DragMany } from "../../utils/dragMultiple";
   import { AddUndoItem } from "../../stores/undoStore";
+  import { updateTextBox } from "../../stores/textBoxStore";
   export let data: TextBoxType;
-  export let updateTextBox: any;
 
-  let { id, height, width } = data;
+  let { id } = data;
   $: x = data.x;
   $: y = data.y;
+  $: height = data.height;
+  $: width = data.width;
 
   let textareaElement: HTMLTextAreaElement;
   let isDragging = false;
@@ -138,7 +140,7 @@
       x = event.clientX - dragOffsetX;
       y = event.clientY - dragOffsetY;
     }
-    updateTextBox(id, { ...data, x, y });
+    updateTextBox(id, { x, y });
   }
 
   function handleMouseUp(event: MouseEvent): void {
@@ -167,6 +169,7 @@
       }
     }
     if (textareaElement.value === "") {
+      //auto remove empty text boxes
       deleteTextBox(id);
     }
     if (eventState.includes("typing")) {
@@ -179,6 +182,7 @@
       });
     }
     checkOverflow();
+    updateTextBox(id, { x, y, height, width });
   }
 
   function handleSingleClick() {
@@ -222,7 +226,9 @@
         textareaElement.scrollHeight > textareaElement.clientHeight &&
         width < window.innerWidth * 0.5
       ) {
+        console.log("helo");
         width = width + 50;
+        updateTextBox(id, { x, y, width, height });
         return;
       }
       //vertical expand
@@ -232,6 +238,7 @@
           return;
         } else {
           height = textareaElement.scrollHeight + 20;
+          updateTextBox(id, { ...data, x, y, width, height });
           tooSmol = false;
           return;
         }
@@ -255,6 +262,12 @@
     startHeight = height;
     startMouseX = e.clientX;
     startMouseY = e.clientY;
+
+    AddUndoItem({
+      action: "expanded",
+      data: { id, x, y, width, height },
+    });
+
     document.addEventListener("mousemove", handleExpanding);
     document.addEventListener("mouseup", stopExpanding);
 
@@ -346,7 +359,6 @@
       height = newHeight;
     }
     checkOverflow();
-    updateTextBox(id, { ...data, x, y, width, height });
   }
 
   function stopExpanding(): void {

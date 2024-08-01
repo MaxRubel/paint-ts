@@ -4,7 +4,6 @@
   import {
     createNewTextBox,
     textBoxesStore,
-    updateTextBox,
     clearAllTextBoxes,
     deleteTextBox,
   } from "../stores/textBoxStore";
@@ -91,7 +90,7 @@
   function handleKeyup(e: KeyboardEvent) {
     if (event_state.includes("typing")) return;
     switch (e.key) {
-      case "p":
+      case "d":
         handle_drawing_mode();
         break;
       case "t":
@@ -151,7 +150,17 @@
     ClearUndoStore();
   }
 
+  document.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+  });
+
+  let oldState: string;
+
   function handlePointerDown(e: PointerEvent): void {
+    oldState = event_state;
+    if (e.buttons === 2) {
+      event_state_store.set("erasing");
+    }
     function startSelecting() {
       xStart = e.clientX;
       yStart = e.clientY;
@@ -210,6 +219,8 @@
           event_state_store.set("arrow");
         }
         break;
+      case "erasing":
+        event_state_store.set(oldState);
     }
   }
 
@@ -277,7 +288,7 @@
       <img src="/high5.webp" alt="meh" class="image" />
     {/if}
     {#each Object.values(textBoxes) as textBox (textBox.id)}
-      <TextBox data={textBox} {updateTextBox} />
+      <TextBox data={textBox} />
     {/each}
     <canvas
       id="main-canvas"

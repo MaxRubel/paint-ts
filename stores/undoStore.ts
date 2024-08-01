@@ -1,5 +1,6 @@
 import { get, writable } from "svelte/store";
 import { SplicePaths } from "../utils/drawBrushStroke";
+import type { UndoBrushStroke, UndoDragSingle, UndoExpand, UndoTyping } from "../utils/types/undo_types";
 import type { UndoType } from "../utils/types/app_types";
 import { deleteTextBox, updateTextBox } from "./textBoxStore";
 import { event_state_store } from "./eventState";
@@ -33,16 +34,20 @@ export function HandleUndo() {
       break;
     case "draggedSingle":
       undoDragSingle(lastAction)
+      break;
+    case "expanded":
+      undoExpand(lastAction)
+      break;
   }
 }
 
-function undoBrushStroke(lastAction) {
+function undoBrushStroke(lastAction: UndoBrushStroke) {
   const { start, end } = lastAction.data;
   SplicePaths(start, end);
   popLastItem();
 }
 
-function undoTyping(lastAction: UndoType) {
+function undoTyping(lastAction: UndoTyping) {
   const oldState = get(event_state_store)
   const { id, start } = lastAction.data
   if (start) {
@@ -56,10 +61,16 @@ function undoTyping(lastAction: UndoType) {
   popLastItem();
 }
 
-function undoDragSingle(lastAction) {
+function undoDragSingle(lastAction: UndoDragSingle) {
   const { id, x, y } = lastAction.data
   updateTextBox(id, { x, y })
   popLastItem();
+}
+
+function undoExpand(lastAction: UndoExpand){
+  const {id, x, y, height, width} = lastAction.data
+  updateTextBox(id, { x, y, height, width })
+  popLastItem()
 }
 
 function popLastItem() {
