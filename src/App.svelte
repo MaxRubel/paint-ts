@@ -158,6 +158,9 @@
       event_state_store.set("selecting");
       initializeSelectBox(canvas);
     }
+    if (event_state.includes("typing")) {
+      event_state_store.set("arrow");
+    }
     switch (event_state) {
       case "selected":
         if ((e.target as HTMLElement)?.id === "main-canvas") {

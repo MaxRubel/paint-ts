@@ -1,4 +1,5 @@
 export interface TextBoxType {
+  type: 'textbox'
   id: string;
   text: string;
   x: number;

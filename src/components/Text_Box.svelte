@@ -99,6 +99,9 @@
     if (eventState === "selected" && selected.length === 1) {
       selected_store.set([textareaElement]);
     }
+    if (eventState.includes("typing")) {
+      textareaElement.focus();
+    }
     if (!typing) {
       event.preventDefault();
       isDragging = true;
@@ -347,7 +350,12 @@
   }
 
   function stopExpanding(): void {
-    event_state_store.set(oldState);
+    if (oldState.includes("typing")) {
+      event_state_store.set("arrow");
+    } else {
+      event_state_store.set(oldState);
+    }
+
     expanding = false;
     isDragging = false;
     document.removeEventListener("mousemove", handleExpanding);
@@ -357,6 +365,13 @@
 
   function handleMouseEnter(): void {
     hidden = false;
+    if (eventState.includes("typing")) {
+      if (iAmSelected) {
+        cursorStyle = "text";
+      } else {
+        cursorStyle = "grab";
+      }
+    }
   }
 
   function handleMoueLeave(): void {
@@ -368,6 +383,9 @@
     }
     if (!expanding && !iAmSelected) {
       hidden = true;
+    }
+    if (eventState.includes("typing")) {
+      cursorStyle = "default";
     }
   }
 
