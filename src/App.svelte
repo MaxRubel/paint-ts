@@ -254,15 +254,6 @@
     ClearSelection();
     event_state_store.set("arrow");
   }
-
-  function handleSelect(e: CustomEvent<string>) {
-    if (e.detail) {
-      const [_, id] = e.detail.split("&");
-      selected = id;
-    } else {
-      selected = "";
-    }
-  }
 </script>
 
 <main>
@@ -283,7 +274,7 @@
       <img src="/high5.webp" alt="meh" class="image" />
     {/if}
     {#each Object.values(textBoxes) as textBox (textBox.id)}
-      <TextBox data={textBox} {updateTextBox} on:select={handleSelect} />
+      <TextBox data={textBox} {updateTextBox} />
     {/each}
     <canvas
       id="main-canvas"

@@ -46,6 +46,15 @@
 
   const unsubscribe4 = selected_store.subscribe((value) => {
     selected = value;
+    if (selected.some((item) => item.id === `textbox&${id}`)) {
+      iAmSelected = true;
+      if (selected.length > 1) {
+        hidden = false;
+      }
+    } else {
+      iAmSelected = false;
+      hidden = true;
+    }
   });
 
   const dispatch = createEventDispatcher();
@@ -78,11 +87,19 @@
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       textareaElement.blur();
+      event_state_store.set("arrow");
+      selected_store.set([]);
     }
   }
 
   //---------Drag and Drop---------------------------
   function handleMouseDown(event: MouseEvent): void {
+    if (eventState === "selected" && selected.length === 1) {
+      selected_store.set([textareaElement]);
+    }
+    // if (eventState === "arrow") {
+    //   selected_store.set([textareaElement]);
+    // }
     if (!typing) {
       event.preventDefault();
       isDragging = true;
@@ -106,7 +123,7 @@
 
   function handleMouseMove(event: MouseEvent): void {
     if (!isDragging) return;
-    if (eventState === "selected") {
+    if (eventState === "selected" && selected.length > 1) {
       DragMany(event);
       return;
     }
@@ -142,9 +159,11 @@
       eventState !== "selecting" &&
       eventState !== "selected"
     ) {
-      if (!eventState.includes("expanding")) event_state_store.set("arrow");
+      if (!eventState.includes("expanding")) {
+        selected_store.set([textareaElement]);
+        // event_state_store.set("arrow");
+      }
     }
-    // dispatch("select", null);
     if (textareaElement.value === "") {
       deleteTextBox(id);
     }
@@ -156,6 +175,11 @@
   }
 
   function handleSingleClick() {
+    if (eventState === "arrow") {
+      selected_store.set([textareaElement]);
+    }
+
+    event_state_store.set("selected");
     textareaElement.focus();
   }
 
@@ -173,6 +197,7 @@
     dispatch("select", `textbox&${id}`);
     hidden = false;
   }
+
   let startX = 0;
   let startY = 0;
   let startWidth = 0;
@@ -197,7 +222,6 @@
       if (textareaElement.scrollHeight > textareaElement.clientHeight) {
         if (expanding) {
           tooSmol = true;
-          // height = textareaElement.scrollHeight + 20;
           return;
         } else {
           height = textareaElement.scrollHeight + 20;
@@ -210,9 +234,10 @@
     }
   }
 
+  let oldState = "";
   function handleExpandStart(e: MouseEvent): void {
-    ClearSelection();
-    event_state_store.set("arrow");
+    selected_store.set([textareaElement]);
+    oldState = eventState;
     typing = false;
     const target = e.target as HTMLElement;
     expand = target.id;
@@ -318,7 +343,7 @@
   }
 
   function stopExpanding(): void {
-    event_state_store.set("arrow");
+    event_state_store.set(oldState);
     expanding = false;
     isDragging = false;
     document.removeEventListener("mousemove", handleExpanding);
@@ -332,13 +357,12 @@
 
   function handleMoueLeave(): void {
     if (eventState === "selected") {
-      for (let i = 0; i < selected.length; i++) {
-        if (selected[i].id === `textbox&${id}`) {
-          return;
-        }
+      if (iAmSelected) {
+        hidden = false;
+        return;
       }
     }
-    if (!expanding) {
+    if (!expanding && !iAmSelected) {
       hidden = true;
     }
   }
@@ -363,16 +387,6 @@
       fontColor = "lightgray";
     } else {
       fontColor = "black";
-    }
-  }
-
-  $: {
-    if (selected.some((item) => item.id === `textbox&${id}`)) {
-      hidden = false;
-      iAmSelected = true;
-    } else {
-      hidden = true;
-      iAmSelected = false;
     }
   }
 
@@ -403,6 +417,7 @@
   class:no-select={!typing}
   class:no-pointer={eventState === "selecting" ||
     eventState === "drawing" ||
+    eventState === "createTextBox" ||
     eventState.includes("expanding")}
   class:iAmSelected
   on:focus={() => {
