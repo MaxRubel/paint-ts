@@ -1,6 +1,6 @@
 import { selected_store, theme_store } from "../stores/eventState";
 import { get } from "svelte/store";
-import { textBoxesStore } from "../stores/migmaStore";
+import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 
 interface TextBoxes {

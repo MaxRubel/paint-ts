@@ -7,7 +7,7 @@
     updateTextBox,
     clearAllTextBoxes,
     deleteTextBox,
-  } from "../stores/migmaStore";
+  } from "../stores/textBoxStore";
   import {
     event_state_store,
     locked_store,
@@ -19,6 +19,7 @@
     ClearOldPathData,
     DrawBrushStroke,
     EndBrushStroke,
+    InitCtx,
     ReDrawBrushStrokes,
   } from "../utils/drawBrushStroke";
   import ToolBar from "./components/ToolBar.svelte";
@@ -30,7 +31,8 @@
   import handleCursor from "../utils/handleCursor";
   import { ClearSelection } from "../utils/clearSelection";
   import { get } from "svelte/store";
-  import type { TextBoxMap } from "../stores/migmaStore";
+  import type { TextBoxMap } from "../stores/textBoxStore";
+  import { AddUndoItem, ClearUndoStore } from "../stores/undoStore";
 
   let mode = "dark";
   let catSmootch = false;
@@ -109,6 +111,7 @@
 
   onMount(() => {
     ctx = canvas?.getContext("2d");
+    InitCtx(ctx);
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("keyup", handleKeyup);
     canvas?.addEventListener("click", handleClick);
@@ -138,17 +141,14 @@
 
   function redrawCanvas(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
-    ReDrawBrushStrokes(ctx);
+    ReDrawBrushStrokes();
   }
 
   function handleClear(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     clearAllTextBoxes();
     ClearOldPathData();
-  }
-
-  function handleUndo(): void {
-    redrawCanvas();
+    ClearUndoStore();
   }
 
   function handlePointerDown(e: PointerEvent): void {
@@ -198,6 +198,7 @@
     switch (event_state) {
       case "drawing":
         EndBrushStroke();
+        AddUndoItem;
         break;
       case "selecting":
         ClearSelectionRect();
@@ -258,7 +259,6 @@
 
 <main>
   <ToolBar
-    {handleUndo}
     {handle_arrow_mode}
     {handle_drawing_mode}
     {handle_new_rectangle}

@@ -7,3 +7,4 @@ export const theme_store = writable("dark")
 export const locked_store = writable(true)
 
 export const selected_store = writable<any[]>([])
+
