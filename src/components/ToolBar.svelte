@@ -134,12 +134,14 @@
     <div class="main-bar">
       <button
         on:click={handle_arrow_mode}
-        style="background-color: {arrow ? '#9096ff' : ''}"
+        class="smallside centered"
+        style="background-color: {arrow ? '#9096ff' : ''}; padding: 18px"
       >
         <CursorPointer />
       </button>
       <button
         on:click={handle_drawing_mode}
+        class="width64"
         style="background-color: {event_state === 'drawing' ? '#9096ff' : ''}"
       >
         <Marker />
@@ -147,6 +149,7 @@
       {#if event_state === "creating_text" || event_state.includes("typing")}
         <button
           on:click={handle_textbox_mode}
+          class="width64"
           style="background-color:  #9096ff"
         >
           <TextIcon />
@@ -156,7 +159,7 @@
           <TextIcon />
         </button>
       {/if}
-      <button on:click={handleLock} style="width: 60px;">
+      <button on:click={handleLock} class="smallside">
         {#if locked}
           <Lock />
         {:else}
@@ -166,11 +169,11 @@
     </div>
     <!-- <button> <GearIcon /> </button> -->
     <div class="side-bar">
-      <button on:click={HandleUndo}>Undo</button>
+      <button class="bigside" on:click={HandleUndo}>Undo</button>
       <button
         on:click={handleDark}
-        class="centered"
-        style="width: 60px; padding: 10px"
+        class="centered width64"
+        style="padding: 10px"
       >
         {#if mode === "light"}
           <Moon />
@@ -178,8 +181,8 @@
           <Sun />
         {/if}
       </button>
-      <button on:click={handleSmootches}><Kiss /></button>
-      <button on:click={handleClear}>Clear</button>
+      <button class="width64" on:click={handleSmootches}><Kiss /></button>
+      <button on:click={handleClear} class="bigside">Clear</button>
     </div>
 
     <!-- <button
@@ -197,6 +200,19 @@
   button {
     height: 50px;
   }
+
+  .smallside {
+    width: 60px;
+  }
+
+  .width64 {
+    width: 64px;
+  }
+
+  .bigside {
+    width: 80px;
+  }
+
   .tool-bar {
     position: fixed;
     display: flex;
