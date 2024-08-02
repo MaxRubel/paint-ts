@@ -388,7 +388,13 @@
     ) {
       AddUndoItem({
         action: "expanded",
-        data: { id, x: startX, y: startY, width, height },
+        data: {
+          id,
+          x: startX,
+          y: startY,
+          width: startWidth,
+          height: startHeight,
+        },
       });
     }
 
