@@ -2,7 +2,7 @@
   export let handleClear;
   export let handleDark;
   export let handleLock;
-  // export let handleSmootches;
+  export let handleSmootches;
   export let handle_arrow_mode;
   export let handle_drawing_mode;
   export let handle_textbox_mode;
@@ -23,6 +23,7 @@
   import GearIcon from "../graphics/GearIcon.svelte";
   import Sun from "../graphics/Sun.svelte";
   import Moon from "../graphics/Moon.svelte";
+  import Kiss from "../graphics/Kiss.svelte";
 
   let mode = "";
   let locked = true;
@@ -177,6 +178,7 @@
           <Sun />
         {/if}
       </button>
+      <button on:click={handleSmootches}><Kiss /></button>
       <button on:click={handleClear}>Clear</button>
     </div>
 
@@ -203,10 +205,10 @@
     justify-content: center;
     padding: 10px;
     gap: 8px;
-    top: 9px;
+    top: 0px;
     left: 0;
     width: 100%;
-    height: 65px;
+    height: 60px;
     z-index: 1000;
     box-sizing: border-box;
     background-color: rgba(0, 0, 0, 0.288);
@@ -233,7 +235,7 @@
     position: fixed;
     text-align: left;
     top: 60px;
-    left: 25px;
+    left: 13px;
     color: white;
   }
 
@@ -244,7 +246,7 @@
     gap: 5px;
   }
 
-  @media screen and (max-width: 550px) {
+  @media screen and (max-width: 630px) {
     .second-row {
       grid-template-columns: 1fr;
     }

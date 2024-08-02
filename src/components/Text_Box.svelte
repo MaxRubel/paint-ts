@@ -101,6 +101,10 @@
     if (eventState === "selected" && selected.length === 1) {
       selected_store.set([textareaElement]);
     }
+    if (eventState === "selected" && selected.length > 1 && !iAmSelected) {
+      selected_store.set([textareaElement]);
+    }
+
     if (eventState.includes("typing")) {
       textareaElement.focus();
     }
@@ -181,7 +185,7 @@
         },
       });
     }
-    checkOverflow();
+    // checkOverflow();
     updateTextBox(id, { x, y, height, width });
   }
 
@@ -226,7 +230,6 @@
         textareaElement.scrollHeight > textareaElement.clientHeight &&
         width < window.innerWidth * 0.5
       ) {
-        console.log("helo");
         width = width + 50;
         updateTextBox(id, { x, y, width, height });
         return;
@@ -372,6 +375,7 @@
     isDragging = false;
     document.removeEventListener("mousemove", handleExpanding);
     document.removeEventListener("mouseup", stopExpanding);
+    updateTextBox(id, { height, width, x, y });
     checkOverflow();
   }
 
