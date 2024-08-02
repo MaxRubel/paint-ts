@@ -52,7 +52,7 @@
     selected = value;
     if (selected.some((item) => item.id === `textbox&${id}`)) {
       iAmSelected = true;
-      if (selected.length > 1) {
+      if (selected.length > 0) {
         hidden = false;
       }
     } else {
@@ -101,6 +101,10 @@
     if (eventState === "selected" && selected.length === 1) {
       selected_store.set([textareaElement]);
     }
+    if (eventState === "selected" && selected.length > 1 && !iAmSelected) {
+      selected_store.set([textareaElement]);
+    }
+
     if (eventState.includes("typing")) {
       textareaElement.focus();
     }
@@ -160,7 +164,7 @@
       hidden = true;
     }
     if (
-      eventState !== "createTextBox" &&
+      eventState !== "creating_text" &&
       eventState !== "selecting" &&
       eventState !== "selected"
     ) {
@@ -181,7 +185,7 @@
         },
       });
     }
-    checkOverflow();
+    // checkOverflow();
     updateTextBox(id, { x, y, height, width });
   }
 
@@ -226,7 +230,6 @@
         textareaElement.scrollHeight > textareaElement.clientHeight &&
         width < window.innerWidth * 0.5
       ) {
-        console.log("helo");
         width = width + 50;
         updateTextBox(id, { x, y, width, height });
         return;
@@ -372,6 +375,7 @@
     isDragging = false;
     document.removeEventListener("mousemove", handleExpanding);
     document.removeEventListener("mouseup", stopExpanding);
+    updateTextBox(id, { height, width, x, y });
     checkOverflow();
   }
 
@@ -427,7 +431,7 @@
   }
 
   $: {
-    if (eventState === "createTextBox") {
+    if (eventState === "creating_text") {
       hidden = true;
     }
   }
@@ -455,7 +459,7 @@
   class:no-select={!typing}
   class:no-pointer={eventState === "selecting" ||
     eventState === "drawing" ||
-    eventState === "createTextBox" ||
+    eventState === "creating_text" ||
     eventState.includes("expanding")}
   class:iAmSelected
   on:focus={() => {
