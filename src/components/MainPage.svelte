@@ -77,14 +77,22 @@
   function handle_delete() {
     if (event_state.includes("typing")) return;
     const selectedArray = get(selected_store);
+    const undoArray = [];
     if (selectedArray.length > 0) {
       selectedArray.forEach((textElement) => {
         const [_, id] = textElement.id.split("&");
+        const thisTextbox = get(textBoxesStore)[id];
+        undoArray.push(thisTextbox);
         deleteTextBox(id);
         ClearSelection();
-        event_state_store.set("arrow");
       });
-    } else deleteTextBox(selected);
+      event_state_store.set("arrow");
+    } else {
+      const thisTextbox = get(textBoxesStore)[selected];
+      undoArray.push(thisTextbox);
+      deleteTextBox(selected);
+    }
+    AddUndoItem({ action: "deleted", data: undoArray });
   }
 
   function handleKeyup(e: KeyboardEvent) {
