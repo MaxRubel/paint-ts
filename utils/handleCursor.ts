@@ -20,7 +20,7 @@ export default function handleCursor(event_state: string, cursor: string): strin
     return cursor
   }
   switch (event_state) {
-    case "createTextBox":
+    case "creating_text":
       cursor = "text";
       break;
     case "drawing":

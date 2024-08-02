@@ -52,7 +52,7 @@
     selected = value;
     if (selected.some((item) => item.id === `textbox&${id}`)) {
       iAmSelected = true;
-      if (selected.length > 1) {
+      if (selected.length > 0) {
         hidden = false;
       }
     } else {
@@ -160,7 +160,7 @@
       hidden = true;
     }
     if (
-      eventState !== "createTextBox" &&
+      eventState !== "creating_text" &&
       eventState !== "selecting" &&
       eventState !== "selected"
     ) {
@@ -427,7 +427,7 @@
   }
 
   $: {
-    if (eventState === "createTextBox") {
+    if (eventState === "creating_text") {
       hidden = true;
     }
   }
@@ -455,7 +455,7 @@
   class:no-select={!typing}
   class:no-pointer={eventState === "selecting" ||
     eventState === "drawing" ||
-    eventState === "createTextBox" ||
+    eventState === "creating_text" ||
     eventState.includes("expanding")}
   class:iAmSelected
   on:focus={() => {
