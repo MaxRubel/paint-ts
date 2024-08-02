@@ -9,7 +9,11 @@
   import { createEventDispatcher } from "svelte";
   import { deleteTextBox } from "../../stores/textBoxStore";
   import type { TextBoxType } from "../../utils/types/app_types";
-  import { StartDragMany, DragMany } from "../../utils/dragMultiple";
+  import {
+    StartDragMany,
+    DragMany,
+    EndDragMany,
+  } from "../../utils/dragMultiple";
   import { AddUndoItem } from "../../stores/undoStore";
   import { updateTextBox } from "../../stores/textBoxStore";
   export let data: TextBoxType;
@@ -50,7 +54,7 @@
 
   const unsubscribe4 = selected_store.subscribe((value) => {
     selected = value;
-    if (selected.some((item) => item.id === `textbox&${id}`)) {
+    if (selected.some((item) => item?.id === `textbox&${id}`)) {
       iAmSelected = true;
       if (selected.length > 0) {
         hidden = false;
@@ -62,10 +66,6 @@
   });
 
   const dispatch = createEventDispatcher();
-
-  onMount(() => {
-    event_state_store.set(`typing&${id}`);
-  });
 
   onDestroy(() => {
     unsubcribe();
@@ -95,7 +95,8 @@
       selected_store.set([]);
     }
   }
-
+  let oldX = 0;
+  let oldY = 0;
   //---------Drag and Drop---------------------------
   function handleMouseDown(event: MouseEvent): void {
     if (eventState === "selected" && selected.length === 1) {
@@ -104,20 +105,21 @@
     if (eventState === "selected" && selected.length > 1 && !iAmSelected) {
       selected_store.set([textareaElement]);
     }
-
+    if (eventState === "arrow") {
+      event_state_store.set("selected");
+      selected_store.set([textareaElement]);
+    }
     if (eventState.includes("typing")) {
       textareaElement.focus();
     }
     if (!typing) {
       event.preventDefault();
+      oldX = x;
+      oldY = y;
       isDragging = true;
       dragOffsetX = event.clientX - x;
       dragOffsetY = event.clientY - y;
 
-      AddUndoItem({
-        action: "draggedSingle",
-        data: { id, x, y },
-      });
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     }
@@ -152,14 +154,34 @@
       isDragging = false;
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+
+      if (oldX !== x || oldY !== y) {
+        if (selected.length === 1) {
+          AddUndoItem({
+            action: "draggedSingle",
+            data: { id, x: oldX, y: oldY },
+          });
+        } else if (selected.length > 1) {
+          EndDragMany();
+        }
+      }
     }
   }
 
   function handleBlur() {
-    textareaElement.setSelectionRange(
+    textareaElement?.setSelectionRange(
       textareaElement.selectionStart,
       textareaElement.selectionStart,
     );
+    if (eventState.includes("typing")) {
+      AddUndoItem({
+        action: "typed",
+        data: {
+          id,
+          start: oldValue ? oldValue : "",
+        },
+      });
+    }
     if (eventState === "selecting") {
       hidden = true;
     }
@@ -172,18 +194,9 @@
         selected_store.set([textareaElement]);
       }
     }
-    if (textareaElement.value === "") {
+    if (textareaElement?.value === "") {
       //auto remove empty text boxes
       deleteTextBox(id);
-    }
-    if (eventState.includes("typing")) {
-      AddUndoItem({
-        action: "typed",
-        data: {
-          id,
-          start: typeStart,
-        },
-      });
     }
     // checkOverflow();
     updateTextBox(id, { x, y, height, width });
@@ -208,9 +221,11 @@
     node.setSelectionRange(0, 0);
   }
 
+  let oldValue = "";
   function handleFocus() {
     dispatch("select", `textbox&${id}`);
     hidden = false;
+    oldValue = textareaElement?.value;
   }
 
   let startX = 0;
@@ -265,11 +280,6 @@
     startHeight = height;
     startMouseX = e.clientX;
     startMouseY = e.clientY;
-
-    AddUndoItem({
-      action: "expanded",
-      data: { id, x, y, width, height },
-    });
 
     document.addEventListener("mousemove", handleExpanding);
     document.addEventListener("mouseup", stopExpanding);
@@ -369,6 +379,17 @@
       event_state_store.set("arrow");
     } else {
       event_state_store.set(oldState);
+    }
+    if (
+      startX !== x ||
+      startY !== y ||
+      startHeight !== height ||
+      startWidth !== width
+    ) {
+      AddUndoItem({
+        action: "expanded",
+        data: { id, x: startX, y: startY, width, height },
+      });
     }
 
     expanding = false;

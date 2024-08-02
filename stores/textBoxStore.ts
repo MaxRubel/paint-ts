@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { writable } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
-import { locked_store } from "./eventState";
+import { event_state_store, locked_store } from "./eventState";
 import { get } from "svelte/store";
 import type { TextBoxType } from "../utils/types/app_types";
 
@@ -40,6 +40,8 @@ export function createNewTextBox(
     ...boxes,
     [newKey]: newBox,
   }));
+
+  event_state_store.set(`typing${newKey}`)
 }
 
 export function updateTextBox(id: string, updates: any) {
@@ -62,4 +64,13 @@ export function deleteTextBox(id: string) {
     const { [id]: deletedBox, ...remainingBoxes } = boxes;
     return remainingBoxes;
   });
+}
+
+export function UndoDeletedTextBoxes(array) {
+  array.forEach((item) => {
+    textBoxesStore.update((boxes) => ({
+      ...boxes,
+      [item.id]: item
+    }))
+  })
 }

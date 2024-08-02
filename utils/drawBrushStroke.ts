@@ -20,7 +20,7 @@ export function DrawBrushStroke(
   size: number,
   e: PointerEvent,
 ): void {
-  points.push([e.clientX - 6, e.clientY - 5, e.pressure]);
+  points.push([e.clientX - 6, e.clientY - 20, e.pressure]);
   if (!isDrawing) {
     start = paths.length;
   }
