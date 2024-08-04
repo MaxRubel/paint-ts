@@ -21,6 +21,7 @@
     "vite": "^5.2.0"
   },
   "dependencies": {
+    "@jaames/iro": "^5.5.2",
     "perfect-freehand": "^1.2.2",
     "uuidv4": "^6.2.13"
   }
