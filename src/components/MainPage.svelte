@@ -32,6 +32,7 @@
   import { get } from "svelte/store";
   import type { TextBoxMap } from "../../stores/textBoxStore";
   import { AddUndoItem, ClearUndoStore } from "../../stores/undoStore";
+  import ColorBar from "./ColorBar.svelte";
 
   let mode = "dark";
   let catSmootch = false;
@@ -277,9 +278,23 @@
     ClearSelection();
     event_state_store.set("arrow");
   }
+
+  let colorBarisOpen = false;
+  $: {
+    if (
+      event_state === "drawing" ||
+      event_state.includes("typing") ||
+      event_state === "creating_text"
+    ) {
+      colorBarisOpen = true;
+    } else {
+      colorBarisOpen = false;
+    }
+  }
 </script>
 
 <main>
+  <ColorBar {colorBarisOpen} />
   <ToolBar
     {handle_arrow_mode}
     {handle_drawing_mode}
@@ -289,7 +304,6 @@
     {handleLock}
     {handleSmootches}
   />
-
   <div class="canvas-container">
     {#if catSmootch}
       <img src="/high5.webp" alt="meh" class="image" />
