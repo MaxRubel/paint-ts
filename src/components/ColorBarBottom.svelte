@@ -7,9 +7,14 @@
   import TextRight from "../graphics/TextRight.svelte";
   import iro from "@jaames/iro";
   import { color_store } from "../../stores/colorStore";
-  import { text_alignment, updateTextBox } from "../../stores/textBoxStore";
+  import {
+    text_alignment,
+    textBoxesStore,
+    updateTextBox,
+  } from "../../stores/textBoxStore";
   import { get } from "svelte/store";
   import { event_state_store } from "../../stores/eventState";
+  import { AddUndoItem } from "../../stores/undoStore";
 
   export let colorBarisOpen = false;
 
@@ -56,7 +61,13 @@
     const eventState = get(event_state_store);
     if (eventState.includes("typing")) {
       const [, textboxid] = eventState.split("&");
+      const oldAlign = get(textBoxesStore)[textboxid].align;
       updateTextBox(textboxid, { align: id });
+      if (oldAlign !== id)
+        AddUndoItem({
+          action: "textBoxAligned",
+          data: { id: textboxid, align: oldAlign },
+        });
     }
   }
 </script>

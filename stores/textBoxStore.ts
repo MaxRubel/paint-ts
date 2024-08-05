@@ -31,7 +31,8 @@ export function createNewTextBox(
     y = e.clientY - 40;
   }
   const fontColor = get(color_store)
-  const align = get(text_alignment)
+  const aligGet = get(text_alignment)
+  const align = aligGet ? aligGet : 'center'
   const newBox: TextBoxType = {
     id: newKey,
     type: 'textbox',
