@@ -4,12 +4,15 @@ import { v4 as uuidv4 } from "uuid";
 import { event_state_store, locked_store } from "./eventState";
 import { get } from "svelte/store";
 import type { TextBoxType } from "../utils/types/app_types";
+import { color_store } from "./colorStore";
 
 export interface TextBoxMap {
   [key: string]: TextBoxType;
 }
 
 export const textBoxesStore = writable<TextBoxMap>({});
+
+export const text_alignment = writable("")
 
 export function createNewTextBox(
   e: MouseEvent,
@@ -27,13 +30,16 @@ export function createNewTextBox(
     x = e.clientX - 133;
     y = e.clientY - 40;
   }
+  const fontColor = get(color_store)
+  const align = get(text_alignment)
   const newBox: TextBoxType = {
     id: newKey,
     type: 'textbox',
     text: "",
-    x, y,
+    x, y, fontColor, align,
     height: 80,
     width: 240,
+
   };
 
   textBoxesStore.update((boxes) => ({

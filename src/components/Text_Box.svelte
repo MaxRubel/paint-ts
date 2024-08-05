@@ -16,13 +16,15 @@
   } from "../../utils/dragMultiple";
   import { AddUndoItem } from "../../stores/undoStore";
   import { updateTextBox } from "../../stores/textBoxStore";
+  import { color_store } from "../../stores/colorStore";
   export let data: TextBoxType;
 
-  let { id } = data;
+  let { id, fontColor } = data;
   $: x = data.x;
   $: y = data.y;
   $: height = data.height;
   $: width = data.width;
+  $: align = data.align;
 
   let textareaElement: HTMLTextAreaElement;
   let isDragging = false;
@@ -65,6 +67,11 @@
     }
   });
 
+  const unsubscribe5 = color_store.subscribe((value) => {
+    fontColor = value;
+    updateTextBox(id, { fontColor: value });
+  });
+
   const dispatch = createEventDispatcher();
 
   onDestroy(() => {
@@ -72,6 +79,7 @@
     unsubcribe2();
     unsubscribe3();
     unsubscribe4();
+    unsubscribe5();
   });
 
   function handleChange(e: Event): void {
@@ -446,14 +454,14 @@
     }
   }
 
-  let fontColor: string = "";
-
   $: {
     //handle theme
-    if (theme === "dark") {
-      fontColor = "lightgray";
-    } else {
-      fontColor = "black";
+    if (!fontColor) {
+      if (theme === "dark") {
+        fontColor = "lightgray";
+      } else {
+        fontColor = "black";
+      }
     }
   }
 
@@ -481,7 +489,14 @@
 <div
   class="text-container"
   bind:this={textContainer}
-  style="top: {y}px; left: {x}px; cursor: {cursorStyle}; height: {height}px; width: {width}px;"
+  style="
+  top: {y}px; 
+  left: {x}px; 
+  cursor: {cursorStyle}; 
+  height: {height}px; 
+  width: {width}px;
+  border-radius: 10px;
+  border: 3px solid {fontColor}"
   class:non-selectable={!typing}
   class:no-select={!typing}
   class:no-pointer={eventState === "selecting" ||
@@ -523,7 +538,7 @@
     class:non-selectable={true}
     class:no-select={true}
     class:active-background={expanding}
-    style="cursor: {cursorStyle}; color: {fontColor}"
+    style="cursor: {cursorStyle}; color: {fontColor}; text-align: {align}"
     id="textbox&{id}"
     on:input={handleChange}
     on:click={handleSingleClick}
@@ -552,8 +567,6 @@
   .text-container {
     position: absolute;
     background-color: transparent;
-    border: 3px solid rgb(113, 113, 113);
-    border-radius: 12px;
     /* overflow: hidden; */
     box-sizing: border-box;
     z-index: 100;

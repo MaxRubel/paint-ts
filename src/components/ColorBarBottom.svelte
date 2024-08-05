@@ -6,6 +6,10 @@
   import TextLeft from "../graphics/TextLeft.svelte";
   import TextRight from "../graphics/TextRight.svelte";
   import iro from "@jaames/iro";
+  import { color_store } from "../../stores/colorStore";
+  import { text_alignment, updateTextBox } from "../../stores/textBoxStore";
+  import { get } from "svelte/store";
+  import { event_state_store } from "../../stores/eventState";
 
   export let colorBarisOpen = false;
 
@@ -34,12 +38,26 @@
 
   function handleMouseUp() {
     newColor = colorPicker.color.rgb;
+    const newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+
+    color_store.set(newColorF);
+
     if (arrayOfColors.length === 12) {
       arrayOfColors.shift();
       arrayOfColors = arrayOfColors;
     }
     arrayOfColors.push(`rgb(${newColor.r},${newColor.g}, ${newColor.b} `);
     arrayOfColors = arrayOfColors;
+  }
+
+  function handleAlignment(e) {
+    const { id } = e.target;
+    text_alignment.set(id);
+    const eventState = get(event_state_store);
+    if (eventState.includes("typing")) {
+      const [, textboxid] = eventState.split("&");
+      updateTextBox(textboxid, { align: id });
+    }
   }
 </script>
 
@@ -48,9 +66,9 @@
     <div class="text-position-container">
       Align
       <div class="text-position">
-        <button> <TextLeft /> </button>
-        <button><TextCenter /></button>
-        <button><TextRight /></button>
+        <button id="left" on:click={handleAlignment}> <TextLeft /> </button>
+        <button id="center" on:click={handleAlignment}><TextCenter /></button>
+        <button id="right" on:click={handleAlignment}><TextRight /></button>
       </div>
       <div class="font-container">
         Font
@@ -77,7 +95,10 @@
       <div class="choices-container" style="margin-top: 6px;">
         {#each arrayOfColors as color}
           <div class="color-box">
-            <button class="color-button" style="background-color: {color}"
+            <button
+              class="color-button"
+              on:click={color_store.set(color)}
+              style="background-color: {color}"
             ></button>
           </div>
         {/each}
