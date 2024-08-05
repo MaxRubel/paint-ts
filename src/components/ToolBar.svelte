@@ -18,9 +18,8 @@
     selected_store,
     theme_store,
   } from "../../stores/eventState";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import { HandleUndo } from "../../stores/undoStore";
-  import GearIcon from "../graphics/GearIcon.svelte";
   import Sun from "../graphics/Sun.svelte";
   import Moon from "../graphics/Moon.svelte";
   import Kiss from "../graphics/Kiss.svelte";

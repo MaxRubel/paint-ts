@@ -1,4 +1,6 @@
 <script>
+  // @ts-nocheck
+
   import { onMount } from "svelte";
   import TextCenter from "../graphics/TextCenter.svelte";
   import TextLeft from "../graphics/TextLeft.svelte";

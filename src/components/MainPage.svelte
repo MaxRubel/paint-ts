@@ -32,7 +32,8 @@
   import { get } from "svelte/store";
   import type { TextBoxMap } from "../../stores/textBoxStore";
   import { AddUndoItem, ClearUndoStore } from "../../stores/undoStore";
-  import ColorBar from "./ColorBar.svelte";
+  import ColorBarSide from "./ColorBarSide.svelte";
+  import ColorBarBottom from "./ColorBarBottom.svelte";
 
   let mode = "dark";
   let catSmootch = false;
@@ -294,7 +295,8 @@
 </script>
 
 <main>
-  <ColorBar {colorBarisOpen} />
+  <!-- <ColorBarSide {colorBarisOpen} /> -->
+  <ColorBarBottom {colorBarisOpen} />
   <ToolBar
     {handle_arrow_mode}
     {handle_drawing_mode}
