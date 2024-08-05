@@ -25,6 +25,7 @@
   $: height = data.height;
   $: width = data.width;
   $: align = data.align;
+  $: fontColor = data.fontColor;
 
   let textareaElement: HTMLTextAreaElement;
   let isDragging = false;
@@ -68,8 +69,17 @@
   });
 
   const unsubscribe5 = color_store.subscribe((value) => {
-    fontColor = value;
-    updateTextBox(id, { fontColor: value });
+    if (eventState.includes("typing")) {
+      const [, boxId] = eventState.split("&");
+      if (value !== fontColor && boxId === id) {
+        AddUndoItem({
+          action: "changedFontColor",
+          data: { id, oldColor: fontColor },
+        });
+        fontColor = value;
+        updateTextBox(id, { fontColor: value });
+      }
+    }
   });
 
   const dispatch = createEventDispatcher();
@@ -182,13 +192,15 @@
       textareaElement.selectionStart,
     );
     if (eventState.includes("typing")) {
-      AddUndoItem({
-        action: "typed",
-        data: {
-          id,
-          start: oldValue ? oldValue : "",
-        },
-      });
+      if (oldValue !== textareaElement.value) {
+        AddUndoItem({
+          action: "typed",
+          data: {
+            id,
+            start: oldValue ? oldValue : "",
+          },
+        });
+      }
     }
     if (eventState === "selecting") {
       hidden = true;

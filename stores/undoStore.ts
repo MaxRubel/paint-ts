@@ -16,7 +16,6 @@ export function AddUndoItem(newItem: UndoType) {
   undo_store.update(oldItems => {
     return [...oldItems, newItem];
   });
-  console.log("adding")
   const undoStore = get(undo_store)
   if (!undoStore[undoStore.length - 1]) {
     console.error("oopsies, an underfined value was pushed into the undo store")
@@ -50,6 +49,9 @@ export function HandleUndo() {
       break;
     case "textBoxAligned":
       undoTextBoxAlignChange(lastAction)
+      break;
+    case "changedFontColor":
+      undoChangedFontColor(lastAction)
       break;
   }
   popLastItem();
@@ -103,6 +105,11 @@ function undoDeletedTextBoxes(array: any) {
 function undoTextBoxAlignChange(lastAction) {
   const { id, align } = lastAction.data
   updateTextBox(id, { align })
+}
+
+function undoChangedFontColor(lastAction) {
+  const { id, oldColor } = lastAction.data
+  updateTextBox(id, { fontColor: oldColor })
 }
 
 function popLastItem() {
