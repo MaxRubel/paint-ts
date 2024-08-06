@@ -7,6 +7,7 @@ export interface TextBoxType {
   height: number;
   width: number;
   fontColor: string;
+  fontFamily: string;
   align: string
 }
 

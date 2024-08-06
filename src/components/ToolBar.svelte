@@ -76,48 +76,6 @@
   }
 
   let dropdownMenu: any = "";
-
-  // onMount(() => {
-  //   document.addEventListener("click", handleClickOutside);
-  // });
-
-  // onDestroy(() => {
-  //   document.addEventListener("remove", handleClickOutside);
-  // });
-  // let x = -308;
-  // let interval: any;
-
-  // function expandSideBar() {
-  //   interval = setInterval(() => {
-  //     x += 3;
-  //     if (x >= 20) {
-  //       clearInterval(interval);
-  //     }
-  //   }, 1);
-  // }
-
-  // function collapseSideBar() {
-  //   interval = setInterval(() => {
-  //     x -= 3;
-  //     if (x === -300) {
-  //       clearInterval(interval);
-  //     }
-  //   }, 1);
-  // }
-
-  // let sidebarIsOpen = false;
-  // function handleExpandSideBar() {
-  //   if (interval) {
-  //     clearInterval(interval);
-  //   }
-  //   if (sidebarIsOpen) {
-  //     collapseSideBar();
-  //     sidebarIsOpen = false;
-  //   } else {
-  //     expandSideBar();
-  //     sidebarIsOpen = true;
-  //   }
-  // }
 </script>
 
 <div class="tool-bar">
@@ -235,15 +193,14 @@
     grid-template-columns: 1fr 1fr;
     justify-content: center;
     align-items: center;
-    /* gap: 6px; */
   }
 
   .main-bar {
     display: flex;
+    padding-right: 20px;
     justify-content: flex-end;
     align-items: center;
     gap: 5px;
-    /* margin-right: 15px; */
   }
 
   .event-state {
@@ -255,8 +212,9 @@
   }
 
   .side-bar {
+    padding-left: 20px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     gap: 5px;
   }
@@ -268,6 +226,7 @@
 
     .main-bar {
       justify-content: center;
+      padding-right: 0px;
     }
 
     .tool-bar {
@@ -278,9 +237,8 @@
     }
     .side-bar {
       margin-top: 4px;
-      /* margin-left: 30px; */
-      /* position: absolute; */
-      /* margin-left: 15px; */
+      padding-left: 0px;
+      justify-content: center;
     }
   }
   h3 {

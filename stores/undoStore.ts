@@ -53,6 +53,11 @@ export function HandleUndo() {
     case "changedFontColor":
       undoChangedFontColor(lastAction)
       break;
+    case "changedFontSingle":
+      undoChangedFont(lastAction)
+      break;
+    case 'changedManyFonts':
+      undoChangedManyFonts(lastAction)
   }
   popLastItem();
   // console.log("undo: ", lastAction.action, "undo store Total Now: ", get(undo_store).length)
@@ -110,6 +115,19 @@ function undoTextBoxAlignChange(lastAction) {
 function undoChangedFontColor(lastAction) {
   const { id, oldColor } = lastAction.data
   updateTextBox(id, { fontColor: oldColor })
+}
+
+function undoChangedFont(lastAction) {
+  const { id, oldFont } = lastAction.data
+  updateTextBox(id, { fontFamily: oldFont })
+}
+
+function undoChangedManyFonts(lastAction) {
+  const undoArray = lastAction.data
+  undoArray.forEach((item) => {
+    updateTextBox(item.id, { fontFamily: item.fontFamily })
+  })
+
 }
 
 function popLastItem() {

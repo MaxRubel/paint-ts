@@ -1,10 +1,11 @@
 // @ts-nocheck
 import { writable } from "svelte/store";
 import { v4 as uuidv4 } from "uuid";
-import { event_state_store, locked_store } from "./eventState";
+import { event_state_store, locked_store, selected_store } from "./eventState";
 import { get } from "svelte/store";
 import type { TextBoxType } from "../utils/types/app_types";
 import { color_store } from "./colorStore";
+import { AddUndoItem } from "./undoStore";
 
 export interface TextBoxMap {
   [key: string]: TextBoxType;
@@ -13,6 +14,8 @@ export interface TextBoxMap {
 export const textBoxesStore = writable<TextBoxMap>({});
 
 export const text_alignment = writable("")
+
+export const font_family_store = writable("Arial")
 
 export function createNewTextBox(
   e: MouseEvent,
@@ -40,7 +43,7 @@ export function createNewTextBox(
     x, y, fontColor, align,
     height: 80,
     width: 240,
-
+    fontFamily: get(font_family_store)
   };
 
   textBoxesStore.update((boxes) => ({
@@ -80,4 +83,34 @@ export function UndoDeletedTextBoxes(array) {
       [item.id]: item
     }))
   })
+}
+
+export function ChangeTextFont(value: string) {
+  const eventState = get(event_state_store)
+  const oldFont = get(font_family_store)
+
+  if (eventState.includes("typing")) {
+    const [, id] = eventState.split("&")
+    updateTextBox(id, { fontFamily: value })
+    font_family_store.set(value)
+    AddUndoItem({
+      action: "changedFontSingle",
+      data: { id, oldFont }
+    })
+  }
+  if (eventState === "selected") {
+    const selected = get(selected_store)
+    const undoArray = []
+    const textBoxes = get(textBoxesStore)
+    selected.forEach((item) => {
+      const [, id] = item.id.split('&')
+      undoArray.push({ id, fontFamily: textBoxes[id].fontFamily })
+      updateTextBox(id, { fontFamily: value })
+      font_family_store.set(value)
+    })
+    AddUndoItem({
+      action: 'changedManyFonts',
+      data: undoArray
+    })
+  }
 }

@@ -8,6 +8,7 @@
   import iro from "@jaames/iro";
   import { color_store } from "../../stores/colorStore";
   import {
+    ChangeTextFont,
     text_alignment,
     textBoxesStore,
     updateTextBox,
@@ -18,16 +19,8 @@
 
   export let colorBarisOpen = false;
 
-  /**
-   * @type {{ color: { rgb: {}; }; }}
-   */
   let colorPicker;
-  let oldColor = null;
-  let newColor = null;
 
-  /**
-   * @type {any[]}
-   */
   let arrayOfColors = [];
 
   onMount(() => {
@@ -37,21 +30,19 @@
     });
   });
 
-  function handleMouseDown() {
-    oldColor = colorPicker.color.rgb;
-  }
-
   function handleMouseUp() {
-    newColor = colorPicker.color.rgb;
+    const newColor = colorPicker.color.rgb;
     const newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
 
     color_store.set(newColorF);
+
+    if (arrayOfColors.includes(newColorF)) return;
 
     if (arrayOfColors.length === 12) {
       arrayOfColors.shift();
       arrayOfColors = arrayOfColors;
     }
-    arrayOfColors.push(`rgb(${newColor.r},${newColor.g}, ${newColor.b} `);
+    arrayOfColors.push(newColorF);
     arrayOfColors = arrayOfColors;
   }
 
@@ -70,6 +61,10 @@
         });
     }
   }
+
+  function handleFontChange(e) {
+    ChangeTextFont(e.target.value);
+  }
 </script>
 
 <div class="color-bar" class:colorBarisOpen>
@@ -83,10 +78,17 @@
       </div>
       <div class="font-container">
         Font
-        <select class="font-box" style="width: 160px" id="">
-          <option class="font-box" value="arial">Arial</option>
-          <option class="font-box" value="comic-sans">Comic-Sans</option>
-          <option class="font-box" value="comic-sans">Helvettica</option>
+        <select
+          class="font-box"
+          style="width: 160px"
+          id=""
+          on:change={handleFontChange}
+        >
+          <option class="font-box" value="Arial">Arial</option>
+          <option class="font-box" value="Patrick Hand">Patrick Hand</option>
+          <option class="font-box" value="Times New Roman"
+            >Times New Roman</option
+          >
         </select>
       </div>
     </div>
@@ -94,11 +96,7 @@
       Color
       <div style="margin-top: 6px;">
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div
-          id="picker"
-          on:mousedown={handleMouseDown}
-          on:mouseup={handleMouseUp}
-        />
+        <div id="picker" on:mouseup={handleMouseUp} />
       </div>
     </div>
     <div class="recent-choices">

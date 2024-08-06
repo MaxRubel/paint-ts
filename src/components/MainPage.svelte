@@ -291,6 +291,14 @@
     } else {
       colorBarisOpen = false;
     }
+    if (event_state === "selected") {
+      const selected = get(selected_store);
+      selected.forEach((item) => {
+        if (item.id.includes("textbox")) {
+          colorBarisOpen = true;
+        }
+      });
+    }
   }
 </script>
 

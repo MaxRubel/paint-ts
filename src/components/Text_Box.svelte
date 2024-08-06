@@ -19,13 +19,14 @@
   import { color_store } from "../../stores/colorStore";
   export let data: TextBoxType;
 
-  let { id, fontColor } = data;
+  let { id } = data;
   $: x = data.x;
   $: y = data.y;
   $: height = data.height;
   $: width = data.width;
   $: align = data.align;
   $: fontColor = data.fontColor;
+  $: fontFamily = data.fontFamily;
 
   let textareaElement: HTMLTextAreaElement;
   let isDragging = false;
@@ -508,7 +509,8 @@
   height: {height}px; 
   width: {width}px;
   border-radius: 10px;
-  border: 3px solid {fontColor}"
+  border: 3px solid {fontColor};
+  "
   class:non-selectable={!typing}
   class:no-select={!typing}
   class:no-pointer={eventState === "selecting" ||
@@ -550,7 +552,12 @@
     class:non-selectable={true}
     class:no-select={true}
     class:active-background={expanding}
-    style="cursor: {cursorStyle}; color: {fontColor}; text-align: {align}"
+    style="
+      cursor: {cursorStyle};
+      color: {fontColor};
+      text-align: {align};
+      font-family: {fontFamily};
+    "
     id="textbox&{id}"
     on:input={handleChange}
     on:click={handleSingleClick}
