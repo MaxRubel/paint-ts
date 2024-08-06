@@ -5,6 +5,7 @@
   fill="currentColor"
   class="bi bi-text-right"
   viewBox="0 0 16 16"
+  style="pointer-events: none;"
 >
   <path
     fill-rule="evenodd"

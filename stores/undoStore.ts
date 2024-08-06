@@ -2,7 +2,7 @@ import { get, writable } from "svelte/store";
 import { SplicePaths } from "../utils/drawBrushStroke";
 import type { UndoBrushStroke, UndoDragSingle, UndoExpand, UndoTyping } from "../utils/types/undo_types";
 import type { UndoType } from "../utils/types/app_types";
-import { deleteTextBox,  textBoxesStore,  updateTextBox } from "./textBoxStore";
+import { deleteTextBox, textBoxesStore, updateTextBox } from "./textBoxStore";
 import { event_state_store } from "./eventState";
 
 
@@ -17,8 +17,7 @@ export function AddUndoItem(newItem: UndoType) {
     return [...oldItems, newItem];
   });
   const undoStore = get(undo_store)
-  console.log("added to undo store. Total Items: ", undoStore.length)
-  if(!undoStore[undoStore.length -1]){
+  if (!undoStore[undoStore.length - 1]) {
     console.error("oopsies, an underfined value was pushed into the undo store")
   }
 }
@@ -42,21 +41,36 @@ export function HandleUndo() {
       break;
     case "draggedMultiple":
       handleUndoDragMultiple(lastAction)
+      break;
     case "expanded":
       undoExpand(lastAction)
       break;
     case "deleted":
-      undoDeletedTextBoxes(lastAction.data)
+      undoDeletedTextBoxes(lastAction)
+      break;
+    case "textBoxAligned":
+      undoTextBoxAlignChange(lastAction)
+      break;
+    case "changedFontColor":
+      undoChangedFontColor(lastAction)
+      break;
+    case "changedFontSingle":
+      undoChangedFont(lastAction)
+      break;
+    case 'changedManyFonts':
+      undoChangedManyFonts(lastAction)
+      break;
+    case 'changedManyFontColors':
+      undoChangedManyFontColors(lastAction)
       break;
   }
   popLastItem();
-  console.log("undo: ", lastAction.action, "undo store Total Now: ", get(undo_store).length)
+  // console.log("undo: ", lastAction.action, "undo store Total Now: ", get(undo_store).length)
 }
 
 function undoBrushStroke(lastAction: UndoBrushStroke) {
   const { start, end } = lastAction.data;
   SplicePaths(start, end);
-
 }
 
 function undoTyping(lastAction: UndoTyping) {
@@ -77,24 +91,54 @@ function undoDragSingle(lastAction: UndoDragSingle) {
   updateTextBox(id, { x, y })
 }
 
-function handleUndoDragMultiple(lastAction: any){
-  const {data} = lastAction
-  data.forEach((move: any)=>{
-    updateTextBox(move.id, {x: move.x, y: move.y})
+function handleUndoDragMultiple(lastAction: any) {
+  const { data } = lastAction
+  data.forEach((move: any) => {
+    updateTextBox(move.id, { x: move.x, y: move.y })
   })
 }
 
-function undoExpand(lastAction: UndoExpand){
-  const {id, x, y, height, width} = lastAction.data
+function undoExpand(lastAction: UndoExpand) {
+  const { id, x, y, height, width } = lastAction.data
   updateTextBox(id, { x, y, height, width })
 }
 
-function undoDeletedTextBoxes(array: any) {
+function undoDeletedTextBoxes(lastAction: any) {
+  const array = lastAction.data
   array.forEach((item: any) => {
     textBoxesStore.update((boxes) => ({
       ...boxes,
       [item.id]: item
     }))
+  })
+}
+
+function undoTextBoxAlignChange(lastAction) {
+  const { id, align } = lastAction.data
+  updateTextBox(id, { align })
+}
+
+function undoChangedFontColor(lastAction) {
+  const { id, oldColor } = lastAction.data
+  updateTextBox(id, { fontColor: oldColor })
+}
+
+function undoChangedFont(lastAction) {
+  const { id, oldFont } = lastAction.data
+  updateTextBox(id, { fontFamily: oldFont })
+}
+
+function undoChangedManyFonts(lastAction) {
+  const undoArray = lastAction.data
+  undoArray.forEach((item) => {
+    updateTextBox(item.id, { fontFamily: item.fontFamily })
+  })
+}
+
+function undoChangedManyFontColors(lastAction) {
+  const undoArray = lastAction.data
+  undoArray.forEach((item) => {
+    updateTextBox(item.id, { fontColor: item.fontColor })
   })
 }
 

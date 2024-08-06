@@ -16,6 +16,7 @@
   } from "../../utils/dragMultiple";
   import { AddUndoItem } from "../../stores/undoStore";
   import { updateTextBox } from "../../stores/textBoxStore";
+  import { color_store } from "../../stores/colorStore";
   export let data: TextBoxType;
 
   let { id } = data;
@@ -23,6 +24,9 @@
   $: y = data.y;
   $: height = data.height;
   $: width = data.width;
+  $: align = data.align;
+  $: fontColor = data.fontColor;
+  $: fontFamily = data.fontFamily;
 
   let textareaElement: HTMLTextAreaElement;
   let isDragging = false;
@@ -65,6 +69,20 @@
     }
   });
 
+  const unsubscribe5 = color_store.subscribe((value) => {
+    if (eventState.includes("typing")) {
+      const [, boxId] = eventState.split("&");
+      if (value !== fontColor && boxId === id) {
+        AddUndoItem({
+          action: "changedFontColor",
+          data: { id, oldColor: fontColor },
+        });
+        fontColor = value;
+        updateTextBox(id, { fontColor: value });
+      }
+    }
+  });
+
   const dispatch = createEventDispatcher();
 
   onDestroy(() => {
@@ -72,6 +90,7 @@
     unsubcribe2();
     unsubscribe3();
     unsubscribe4();
+    unsubscribe5();
   });
 
   function handleChange(e: Event): void {
@@ -174,13 +193,15 @@
       textareaElement.selectionStart,
     );
     if (eventState.includes("typing")) {
-      AddUndoItem({
-        action: "typed",
-        data: {
-          id,
-          start: oldValue ? oldValue : "",
-        },
-      });
+      if (oldValue !== textareaElement.value) {
+        AddUndoItem({
+          action: "typed",
+          data: {
+            id,
+            start: oldValue ? oldValue : "",
+          },
+        });
+      }
     }
     if (eventState === "selecting") {
       hidden = true;
@@ -446,14 +467,14 @@
     }
   }
 
-  let fontColor: string = "";
-
   $: {
     //handle theme
-    if (theme === "dark") {
-      fontColor = "lightgray";
-    } else {
-      fontColor = "black";
+    if (!fontColor) {
+      if (theme === "dark") {
+        fontColor = "lightgray";
+      } else {
+        fontColor = "black";
+      }
     }
   }
 
@@ -481,7 +502,15 @@
 <div
   class="text-container"
   bind:this={textContainer}
-  style="top: {y}px; left: {x}px; cursor: {cursorStyle}; height: {height}px; width: {width}px;"
+  style="
+  top: {y}px; 
+  left: {x}px; 
+  cursor: {cursorStyle}; 
+  height: {height}px; 
+  width: {width}px;
+  border-radius: 10px;
+  border: 3px solid {fontColor};
+  "
   class:non-selectable={!typing}
   class:no-select={!typing}
   class:no-pointer={eventState === "selecting" ||
@@ -523,7 +552,12 @@
     class:non-selectable={true}
     class:no-select={true}
     class:active-background={expanding}
-    style="cursor: {cursorStyle}; color: {fontColor}"
+    style="
+      cursor: {cursorStyle};
+      color: {fontColor};
+      text-align: {align};
+      font-family: {fontFamily};
+    "
     id="textbox&{id}"
     on:input={handleChange}
     on:click={handleSingleClick}
@@ -552,8 +586,6 @@
   .text-container {
     position: absolute;
     background-color: transparent;
-    border: 3px solid rgb(113, 113, 113);
-    border-radius: 12px;
     /* overflow: hidden; */
     box-sizing: border-box;
     z-index: 100;

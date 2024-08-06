@@ -3,13 +3,15 @@ import { getSvgPathFromStroke } from "./getSvgPathFromStroke";
 import { get } from "svelte/store";
 import { theme_store } from "../stores/eventState";
 import { AddUndoItem } from "../stores/undoStore";
+import { color_store } from "../stores/colorStore";
 
 let points: [number, number, number][] = [];
-let paths: string[] = [];
+let paths: { pathData: string, color: string }[] = [];
 let ctx: CanvasRenderingContext2D;
 let start = 0;
 let end = 0;
 let isDrawing = false;
+let color = ""
 
 export function InitCtx(context: CanvasRenderingContext2D) {
   ctx = context;
@@ -34,11 +36,13 @@ export function DrawBrushStroke(
   });
 
   const pathData = getSvgPathFromStroke(stroke);
-  paths.push(pathData);
-
   const canvasPath = new Path2D(pathData);
-  const mode = get(theme_store);
-  context.fillStyle = mode === "light" ? "black" : "rgb(143, 143, 143)";
+  color = get(color_store)
+  if (!color) {
+    color = get(theme_store) === 'dark' ? 'lightgray' : 'black'
+  }
+  paths.push({ color, pathData });
+  context.fillStyle = color
   context.fill(canvasPath);
 }
 
@@ -48,17 +52,16 @@ export function EndBrushStroke() {
   isDrawing = false;
   AddUndoItem({
     action: 'drewBrush',
-    data: { start, end }
+    data: { start, end, color }
   });
 }
 
 export function ReDrawBrushStrokes() {
   if (ctx) {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    paths.forEach((path: string) => {
-      const canvasPath = new Path2D(path);
-      const mode = get(theme_store);
-      ctx.fillStyle = mode === "light" ? "black" : "rgb(143, 143, 143)";
+    paths.forEach((path: any) => {
+      const canvasPath = new Path2D(path.pathData);
+      ctx.fillStyle = path.color
       ctx.fill(canvasPath);
     });
   } else {

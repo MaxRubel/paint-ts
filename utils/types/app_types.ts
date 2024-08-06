@@ -6,6 +6,9 @@ export interface TextBoxType {
   y: number;
   height: number;
   width: number;
+  fontColor: string;
+  fontFamily: string;
+  align: string
 }
 
 export interface RectangleType {

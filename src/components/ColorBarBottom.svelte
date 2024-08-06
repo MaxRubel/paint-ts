@@ -1,45 +1,147 @@
 <script>
   // @ts-nocheck
 
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import TextCenter from "../graphics/TextCenter.svelte";
   import TextLeft from "../graphics/TextLeft.svelte";
   import TextRight from "../graphics/TextRight.svelte";
   import iro from "@jaames/iro";
+  import { color_store } from "../../stores/colorStore";
+  import {
+    ChangeTextFont,
+    text_alignment,
+    textBoxesStore,
+    updateTextBox,
+  } from "../../stores/textBoxStore";
+  import { get } from "svelte/store";
+  import {
+    event_state_store,
+    selected_store,
+    theme_store,
+  } from "../../stores/eventState";
+  import { AddUndoItem } from "../../stores/undoStore";
 
   export let colorBarisOpen = false;
 
-  /**
-   * @type {{ color: { rgb: {}; }; }}
-   */
   let colorPicker;
-  let oldColor = null;
-  let newColor = null;
-
-  /**
-   * @type {any[]}
-   */
   let arrayOfColors = [];
+
+  let colorStoreReturn;
+
+  function rgbStringToHex(rgbString) {
+    // Use regex to extract the RGB values
+    const rgbMatch = rgbString.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+
+    if (!rgbMatch) {
+      throw new Error('Invalid RGB string format. Expected "rgb(r, g, b)"');
+    }
+
+    // Convert the matched values to numbers
+    const r = parseInt(rgbMatch[1], 10);
+    const g = parseInt(rgbMatch[2], 10);
+    const b = parseInt(rgbMatch[3], 10);
+
+    // Convert to hex and pad with zeros if necessary
+    const toHex = (c) => {
+      const hex = c.toString(16);
+      return hex.length === 1 ? "0" + hex : hex;
+    };
+
+    // Combine the hex values
+    return "#" + toHex(r) + toHex(g) + toHex(b);
+  }
+
+  const unsubcribe = color_store.subscribe((value) => {
+    if (!value) {
+      const mode = get(theme_store);
+      mode === "dark"
+        ? (colorStoreReturn = "#D3D3D3")
+        : (colorStoreReturn = "#D3D3D3");
+    } else {
+      colorStoreReturn = rgbStringToHex(value);
+    }
+  });
+
+  onDestroy(unsubcribe);
 
   onMount(() => {
     // @ts-ignore
     colorPicker = new iro.ColorPicker("#picker", {
       width: 66,
     });
+    colorPicker.id = "colorpicker";
   });
 
-  function handleMouseDown() {
-    oldColor = colorPicker.color.rgb;
+  $: {
+    if (colorPicker) {
+      colorPicker.color.hexString = colorStoreReturn;
+    }
   }
 
-  function handleMouseUp() {
-    newColor = colorPicker.color.rgb;
+  function handleChangeColor(origin) {
+    let newColorF;
+    if (origin === "circle") {
+      const newColor = colorPicker.color.rgb;
+      newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+    } else {
+      newColorF = origin;
+    }
+
+    color_store.set(newColorF);
+    const eventState = get(event_state_store);
+
+    if (eventState === "selected") {
+      const selectedArray = get(selected_store);
+      const undoArray = [];
+      selectedArray.forEach((item) => {
+        const [, id] = item.id.split("&");
+        if (item.id.includes("textbox")) {
+          const ogTextbox = get(textBoxesStore)[id];
+          if (ogTextbox.fontColor !== newColorF) {
+            undoArray.push({
+              id,
+              fontColor: ogTextbox.fontColor,
+            });
+            updateTextBox(id, { fontColor: newColorF });
+          }
+        }
+      });
+      if (undoArray.length > 0) {
+        AddUndoItem({
+          action: "changedManyFontColors",
+          data: undoArray,
+        });
+      }
+    }
+
+    if (arrayOfColors.includes(newColorF)) return;
+
     if (arrayOfColors.length === 12) {
       arrayOfColors.shift();
       arrayOfColors = arrayOfColors;
     }
-    arrayOfColors.push(`rgb(${newColor.r},${newColor.g}, ${newColor.b} `);
+    arrayOfColors.push(newColorF);
     arrayOfColors = arrayOfColors;
+  }
+
+  function handleAlignment(e) {
+    const { id } = e.target;
+    text_alignment.set(id);
+    const eventState = get(event_state_store);
+    if (eventState.includes("typing")) {
+      const [, textboxid] = eventState.split("&");
+      const oldAlign = get(textBoxesStore)[textboxid].align;
+      updateTextBox(textboxid, { align: id });
+      if (oldAlign !== id)
+        AddUndoItem({
+          action: "textBoxAligned",
+          data: { id: textboxid, align: oldAlign },
+        });
+    }
+  }
+
+  function handleFontChange(e) {
+    ChangeTextFont(e.target.value);
   }
 </script>
 
@@ -48,16 +150,23 @@
     <div class="text-position-container">
       Align
       <div class="text-position">
-        <button> <TextLeft /> </button>
-        <button><TextCenter /></button>
-        <button><TextRight /></button>
+        <button id="left" on:click={handleAlignment}> <TextLeft /> </button>
+        <button id="center" on:click={handleAlignment}><TextCenter /></button>
+        <button id="right" on:click={handleAlignment}><TextRight /></button>
       </div>
       <div class="font-container">
         Font
-        <select class="font-box" style="width: 160px" id="">
-          <option class="font-box" value="arial">Arial</option>
-          <option class="font-box" value="comic-sans">Comic-Sans</option>
-          <option class="font-box" value="comic-sans">Helvettica</option>
+        <select
+          class="font-box"
+          style="width: 160px"
+          id=""
+          on:change={handleFontChange}
+        >
+          <option class="font-box" value="Arial">Arial</option>
+          <option class="font-box" value="Patrick Hand">Patrick Hand</option>
+          <option class="font-box" value="Times New Roman"
+            >Times New Roman</option
+          >
         </select>
       </div>
     </div>
@@ -67,8 +176,9 @@
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
           id="picker"
-          on:mousedown={handleMouseDown}
-          on:mouseup={handleMouseUp}
+          on:mouseup={() => {
+            handleChangeColor("circle");
+          }}
         />
       </div>
     </div>
@@ -77,7 +187,12 @@
       <div class="choices-container" style="margin-top: 6px;">
         {#each arrayOfColors as color}
           <div class="color-box">
-            <button class="color-button" style="background-color: {color}"
+            <button
+              class="color-button"
+              on:click={() => {
+                handleChangeColor(color);
+              }}
+              style="background-color: {color}"
             ></button>
           </div>
         {/each}
