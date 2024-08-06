@@ -41,11 +41,12 @@ export function HandleUndo() {
       break;
     case "draggedMultiple":
       handleUndoDragMultiple(lastAction)
+      break;
     case "expanded":
       undoExpand(lastAction)
       break;
     case "deleted":
-      undoDeletedTextBoxes(lastAction.data)
+      undoDeletedTextBoxes(lastAction)
       break;
     case "textBoxAligned":
       undoTextBoxAlignChange(lastAction)
@@ -58,6 +59,10 @@ export function HandleUndo() {
       break;
     case 'changedManyFonts':
       undoChangedManyFonts(lastAction)
+      break;
+    case 'changedManyFontColors':
+      undoChangedManyFontColors(lastAction)
+      break;
   }
   popLastItem();
   // console.log("undo: ", lastAction.action, "undo store Total Now: ", get(undo_store).length)
@@ -98,7 +103,8 @@ function undoExpand(lastAction: UndoExpand) {
   updateTextBox(id, { x, y, height, width })
 }
 
-function undoDeletedTextBoxes(array: any) {
+function undoDeletedTextBoxes(lastAction: any) {
+  const array = lastAction.data
   array.forEach((item: any) => {
     textBoxesStore.update((boxes) => ({
       ...boxes,
@@ -127,7 +133,13 @@ function undoChangedManyFonts(lastAction) {
   undoArray.forEach((item) => {
     updateTextBox(item.id, { fontFamily: item.fontFamily })
   })
+}
 
+function undoChangedManyFontColors(lastAction) {
+  const undoArray = lastAction.data
+  undoArray.forEach((item) => {
+    updateTextBox(item.id, { fontColor: item.fontColor })
+  })
 }
 
 function popLastItem() {

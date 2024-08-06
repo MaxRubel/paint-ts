@@ -37,10 +37,12 @@ export function DrawBrushStroke(
 
   const pathData = getSvgPathFromStroke(stroke);
   const canvasPath = new Path2D(pathData);
-  const mode = get(theme_store);
   color = get(color_store)
+  if (!color) {
+    color = get(theme_store) === 'dark' ? 'lightgray' : 'black'
+  }
   paths.push({ color, pathData });
-  context.fillStyle = color ? color : 'black'
+  context.fillStyle = color
   context.fill(canvasPath);
 }
 
@@ -59,7 +61,6 @@ export function ReDrawBrushStrokes() {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     paths.forEach((path: any) => {
       const canvasPath = new Path2D(path.pathData);
-      const mode = get(theme_store);
       ctx.fillStyle = path.color
       ctx.fill(canvasPath);
     });

@@ -89,6 +89,10 @@ export function ChangeTextFont(value: string) {
   const eventState = get(event_state_store)
   const oldFont = get(font_family_store)
 
+  if (eventState === "creating_text") {
+    font_family_store.set(value)
+  }
+
   if (eventState.includes("typing")) {
     const [, id] = eventState.split("&")
     updateTextBox(id, { fontFamily: value })

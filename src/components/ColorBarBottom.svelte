@@ -1,7 +1,7 @@
 <script>
   // @ts-nocheck
 
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import TextCenter from "../graphics/TextCenter.svelte";
   import TextLeft from "../graphics/TextLeft.svelte";
   import TextRight from "../graphics/TextRight.svelte";
@@ -14,27 +14,105 @@
     updateTextBox,
   } from "../../stores/textBoxStore";
   import { get } from "svelte/store";
-  import { event_state_store } from "../../stores/eventState";
+  import {
+    event_state_store,
+    selected_store,
+    theme_store,
+  } from "../../stores/eventState";
   import { AddUndoItem } from "../../stores/undoStore";
 
   export let colorBarisOpen = false;
 
   let colorPicker;
-
   let arrayOfColors = [];
+
+  let colorStoreReturn;
+
+  function rgbStringToHex(rgbString) {
+    // Use regex to extract the RGB values
+    const rgbMatch = rgbString.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+
+    if (!rgbMatch) {
+      throw new Error('Invalid RGB string format. Expected "rgb(r, g, b)"');
+    }
+
+    // Convert the matched values to numbers
+    const r = parseInt(rgbMatch[1], 10);
+    const g = parseInt(rgbMatch[2], 10);
+    const b = parseInt(rgbMatch[3], 10);
+
+    // Convert to hex and pad with zeros if necessary
+    const toHex = (c) => {
+      const hex = c.toString(16);
+      return hex.length === 1 ? "0" + hex : hex;
+    };
+
+    // Combine the hex values
+    return "#" + toHex(r) + toHex(g) + toHex(b);
+  }
+
+  const unsubcribe = color_store.subscribe((value) => {
+    if (!value) {
+      const mode = get(theme_store);
+      mode === "dark"
+        ? (colorStoreReturn = "#D3D3D3")
+        : (colorStoreReturn = "#D3D3D3");
+    } else {
+      colorStoreReturn = rgbStringToHex(value);
+    }
+  });
+
+  onDestroy(unsubcribe);
 
   onMount(() => {
     // @ts-ignore
     colorPicker = new iro.ColorPicker("#picker", {
       width: 66,
     });
+    colorPicker.id = "colorpicker";
   });
 
-  function handleMouseUp() {
-    const newColor = colorPicker.color.rgb;
-    const newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+  $: {
+    if (colorPicker) {
+      colorPicker.color.hexString = colorStoreReturn;
+    }
+  }
+
+  function handleChangeColor(origin) {
+    let newColorF;
+    if (origin === "circle") {
+      const newColor = colorPicker.color.rgb;
+      newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+    } else {
+      newColorF = origin;
+    }
 
     color_store.set(newColorF);
+    const eventState = get(event_state_store);
+
+    if (eventState === "selected") {
+      const selectedArray = get(selected_store);
+      const undoArray = [];
+      selectedArray.forEach((item) => {
+        const [, id] = item.id.split("&");
+        if (item.id.includes("textbox")) {
+          const ogTextbox = get(textBoxesStore)[id];
+          if (ogTextbox.fontColor !== newColorF) {
+            undoArray.push({
+              id,
+              fontColor: ogTextbox.fontColor,
+            });
+            updateTextBox(id, { fontColor: newColorF });
+          }
+        }
+      });
+      if (undoArray.length > 0) {
+        AddUndoItem({
+          action: "changedManyFontColors",
+          data: undoArray,
+        });
+      }
+    }
 
     if (arrayOfColors.includes(newColorF)) return;
 
@@ -96,7 +174,12 @@
       Color
       <div style="margin-top: 6px;">
         <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div id="picker" on:mouseup={handleMouseUp} />
+        <div
+          id="picker"
+          on:mouseup={() => {
+            handleChangeColor("circle");
+          }}
+        />
       </div>
     </div>
     <div class="recent-choices">
@@ -106,7 +189,9 @@
           <div class="color-box">
             <button
               class="color-button"
-              on:click={color_store.set(color)}
+              on:click={() => {
+                handleChangeColor(color);
+              }}
               style="background-color: {color}"
             ></button>
           </div>
