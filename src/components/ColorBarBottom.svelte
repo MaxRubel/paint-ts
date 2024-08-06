@@ -285,7 +285,7 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    opacity: 0.8;
+    /* opacity: 0.8; */
   }
 
   .recent-choices {
@@ -319,7 +319,7 @@
   }
 
   .color-button {
-    opacity: 0.8;
+    /* opacity: 0.8; */
     height: 100%;
     width: 100%;
     border-radius: 8px;
