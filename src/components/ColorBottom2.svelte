@@ -21,8 +21,6 @@
   } from "../../stores/eventState";
   import { AddUndoItem } from "../../stores/undoStore";
 
-  export let colorBarisOpen = false;
-
   let colorPicker;
   let arrayOfColors = [];
   let colorStoreReturn;
@@ -65,6 +63,7 @@
   const unsubcribe2 = event_state_store.subscribe((value) => {
     eventState = value;
   });
+
   onDestroy(() => {
     unsubcribe();
     unsubcribe2();
@@ -73,7 +72,7 @@
   onMount(() => {
     // @ts-ignore
     colorPicker = new iro.ColorPicker("#picker", {
-      width: 66,
+      width: 77,
       layout: [
         {
           component: iro.ui.Wheel,
@@ -127,7 +126,7 @@
 
     if (arrayOfColors.includes(newColorF)) return;
 
-    if (arrayOfColors.length === 12) {
+    if (arrayOfColors.length === 15) {
       arrayOfColors.shift();
       arrayOfColors = arrayOfColors;
     }
@@ -148,50 +147,55 @@
           action: "textBoxAligned",
           data: { id: textboxid, align: oldAlign },
         });
+      document.getElementById(`textbox&${textboxid}`).focus();
     }
   }
 
   function handleFontChange(e) {
     ChangeTextFont(e.target.value);
   }
-
-  $: console.log(eventState);
 </script>
 
-<div class="color-bar" class:colorBarisOpen>
+<div class="color-bar">
   <div class="hi">
-    {#if eventState.includes("typing") || eventState === "drawing" || eventState === "creating_text"}
-      <div class="text-position-container">
-        <div class="align-box">
-          Align
-          <div class="text-position" style="margin-top: 11px">
-            <button id="left" on:click={handleAlignment}> <TextLeft /> </button>
-            <button id="center" on:click={handleAlignment}
-              ><TextCenter /></button
-            >
-            <button id="right" on:click={handleAlignment}><TextRight /></button>
-          </div>
-        </div>
-        <div class="font-container">
-          Font
-          <select
-            class="font-box"
-            style="width: 160px; margin-top: 22px"
-            id=""
-            on:change={handleFontChange}
-          >
-            <option class="font-box" value="Arial">Arial</option>
-            <option class="font-box" value="Patrick Hand">Patrick Hand</option>
-            <option class="font-box" value="Times New Roman"
-              >Times New Roman</option
-            >
-          </select>
+    <div class="text-position-container">
+      <div class="align-box">
+        Align
+        <div class="text-position" style="margin-top: 0px">
+          <button id="left" on:click={handleAlignment}> <TextLeft /> </button>
+          <button id="center" on:click={handleAlignment}><TextCenter /></button>
+          <button id="right" on:click={handleAlignment}><TextRight /></button>
         </div>
       </div>
-    {/if}
+      <div class="font-container">
+        Font
+        <select
+          class="font-box"
+          id=""
+          on:click={handleFontChange}
+          on:change={handleFontChange}
+        >
+          <option class="font-box" value="Arial">Arial</option>
+          <option class="font-box" value="Patrick Hand">Patrick Hand</option>
+          <option class="font-box" value="Times New Roman"
+            >Times New Roman</option
+          >
+        </select>
+        <div class="size-container">
+          <div>Size</div>
+          <div>
+            <input
+              type="number"
+              class="font-box"
+              style="width: 108px; height: 24px"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="color-container">
       Color
-      <div style="margin-top: 6px;">
+      <div style="margin-top: 16px;">
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
           id="picker"
@@ -211,7 +215,7 @@
               on:click={() => {
                 handleChangeColor(color);
               }}
-              style="background-color: {color}"
+              style="background-color: {color};"
             ></button>
           </div>
         {/each}
@@ -223,7 +227,7 @@
 <style>
   button {
     width: 44px;
-    height: 44px;
+    height: 36px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -236,17 +240,14 @@
   .color-bar {
     width: 100%;
     position: fixed;
-    height: 142px;
+    height: 130px;
     left: 0;
     bottom: 0;
     transition: all ease 1s;
     z-index: 400;
     color: rgb(255, 255, 255);
     background-color: rgba(0, 0, 0, 0.288);
-    opacity: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    opacity: 1;
   }
 
   .colorBarisOpen {
@@ -256,25 +257,19 @@
   .text-position-container {
     text-align: center;
     display: flex;
-    justify-content: center;
-    /* align-items: center; */
-
-    /* background-color: aliceblue; */
+    justify-content: space-evenly;
   }
 
   .hi {
     display: grid;
-    width: 600px;
     grid-template-columns: 2fr 1fr 2fr;
   }
 
   .text-position {
     height: 44px;
     display: flex;
-    margin-top: 4px;
     gap: 6px;
     justify-content: center;
-    margin-top: 4px;
     padding: 3px;
   }
 
@@ -286,6 +281,21 @@
   }
 
   .font-box {
+    /* width: 100%; */
+    padding: 5px;
+    padding-top: 3px;
+    border-radius: 5px;
+    background-color: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.538);
+    outline: none;
+    margin-top: 4px;
+    height: 36px;
+    width: 120px;
+    /* background-color: red; */
+  }
+
+  .size-input {
     width: 100%;
     padding: 5px;
     border-radius: 5px;
@@ -320,22 +330,22 @@
     width: 100%;
     border-radius: 10px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    width: 190px;
-    height: 96px;
+    grid-template-columns: repeat(5, 1fr);
+    width: 260px;
+    height: 84px;
     place-items: center;
     align-content: start;
     gap: 2px;
     padding: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.166);
+    border: 1px solid rgba(255, 255, 255, 0.538);
   }
 
   .color-box {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px;
-    height: 29px;
+    width: 44px;
+    height: 25px;
     border: 1px solid rgba(0, 0, 0, 0);
     border-radius: 10px;
   }

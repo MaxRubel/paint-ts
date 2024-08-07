@@ -51,7 +51,7 @@ export function createNewTextBox(
     [newKey]: newBox,
   }));
 
-  event_state_store.set(`typing${newKey}`)
+  event_state_store.set(`typing&${newKey}`)
 }
 
 export function updateTextBox(id: string, updates: any) {

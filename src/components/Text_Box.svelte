@@ -188,37 +188,37 @@
   }
 
   function handleBlur() {
-    textareaElement?.setSelectionRange(
-      textareaElement.selectionStart,
-      textareaElement.selectionStart,
-    );
-    if (eventState.includes("typing")) {
-      if (oldValue !== textareaElement.value) {
-        AddUndoItem({
-          action: "typed",
-          data: {
-            id,
-            start: oldValue ? oldValue : "",
-          },
-        });
-      }
-    }
-    if (eventState === "selecting") {
-      hidden = true;
-    }
-    if (
-      eventState !== "creating_text" &&
-      eventState !== "selecting" &&
-      eventState !== "selected"
-    ) {
-      if (!eventState.includes("expanding")) {
-        selected_store.set([textareaElement]);
-      }
-    }
-    if (textareaElement?.value === "") {
-      //auto remove empty text boxes
-      deleteTextBox(id);
-    }
+    // textareaElement?.setSelectionRange(
+    //   textareaElement.selectionStart,
+    //   textareaElement.selectionStart,
+    // );
+    // if (eventState.includes("typing")) {
+    //   if (oldValue !== textareaElement.value) {
+    //     AddUndoItem({
+    //       action: "typed",
+    //       data: {
+    //         id,
+    //         start: oldValue ? oldValue : "",
+    //       },
+    //     });
+    //   }
+    // }
+    // if (eventState === "selecting") {
+    //   hidden = true;
+    // }
+    // if (
+    //   eventState !== "creating_text" &&
+    //   eventState !== "selecting" &&
+    //   eventState !== "selected"
+    // ) {
+    //   if (!eventState.includes("expanding")) {
+    //     selected_store.set([textareaElement]);
+    //   }
+    // }
+    // if (textareaElement?.value === "") {
+    //   //auto remove empty text boxes
+    //   deleteTextBox(id);
+    // }
     // checkOverflow();
     updateTextBox(id, { x, y, height, width });
   }
@@ -490,7 +490,7 @@
       const [_, eventId] = eventState.split("&");
       if (eventId === id) {
         typing = true;
-        typeStart = textareaElement.value;
+        typeStart = textareaElement?.value;
       }
     } else {
       typing = false;
