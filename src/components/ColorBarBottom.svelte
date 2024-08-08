@@ -159,7 +159,7 @@
 <div class="color-bar" class:colorBarisOpen>
   <button>hey</button>
   <div class="hi">
-    {#if eventState.includes("typing") || eventState === "drawing" || eventState === "creating_text"}
+    {#if eventState.includes("typing") || eventState === "creating_text"}
       <div class="text-position-container">
         <div class="align-box">
           Align

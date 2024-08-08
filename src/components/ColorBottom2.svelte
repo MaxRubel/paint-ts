@@ -28,6 +28,8 @@
     user_prefs_store,
   } from "../../stores/userPrefsStore";
   import Arrow from "../graphics/Arrow.svelte";
+  import { brush_size_store } from "../../stores/brushStore";
+  import Slider from "./Slider.svelte";
 
   let colorPicker;
   let arrayOfColors = [];
@@ -37,6 +39,7 @@
   let textAlignment;
   let fontFamily;
   let userPrefs;
+  let brushSize;
 
   function rgbStringToHex(rgbString) {
     // Use regex to extract the RGB values
@@ -92,6 +95,10 @@
     userPrefs = value;
   });
 
+  const unsubscribe7 = brush_size_store.subscribe((value) => {
+    brushSize = value;
+  });
+
   onDestroy(() => {
     unsubcribe();
     unsubcribe2();
@@ -99,6 +106,7 @@
     unsubscribe4();
     unsubscribe5();
     unsubscribe6();
+    unsubscribe7();
   });
 
   onMount(() => {
@@ -234,6 +242,13 @@
       UpdateUserPrefs({ colorBarVisible: true });
     }
   }
+
+  function changeBrushSize(e) {
+    const { value } = e.target;
+    if (value > 0) {
+      brush_size_store.set(value);
+    }
+  }
 </script>
 
 <div
@@ -244,59 +259,68 @@
     <Arrow colorBarVisible={userPrefs.colorBarVisible} />
   </button>
   <div class="hi">
-    <div class="text-position-container">
-      <div class="align-box">
-        Align
-        <div class="text-position" style="margin-top: 0px">
-          <button
-            id="left"
-            style={textAlignment === "left" && "color: white;"}
-            on:click={handleAlignment}
-          >
-            <TextLeft />
-          </button>
-          <button
-            id="center"
-            style={textAlignment === "center" && "color: white;"}
-            on:click={handleAlignment}><TextCenter /></button
-          >
-          <button
-            id="right"
-            style={textAlignment === "right" && "color: white;"}
-            on:click={handleAlignment}><TextRight /></button
-          >
+    {#if eventState === "drawing"}
+      <div class="brush-size-container" style="flex-direction: column;">
+        <div>Brush Size</div>
+        <div class="centered" style="height: 90px;">
+          <Slider />
         </div>
       </div>
-      <div class="font-container">
-        Font
-        <select
-          class="font-box"
-          id=""
-          value={fontFamily}
-          on:click={handleFontChange}
-          on:change={handleFontChange}
-        >
-          <option class="font-box" value="Arial">Arial</option>
-          <option class="font-box" value="Patrick Hand">Patrick Hand</option>
-          <option class="font-box" value="Times New Roman"
-            >Times New Roman</option
+    {:else}
+      <div class="text-position-container">
+        <div class="align-box">
+          Align
+          <div class="text-position" style="margin-top: 0px">
+            <button
+              id="left"
+              style={textAlignment === "left" && "color: white;"}
+              on:click={handleAlignment}
+            >
+              <TextLeft />
+            </button>
+            <button
+              id="center"
+              style={textAlignment === "center" && "color: white;"}
+              on:click={handleAlignment}><TextCenter /></button
+            >
+            <button
+              id="right"
+              style={textAlignment === "right" && "color: white;"}
+              on:click={handleAlignment}><TextRight /></button
+            >
+          </div>
+        </div>
+        <div class="font-container">
+          Font
+          <select
+            class="font-box"
+            id=""
+            value={fontFamily}
+            on:click={handleFontChange}
+            on:change={handleFontChange}
           >
-        </select>
-        <div class="size-container">
-          <div>Size</div>
-          <div>
-            <input
-              type="number"
-              id="font-size-input-box"
-              class="font-box"
-              on:input={handleSizeChange}
-              value={fontSize}
-              style="width: 140px; height: 24px"
-            />
+            <option class="font-box" value="Arial">Arial</option>
+            <option class="font-box" value="Patrick Hand">Patrick Hand</option>
+            <option class="font-box" value="Times New Roman"
+              >Times New Roman</option
+            >
+          </select>
+          <div class="size-container">
+            <div>Size</div>
+            <div>
+              <input
+                type="number"
+                id="font-size-input-box"
+                class="font-box"
+                on:input={handleSizeChange}
+                value={fontSize}
+                style="width: 140px; height: 24px"
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    {/if}
     <div class="color-container">
       Color
       <div class="color-wheel-border">
@@ -375,7 +399,11 @@
     display: flex;
     justify-content: space-evenly;
   }
-
+  .brush-size-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
   .hi {
     display: grid;
     grid-template-columns: 2fr 1fr 2fr;
