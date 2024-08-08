@@ -22,6 +22,12 @@
     theme_store,
   } from "../../stores/eventState";
   import { AddUndoItem } from "../../stores/undoStore";
+  import DownArrow from "../graphics/Arrow.svelte";
+  import {
+    UpdateUserPrefs,
+    user_prefs_store,
+  } from "../../stores/userPrefsStore";
+  import Arrow from "../graphics/Arrow.svelte";
 
   let colorPicker;
   let arrayOfColors = [];
@@ -30,6 +36,7 @@
   let fontSize;
   let textAlignment;
   let fontFamily;
+  let userPrefs;
 
   function rgbStringToHex(rgbString) {
     // Use regex to extract the RGB values
@@ -81,12 +88,17 @@
     fontFamily = value;
   });
 
+  const unsubscribe6 = user_prefs_store.subscribe((value) => {
+    userPrefs = value;
+  });
+
   onDestroy(() => {
     unsubcribe();
     unsubcribe2();
     unsubcribe3();
     unsubscribe4();
     unsubscribe5();
+    unsubscribe6();
   });
 
   onMount(() => {
@@ -214,9 +226,23 @@
     }
     oldFontSize = value;
   }
+
+  function handleToggleVisible() {
+    if (userPrefs.colorBarVisible) {
+      UpdateUserPrefs({ colorBarVisible: false });
+    } else {
+      UpdateUserPrefs({ colorBarVisible: true });
+    }
+  }
 </script>
 
-<div class="color-bar">
+<div
+  class="color-bar"
+  style="bottom: {userPrefs.colorBarVisible ? '0px' : '-130px'}"
+>
+  <button class="toggle-button" on:click={handleToggleVisible}>
+    <Arrow colorBarVisible={userPrefs.colorBarVisible} />
+  </button>
   <div class="hi">
     <div class="text-position-container">
       <div class="align-box">
@@ -313,6 +339,18 @@
     background-color: transparent;
     color: rgba(255, 255, 255, 0.538);
     border: 1px solid;
+  }
+
+  .toggle-button {
+    position: absolute;
+    top: -40px;
+    right: 5px;
+    color: white;
+  }
+
+  .toggle-button:hover {
+    color: rgb(255, 165, 255);
+    transition: all ease 0.3s;
   }
 
   .color-bar {
