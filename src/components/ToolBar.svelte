@@ -64,29 +64,17 @@
     unsubscribe3();
     unsubscribe4();
   });
-
-  let dropdpwnOpen = false;
-
-  function openDropdown() {
-    dropdpwnOpen = true;
-  }
-
-  function closeDropdown() {
-    dropdpwnOpen = false;
-  }
-
-  let dropdownMenu: any = "";
 </script>
 
 <div class="tool-bar">
-  <div class="event-state">
+  <!-- <div class="event-state">
     <div>
       <h3>{event_state.includes("typing") ? "typing" : event_state}</h3>
     </div>
     {#if event_state === "selecting" || event_state === "selected"}
       <div>selected: {selected.length}</div>
     {/if}
-  </div>
+  </div> -->
   <div class="second-row" style="color: white">
     <div class="main-bar">
       <button
@@ -203,13 +191,13 @@
     gap: 5px;
   }
 
-  .event-state {
+  /* .event-state {
     position: fixed;
     text-align: left;
     top: 60px;
     left: 13px;
     color: white;
-  }
+  } */
 
   .side-bar {
     padding-left: 20px;
@@ -232,16 +220,16 @@
     .tool-bar {
       height: auto;
     }
-    .event-state {
+    /* .event-state {
       top: 114px;
-    }
+    } */
     .side-bar {
       margin-top: 4px;
       padding-left: 0px;
       justify-content: center;
     }
   }
-  h3 {
+  /* h3 {
     margin-bottom: 10px;
-  }
+  } */
 </style>

@@ -9,6 +9,8 @@
   import { color_store } from "../../stores/colorStore";
   import {
     ChangeTextFont,
+    font_family_store,
+    font_size_store,
     text_alignment,
     textBoxesStore,
     updateTextBox,
@@ -25,6 +27,9 @@
   let arrayOfColors = [];
   let colorStoreReturn;
   let eventState;
+  let fontSize;
+  let textAlignment;
+  let fontFamily;
 
   function rgbStringToHex(rgbString) {
     // Use regex to extract the RGB values
@@ -64,9 +69,24 @@
     eventState = value;
   });
 
+  const unsubcribe3 = font_size_store.subscribe((value) => {
+    fontSize = value;
+  });
+
+  const unsubscribe4 = text_alignment.subscribe((value) => {
+    textAlignment = value;
+  });
+
+  const unsubscribe5 = font_family_store.subscribe((value) => {
+    fontFamily = value;
+  });
+
   onDestroy(() => {
     unsubcribe();
     unsubcribe2();
+    unsubcribe3();
+    unsubscribe4();
+    unsubscribe5();
   });
 
   onMount(() => {
@@ -138,6 +158,7 @@
     const { id } = e.target;
     text_alignment.set(id);
     const eventState = get(event_state_store);
+
     if (eventState.includes("typing")) {
       const [, textboxid] = eventState.split("&");
       const oldAlign = get(textBoxesStore)[textboxid].align;
@@ -149,10 +170,49 @@
         });
       document.getElementById(`textbox&${textboxid}`).focus();
     }
+
+    if (eventState === "selected") {
+      const selectedArray = get(selected_store);
+      const data = [];
+      selectedArray.forEach((item) => {
+        const [, textboxid] = item.id.split("&");
+        const oldAlign = get(textBoxesStore)[textboxid].align;
+        data.push({ id: textboxid, align: oldAlign });
+        updateTextBox(textboxid, { align: id });
+      });
+      AddUndoItem({ action: "manyTextBoxAligned", data });
+    }
   }
 
   function handleFontChange(e) {
     ChangeTextFont(e.target.value);
+  }
+
+  let oldFontSize = 24;
+  function handleSizeChange(e) {
+    const { value } = e.target;
+    if (value < 8) return;
+    font_size_store.set(value);
+
+    if (eventState.includes("typing")) {
+      const [, id] = eventState.split("&");
+      updateTextBox(id, { fontSize: value });
+      AddUndoItem({
+        action: "changedFontSizes",
+        data: [{ id, oldFontSize }],
+      });
+    }
+
+    if (eventState === "selected") {
+      const data = [];
+      get(selected_store).forEach((item) => {
+        const [, id] = item.id.split("&");
+        updateTextBox(id, { fontSize: value });
+        data.push({ id, oldFontSize });
+      });
+      AddUndoItem({ action: "changedFontSizes", data });
+    }
+    oldFontSize = value;
   }
 </script>
 
@@ -162,9 +222,23 @@
       <div class="align-box">
         Align
         <div class="text-position" style="margin-top: 0px">
-          <button id="left" on:click={handleAlignment}> <TextLeft /> </button>
-          <button id="center" on:click={handleAlignment}><TextCenter /></button>
-          <button id="right" on:click={handleAlignment}><TextRight /></button>
+          <button
+            id="left"
+            style={textAlignment === "left" && "color: white;"}
+            on:click={handleAlignment}
+          >
+            <TextLeft />
+          </button>
+          <button
+            id="center"
+            style={textAlignment === "center" && "color: white;"}
+            on:click={handleAlignment}><TextCenter /></button
+          >
+          <button
+            id="right"
+            style={textAlignment === "right" && "color: white;"}
+            on:click={handleAlignment}><TextRight /></button
+          >
         </div>
       </div>
       <div class="font-container">
@@ -172,6 +246,7 @@
         <select
           class="font-box"
           id=""
+          value={fontFamily}
           on:click={handleFontChange}
           on:change={handleFontChange}
         >
@@ -186,8 +261,11 @@
           <div>
             <input
               type="number"
+              id="font-size-input-box"
               class="font-box"
-              style="width: 108px; height: 24px"
+              on:input={handleSizeChange}
+              value={fontSize}
+              style="width: 140px; height: 24px"
             />
           </div>
         </div>
@@ -195,7 +273,7 @@
     </div>
     <div class="color-container">
       Color
-      <div style="margin-top: 16px;">
+      <div class="color-wheel-border">
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <div
           id="picker"
@@ -207,7 +285,7 @@
     </div>
     <div class="recent-choices">
       Recent
-      <div class="choices-container" style="margin-top: 6px;">
+      <div class="choices-container" style="margin-top: 4px;">
         {#each arrayOfColors as color}
           <div class="color-box">
             <button
@@ -246,13 +324,13 @@
     transition: all ease 1s;
     z-index: 400;
     color: rgb(255, 255, 255);
-    background-color: rgba(0, 0, 0, 0.288);
+    background-color: rgba(0, 0, 0, 0.475);
     opacity: 1;
   }
 
-  .colorBarisOpen {
+  /* .colorBarisOpen {
     opacity: 1;
-  }
+  } */
 
   .text-position-container {
     text-align: center;
@@ -291,11 +369,11 @@
     outline: none;
     margin-top: 4px;
     height: 36px;
-    width: 120px;
+    width: 150px;
     /* background-color: red; */
   }
 
-  .size-input {
+  /* .size-input {
     width: 100%;
     padding: 5px;
     border-radius: 5px;
@@ -304,7 +382,7 @@
     border: 1px solid rgba(255, 255, 255, 0.538);
     outline: none;
     margin-top: 4px;
-  }
+  } */
 
   .font-box:active,
   .font-box:focus {
@@ -332,12 +410,22 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     width: 260px;
-    height: 84px;
-    place-items: center;
-    align-content: start;
+    height: 88px;
     gap: 2px;
     padding: 4px;
     border: 1px solid rgba(255, 255, 255, 0.538);
+  }
+
+  .color-wheel-border {
+    margin-top: 13px;
+    /* width: 122px;
+    height: 100px; */
+    /* border: 1px solid rgba(255, 255, 255, 0.284);
+    padding: 0px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center; */
   }
 
   .color-box {

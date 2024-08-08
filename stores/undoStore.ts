@@ -2,7 +2,7 @@ import { get, writable } from "svelte/store";
 import { SplicePaths } from "../utils/drawBrushStroke";
 import type { UndoBrushStroke, UndoDragSingle, UndoExpand, UndoTyping } from "../utils/types/undo_types";
 import type { UndoType } from "../utils/types/app_types";
-import { deleteTextBox, textBoxesStore, updateTextBox } from "./textBoxStore";
+import { deleteTextBox, font_size_store, textBoxesStore, updateTextBox } from "./textBoxStore";
 import { event_state_store } from "./eventState";
 
 
@@ -62,6 +62,12 @@ export function HandleUndo() {
       break;
     case 'changedManyFontColors':
       undoChangedManyFontColors(lastAction)
+      break;
+    case "changedFontSizes":
+      undoChangedFontSizes(lastAction)
+      break;
+    case "manyTextBoxAligned":
+      undoManyTextBoxAligned(lastAction)
       break;
   }
   popLastItem();
@@ -139,6 +145,21 @@ function undoChangedManyFontColors(lastAction) {
   const undoArray = lastAction.data
   undoArray.forEach((item) => {
     updateTextBox(item.id, { fontColor: item.fontColor })
+  })
+}
+
+function undoChangedFontSizes(lastAction) {
+  const undoArray = lastAction.data
+  undoArray.forEach((item) => {
+    updateTextBox(item.id, { fontSize: item.oldFontSize })
+    font_size_store.set(item.oldFontSize)
+  })
+}
+
+function undoManyTextBoxAligned(lastAction) {
+  const undoArray = lastAction.data
+  undoArray.forEach((item) => {
+    updateTextBox(item.id, { align: item.align })
   })
 }
 

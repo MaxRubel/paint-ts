@@ -98,6 +98,7 @@
 
   function handleKeyup(e: KeyboardEvent) {
     if (event_state.includes("typing")) return;
+    if ((e.target as HTMLInputElement).id === "font-size-input-box") return;
     switch (e.key) {
       case "d":
         handle_drawing_mode();
