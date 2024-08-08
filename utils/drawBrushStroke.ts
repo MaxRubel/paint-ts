@@ -4,6 +4,7 @@ import { get } from "svelte/store";
 import { theme_store } from "../stores/eventState";
 import { AddUndoItem } from "../stores/undoStore";
 import { color_store } from "../stores/colorStore";
+import { brush_size_store } from "../stores/brushStore";
 
 let points: [number, number, number][] = [];
 let paths: { pathData: string, color: string }[] = [];
@@ -29,7 +30,7 @@ export function DrawBrushStroke(
   isDrawing = true;
 
   const stroke = getStroke(points, {
-    size: size,
+    size: get(brush_size_store),
     thinning: 0.5,
     smoothing: 0.5,
     streamline: 0.5,
