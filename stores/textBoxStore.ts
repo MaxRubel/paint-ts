@@ -17,6 +17,8 @@ export const text_alignment = writable("")
 
 export const font_family_store = writable("Arial")
 
+export const font_size_store = writable(24)
+
 export function createNewTextBox(
   e: MouseEvent,
   boxHeight: number,
@@ -43,7 +45,8 @@ export function createNewTextBox(
     x, y, fontColor, align,
     height: 80,
     width: 240,
-    fontFamily: get(font_family_store)
+    fontFamily: get(font_family_store),
+    fontSize: get(font_size_store)
   };
 
   textBoxesStore.update((boxes) => ({
@@ -88,10 +91,7 @@ export function UndoDeletedTextBoxes(array) {
 export function ChangeTextFont(value: string) {
   const eventState = get(event_state_store)
   const oldFont = get(font_family_store)
-
-  if (eventState === "creating_text") {
-    font_family_store.set(value)
-  }
+  font_family_store.set(value)
 
   if (eventState.includes("typing")) {
     const [, id] = eventState.split("&")

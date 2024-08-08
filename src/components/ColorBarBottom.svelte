@@ -154,8 +154,6 @@
   function handleFontChange(e) {
     ChangeTextFont(e.target.value);
   }
-
-  $: console.log(eventState);
 </script>
 
 <div class="color-bar" class:colorBarisOpen>

@@ -7,7 +7,11 @@
     theme_store,
   } from "../../stores/eventState";
   import { createEventDispatcher } from "svelte";
-  import { deleteTextBox } from "../../stores/textBoxStore";
+  import {
+    font_family_store,
+    font_size_store,
+    text_alignment,
+  } from "../../stores/textBoxStore";
   import type { TextBoxType } from "../../utils/types/app_types";
   import {
     StartDragMany,
@@ -27,6 +31,7 @@
   $: align = data.align;
   $: fontColor = data.fontColor;
   $: fontFamily = data.fontFamily;
+  $: fontSize = data.fontSize;
 
   let textareaElement: HTMLTextAreaElement;
   let isDragging = false;
@@ -60,6 +65,9 @@
     selected = value;
     if (selected.some((item) => item?.id === `textbox&${id}`)) {
       iAmSelected = true;
+      font_size_store.set(fontSize);
+      text_alignment.set(align);
+      font_family_store.set(fontFamily);
       if (selected.length > 0) {
         hidden = false;
       }
@@ -557,6 +565,7 @@
       color: {fontColor};
       text-align: {align};
       font-family: {fontFamily};
+      font-size: {fontSize}px;
     "
     id="textbox&{id}"
     on:input={handleChange}
