@@ -33,6 +33,7 @@
   import type { TextBoxMap } from "../../stores/textBoxStore";
   import { AddUndoItem, ClearUndoStore } from "../../stores/undoStore";
   import ColorBottom2 from "./ColorBottom2.svelte";
+  import SideBar from "./SideBar.svelte";
 
   let mode = "dark";
   let catSmootch = false;
@@ -306,6 +307,7 @@
   <!-- <ColorBarSide {colorBarisOpen} /> -->
   <!-- <ColorBarBottom {colorBarisOpen} /> -->
   <ColorBottom2 />
+  <SideBar />
   <ToolBar
     {handle_arrow_mode}
     {handle_drawing_mode}
