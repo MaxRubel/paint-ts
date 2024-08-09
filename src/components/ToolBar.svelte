@@ -143,7 +143,7 @@
 
 <style>
   button {
-    height: 50px;
+    height: 44px;
   }
 
   .smallside {
@@ -169,7 +169,7 @@
     top: 0px;
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 50px;
     z-index: 1000;
     box-sizing: border-box;
     background-color: rgba(0, 0, 0, 0.288);
