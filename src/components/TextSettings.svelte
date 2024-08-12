@@ -291,18 +291,15 @@
     transform: translateY(-50%);
     display: none;
     flex-direction: column;
-    border: 3px solid rgba(255, 255, 255, 0.198);
-    /* width: 244px; */
+    border: 2px solid rgba(255, 255, 255, 0.198);
   }
 
   .font-container {
     display: flex;
     justify-content: space-between;
-    /* flex-direction: column; */
   }
 
   .font-box {
-    /* width: 100%; */
     padding: 5px;
     padding-top: 3px;
     border-radius: 5px;
@@ -310,10 +307,8 @@
     color: white;
     border: 1px solid rgb(255, 255, 255);
     outline: none;
-    /* margin-top: 4px; */
     height: 36px;
     width: 145px;
-    /* background-color: red; */
   }
 
   .size-box {
@@ -326,7 +321,7 @@
 
   .align-box {
     flex-direction: column;
-    border-bottom: 3px solid rgba(255, 255, 255, 0.198);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.198);
     padding-bottom: 15px;
   }
 
@@ -353,13 +348,13 @@
     margin-top: 10px;
     gap: 40px;
     justify-content: space-between;
-    border-bottom: 3px solid rgba(255, 255, 255, 0.198);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.198);
     padding-bottom: 15px;
   }
 
   .color-container {
     padding-bottom: 10px;
-    border-bottom: 3px solid rgba(255, 255, 255, 0.198);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.198);
   }
 
   .color-picker {

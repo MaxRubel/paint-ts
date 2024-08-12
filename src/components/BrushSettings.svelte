@@ -146,7 +146,7 @@
     transform: translateY(-50%);
     display: none;
     flex-direction: column;
-    border: 3px solid rgba(255, 255, 255, 0.198);
+    border: 2px solid rgba(255, 255, 255, 0.198);
     width: 208px;
   }
 
@@ -161,7 +161,7 @@
   }
 
   .color-container {
-    border-bottom: 3px solid rgba(255, 255, 255, 0.198);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.198);
     padding-bottom: 15px;
   }
 
@@ -173,7 +173,7 @@
   }
 
   .slider {
-    border-bottom: 3px solid rgba(255, 255, 255, 0.198);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.198);
     padding-bottom: 10px;
   }
 
