@@ -137,15 +137,15 @@
     border-radius: 20px;
     height: 548px;
     background-color: rgba(0, 0, 0, 0.266);
-    left: 4px;
+    left: 15px;
     padding: 20px 10px;
-    top: 417px;
+    top: 400px;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
     transition: all ease 0.2s;
     opacity: 0;
-    border: 1px solid rgba(255, 255, 255, 0.077);
+    border: 3px solid rgba(255, 255, 255, 0.198);
   }
 
   .isVisible {
