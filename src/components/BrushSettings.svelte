@@ -99,7 +99,10 @@
       Stroke
       <div class="centered" style="margin-top: 5px;"><Slider /></div>
     </div>
-    <div style="margin-top: 10px; flex-direction: column" class="centered">
+    <div
+      style="margin-top: 10px; flex-direction: column"
+      class="centered color-container"
+    >
       Color
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
@@ -138,19 +141,17 @@
     height: 548px;
     background-color: rgba(0, 0, 0, 0.266);
     left: 15px;
-    padding: 20px 10px;
+    padding: 20px;
     top: 400px;
     transform: translateY(-50%);
-    display: flex;
+    display: none;
     flex-direction: column;
-    transition: all ease 0.2s;
-    opacity: 0;
     border: 3px solid rgba(255, 255, 255, 0.198);
+    width: 208px;
   }
 
   .isVisible {
-    opacity: 1;
-    transition: all 0.3 ease;
+    display: flex !important;
   }
 
   .content-wrapper {
@@ -159,11 +160,21 @@
     height: 100%;
   }
 
+  .color-container {
+    border-bottom: 3px solid rgba(255, 255, 255, 0.198);
+    padding-bottom: 15px;
+  }
+
   .color-picker {
     margin-top: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+
+  .slider {
+    border-bottom: 3px solid rgba(255, 255, 255, 0.198);
+    padding-bottom: 10px;
   }
 
   .palette {
@@ -176,15 +187,14 @@
   }
 
   .recent-choices {
-    margin-top: 10px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-auto-rows: min-content;
     padding: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.731);
+    /* border: 1px solid rgba(255, 255, 255, 0.731); */
     border-radius: 10pt;
     flex-grow: 1;
-    width: 180px;
+    width: 170px;
     gap: 5px;
     align-content: start;
     height: 100%;

@@ -21,7 +21,6 @@
     InitCtx,
     ReDrawBrushStrokes,
   } from "../../utils/drawBrushStroke";
-  import ToolBar from "./../components/ToolBar.svelte";
   import {
     ClearSelectionRect,
     DrawSelectBox,
@@ -32,11 +31,11 @@
   import { get } from "svelte/store";
   import type { TextBoxMap } from "../../stores/textBoxStore";
   import { AddUndoItem, ClearUndoStore } from "../../stores/undoStore";
-  import ColorBottom2 from "./ColorBottom2.svelte";
   import SideBar from "./SideBar.svelte";
   import ToolBar2 from "./ToolBar2.svelte";
   import PageTurn from "./PageTurn.svelte";
-  import ColorBottom3 from "./ColorBottom3.svelte";
+  import BrushSettings from "./BrushSettings.svelte";
+  import TextSettings from "./TextSettings.svelte";
 
   let mode = "dark";
   let catSmootch = false;
@@ -339,7 +338,8 @@
       on:pointermove={handlePointerMove}
     >
     </canvas>
-    <ColorBottom3 />
+    <BrushSettings />
+    <TextSettings />
     <PageTurn />
   </div>
 </main>
@@ -347,7 +347,6 @@
 <style>
   .canvas-container {
     position: relative;
-    /* height: 100vh; */
     width: 100vw;
   }
 
