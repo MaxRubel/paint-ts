@@ -1,8 +1,8 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   style="rotate: -90deg;"
-  width="24"
-  height="24"
+  width="16"
+  height="16"
   fill="currentColor"
   class="bi bi-cursor-fill"
   viewBox="0 0 16 16"

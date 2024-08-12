@@ -34,6 +34,9 @@
   import { AddUndoItem, ClearUndoStore } from "../../stores/undoStore";
   import ColorBottom2 from "./ColorBottom2.svelte";
   import SideBar from "./SideBar.svelte";
+  import ToolBar2 from "./ToolBar2.svelte";
+  import PageTurn from "./PageTurn.svelte";
+  import ColorBottom3 from "./ColorBottom3.svelte";
 
   let mode = "dark";
   let catSmootch = false;
@@ -308,7 +311,7 @@
   <!-- <ColorBarBottom {colorBarisOpen} /> -->
   <ColorBottom2 />
   <SideBar />
-  <ToolBar
+  <ToolBar2
     {handle_arrow_mode}
     {handle_drawing_mode}
     {handle_textbox_mode}
@@ -336,13 +339,15 @@
       on:pointermove={handlePointerMove}
     >
     </canvas>
+    <ColorBottom3 />
+    <PageTurn />
   </div>
 </main>
 
 <style>
   .canvas-container {
     position: relative;
-    height: 100vh;
+    /* height: 100vh; */
     width: 100vw;
   }
 
@@ -368,6 +373,6 @@
   }
 
   canvas.dark {
-    background-color: rgb(42, 50, 53);
+    background-color: rgb(40, 49, 52);
   }
 </style>
