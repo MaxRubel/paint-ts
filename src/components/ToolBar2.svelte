@@ -30,6 +30,8 @@
   let arrow = true;
   let selected = [];
 
+  console.log("hello");
+
   const unsubscribe = theme_store.subscribe((value) => {
     mode = value;
   });
