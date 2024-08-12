@@ -116,7 +116,7 @@
 
   function calculateNewValue(clientX) {
     // Find distance between cursor and element's left cord (20px / 2 = 10px) - Center of thumb
-    let delta = clientX - elementX;
+    let delta = clientX - elementX - 20;
 
     // Use width of the container for percent calc
     let percent = (delta * 100) / container.clientWidth;
@@ -242,6 +242,8 @@
     padding: 0.5rem;
     box-sizing: border-box;
     outline: none;
+    display: flex;
+    justify-content: center;
   }
 
   .range__wrapper:focus-visible > .range__track {
@@ -252,13 +254,14 @@
 
   .range__track {
     height: 8px;
-    background-color: var(--track-bgcolor, #d0d0d0);
+    /* background-color: var(--track-bgcolor, #d0d0d0); */
     border-radius: 999px;
     width: 200px;
+    border: 1px solid rgba(255, 255, 255, 0.731);
   }
 
   .range__track--highlighted {
-    background-color: var(--track-highlight-bgcolor, #8b61ff99);
+    background-color: var(--track-highlight-bgcolor, #000000c1);
     /* background: var(
       --track-highlight-bg,
       linear-gradient(90deg, #6185ff, #9c65ff)
@@ -280,6 +283,7 @@
     cursor: pointer;
     border-radius: 999px;
     margin-top: -6px;
+    margin-left: 7px;
     transition: box-shadow 100ms;
     user-select: none;
     box-shadow: var(

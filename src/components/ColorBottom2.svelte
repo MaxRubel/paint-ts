@@ -112,7 +112,7 @@
   onMount(() => {
     // @ts-ignore
     colorPicker = new iro.ColorPicker("#picker", {
-      width: 77,
+      width: 200,
       layout: [
         {
           component: iro.ui.Wheel,

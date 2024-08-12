@@ -309,7 +309,7 @@
 <main>
   <!-- <ColorBarSide {colorBarisOpen} /> -->
   <!-- <ColorBarBottom {colorBarisOpen} /> -->
-  <ColorBottom2 />
+  <!-- <ColorBottom2 /> -->
   <SideBar />
   <ToolBar2
     {handle_arrow_mode}
