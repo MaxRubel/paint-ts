@@ -10,13 +10,6 @@
 </div>
 
 <style>
-  button {
-    height: 44px;
-    width: 60px;
-    color: aliceblue;
-    background-color: rgba(0, 0, 0, 0.269);
-    /* background-color: #9096ff48; */
-  }
   .page-turn {
     background-color: transparent;
     position: fixed;
