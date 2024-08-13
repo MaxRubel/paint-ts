@@ -36,6 +36,8 @@
   import PageTurn from "./PageTurn.svelte";
   import BrushSettings from "./BrushSettings.svelte";
   import TextSettings from "./TextSettings.svelte";
+  import NavButton from "../graphics/NavButton.svelte";
+  import NavMenu from "./NavMenu.svelte";
 
   let mode = "dark";
   let catSmootch = false;
@@ -306,10 +308,8 @@
 </script>
 
 <main>
-  <!-- <ColorBarSide {colorBarisOpen} /> -->
-  <!-- <ColorBarBottom {colorBarisOpen} /> -->
-  <!-- <ColorBottom2 /> -->
-  <SideBar />
+  <NavMenu />
+  <!-- <SideBar /> -->
   <ToolBar2
     {handle_arrow_mode}
     {handle_drawing_mode}

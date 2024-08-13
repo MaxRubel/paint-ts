@@ -30,6 +30,23 @@ a:hover {
   align-items: center;
 }
 
+.clear-button {
+  background-color: transparent;
+  color: white;
+  /* height: 45px; */
+  width: auto;
+  cursor: default;
+  padding: 24px 20px;
+  width: 200px;
+  display: flex;
+  align-items: center;
+}
+
+.clear-button:hover {
+  background-color: #9096ff16;
+  transition: all .2s ease;
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
@@ -56,20 +73,17 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
   color: black;
-  background-color: rgb(255, 255, 255);
+  height: 44px;
+  width: 60px;
+  color: aliceblue;
+  background-color: rgba(0, 0, 0, 0.269);
 }
 
 button:hover {
-  background-color: #9096ff;
-  transition: all .3s ease;
-  color: black
+  background-color: #9096ff16;
+  transition: all .2s ease;
 }
 
-button:focus,
-button:focus-visible {
-  /* outline: 4px auto -webkit-focus-ring-color; */
-  color: black
-}
 
 @media (prefers-color-scheme: light) {
   :root {
