@@ -2,16 +2,24 @@
   import { onDestroy, onMount } from "svelte";
   import NavButton from "../graphics/NavButton.svelte";
   import { event_state_store } from "../../stores/eventState";
+  import { signIn, signOut } from "../../utils/auth/firebase";
+  import { auth_store } from "../../utils/auth/auth_store";
 
   let menuOpen = false;
   let eventState: String;
+  let authState: any;
 
   const unsubscribe = event_state_store.subscribe((value) => {
     eventState = value;
   });
 
+  const unsubscribe2 = auth_store.subscribe((value) => {
+    authState = value;
+  });
+
   onDestroy(() => {
     unsubscribe();
+    unsubscribe2();
   });
 
   function toggleNavMenu() {
@@ -54,12 +62,16 @@
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
   <button class="clear-button">About Us</button>
-  <button class="clear-button">Sign in</button>
+  {#if !authState.user}
+    <button class="clear-button" on:click={signIn}>Sign in</button>
+  {/if}
   <button class="clear-button">Open Project</button>
   <!-- <button class="clear-button">Save Project</button> -->
   <button class="clear-button">Color Palettes</button>
   <button class="clear-button">Share</button>
-  <button class="clear-button">Sign Out</button>
+  {#if authState.user}
+    <button class="clear-button" on:click={signOut}>Sign Out</button>
+  {/if}
 </div>
 
 <style>
