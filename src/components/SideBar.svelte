@@ -8,6 +8,7 @@
   } from "../../stores/userPrefsStore";
   import Folder from "../graphics/Folder.svelte";
   import Close from "../graphics/Close.svelte";
+  import { event_state_store } from "../../stores/eventState";
 
   let sideBarVisible;
   let closeButton = false;
@@ -25,6 +26,7 @@
       }, 900);
     } else {
       UpdateUserPrefs({ sideBarVisible: true });
+      event_state_store.set("arrow");
       timeoutId = setTimeout(() => {
         closeButton = true;
       }, 900);
