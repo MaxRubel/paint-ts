@@ -8,9 +8,12 @@ function createAuthStore() {
 
     return {
         subscribe,
-        setUser: (user: any) => {
-            update(state => ({ ...state, user }));
-            localStorage.setItem('user', JSON.stringify(user));
+        setUser: (newUserData: Partial<any>) => {
+            update(state => {
+                const updatedUser = state.user ? { ...state.user, ...newUserData } : newUserData;
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                return { ...state, user: updatedUser };
+            });
         },
         clearUser: () => {
             set({ user: null });
@@ -20,4 +23,3 @@ function createAuthStore() {
 }
 
 export const authStore = createAuthStore();
-

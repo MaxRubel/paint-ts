@@ -1,9 +1,13 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import NavButton from "../graphics/NavButton.svelte";
   import { event_state_store } from "../../stores/eventState";
   import { signIn, signOut } from "../../utils/auth/firebase";
   import { authStore } from "../../utils/auth/auth_store";
+  import { get } from "svelte/store";
+  import { CompileAndSaveDoodle, doodle_info } from "../../stores/doodleDataStore";
+
+  export let handleClear;
 
   let menuOpen = false;
   let eventState: String;
@@ -37,6 +41,15 @@
     }
   }
 
+  function handleSaveDoodle() {
+    if (get(doodle_info).id) {
+      console.log("update doodle");
+      CompileAndSaveDoodle("", true);
+    } else {
+      event_state_store.set("saving_new_project_form");
+    }
+  }
+
   $: {
     if (eventState !== "nav-menu") {
       menuOpen = false;
@@ -62,17 +75,22 @@
   <button class="clear-button">About Us</button>
   {#if !authState}
     <button class="clear-button" on:click={signIn}>Sign in</button>
-  {/if}
-  {#if authState}
-    <button class="clear-button">Open Project</button>
-    <button class="clear-button">Save Project</button>
+    <button class="clear-button" on:click={handleClear}>Clear Doodle</button>
+  {:else}
+    <button class="clear-button">View Doodles</button>
+    <button class="clear-button" on:click={handleSaveDoodle}>Save Doodle</button>
     <button class="clear-button">Color Palettes</button>
     <button class="clear-button">Share</button>
+    <button class="clear-button" on:click={handleClear}>Clear Doodle</button>
     <button class="clear-button" on:click={signOut}>Sign Out</button>
   {/if}
 </div>
 
 <style>
+  button {
+    cursor: pointer;
+  }
+
   .nav-button {
     position: fixed;
     top: 15px;

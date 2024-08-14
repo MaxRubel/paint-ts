@@ -18,6 +18,14 @@ export function InitCtx(context: CanvasRenderingContext2D) {
   ctx = context;
 }
 
+export function GetCanvasContext(){
+  if(ctx){
+    return ctx
+  } else {
+    console.error("Canvas was not initialized properly")
+  }
+}
+
 export function DrawBrushStroke(
   context: CanvasRenderingContext2D,
   size: number,
@@ -77,4 +85,8 @@ export function ClearOldPathData() {
 export function SplicePaths(start: number, amount: number) {
   paths.splice(start, amount);
   ReDrawBrushStrokes();
+}
+
+export function GetVectorPaths(){
+  return paths
 }

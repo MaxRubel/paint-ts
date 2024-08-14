@@ -308,7 +308,7 @@
 </script>
 
 <main>
-  <NavMenu />
+  <NavMenu {handleClear} />
   <!-- <SideBar /> -->
   <ToolBar2
     {handle_arrow_mode}

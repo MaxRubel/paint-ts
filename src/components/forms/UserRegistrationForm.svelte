@@ -14,6 +14,8 @@
     await RegisterUser({ email, uid, username });
 
     const resp: any = await CheckUser(uid);
+    authStore.setUser(resp);
+
     if (resp.id) {
       event_state_store.set("arrow");
     }
@@ -27,10 +29,10 @@
 </script>
 
 <div class="overlay" />
-<form class="user-registration-form" on:submit={handleSubmit}>
+<form class="user-registration-form cool fixed-center" on:submit={handleSubmit}>
   <h2>Welcome to GroupDoodles!</h2>
   <p>We're happy to have you!</p>
-  <p>Please choose a username:</p>
+  <p>Please choose a nickname:</p>
   <input
     type="text"
     class="username_input"
@@ -39,26 +41,15 @@
   />
   <div class="top">
     <button type="submit" class="submit-button"> Submit</button>
-    <button class="submit-button" on:click={handleCancel}>Cancel</button>
+    <button type="button" class="submit-button" on:click={handleCancel}
+      >Cancel</button
+    >
   </div>
-  <!-- Add your form fields here -->
 </form>
 
 <style>
   .user-registration-form {
     z-index: 1002;
-    position: fixed;
-
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    height: 18rem;
-    width: 30rem;
-    min-width: 350px;
-    background: white;
-    color: black;
-    padding: 30px;
-    border-radius: 8px;
   }
 
   .overlay {
@@ -72,7 +63,7 @@
   }
 
   .username_input {
-    height: 36px;
+    height: 25px;
     width: 200px;
   }
 

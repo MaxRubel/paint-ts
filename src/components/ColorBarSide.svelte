@@ -123,7 +123,6 @@
   }
 
   .tool-box {
-    border: 1px solid rgb(129, 129, 129);
     background-color: rgb(211, 211, 211);
     border-radius: 10px;
     margin-top: 60px;

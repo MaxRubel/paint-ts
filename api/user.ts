@@ -15,7 +15,7 @@ export const CheckUser = (uid: string) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
-export const RegisterUser = (payload) => new Promise((resolve, reject) => {
+export const RegisterUser = (payload: any) => new Promise((resolve, reject) => {
   fetch(`${endpoint}/users`, {
     method: 'POST',
     body: JSON.stringify(payload),

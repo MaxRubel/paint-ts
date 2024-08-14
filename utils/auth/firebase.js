@@ -2,6 +2,9 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { authStore } from './auth_store'
+import { CheckUser } from '../../api/user';
+import { get } from 'svelte/store';
+import { event_state_store } from '../../stores/eventState';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,9 +18,15 @@ const auth = getAuth(app);
 export const signIn = async () => {
   const provider = new GoogleAuthProvider();
   try {
-    const result = await signInWithPopup(auth, provider);
-    authStore.setUser(result.user);
-    return result.user;
+    const googleUser = await signInWithPopup(auth, provider);
+    const djangoUser = await CheckUser(googleUser.user.uid)
+    if(djangoUser?.id){
+      authStore.setUser({...googleUser.user, ...djangoUser})
+    } else {
+      authStore.setUser(googleUser.user)
+    }
+    event_state_store.set("alert: Sign-in Succesful!")
+    return googleUser.user;
   } catch (error) {
     console.error("Error signing in", error);
     throw error;
@@ -28,6 +37,7 @@ export const signOut = async () => {
   try {
     await firebaseSignOut(auth);
     authStore.clearUser();
+    event_state_store.set("alert: You are logged out!")
   } catch (error) {
     console.error("Error signing out", error);
     throw error;

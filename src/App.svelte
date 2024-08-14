@@ -5,6 +5,8 @@
   import { CheckUser } from "../api/user";
   import { event_state_store } from "../stores/eventState";
   import UserRegistrationForm from "./components/forms/UserRegistrationForm.svelte";
+  import FormRouter from "./components/forms/FormRouter.svelte";
+  import Alert from "./components/alerts/Alert.svelte";
 
   let user: any;
   let eventState: string;
@@ -33,4 +35,6 @@
 {#if eventState === "needs_registration_form"}
   <UserRegistrationForm />
 {/if}
+<Alert />
+<FormRouter />
 <MainPage />
