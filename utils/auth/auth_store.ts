@@ -1,9 +1,4 @@
-import { writable } from "svelte/store";
-
-export const auth_store = writable({
-    user: null,
-    user_db: null
-})
+import { get, writable } from "svelte/store";
 
 function createAuthStore() {
     const storedUser = localStorage.getItem('user');
@@ -17,7 +12,6 @@ function createAuthStore() {
             update(state => ({ ...state, user }));
             localStorage.setItem('user', JSON.stringify(user));
         },
-
         clearUser: () => {
             set({ user: null });
             localStorage.removeItem('user');

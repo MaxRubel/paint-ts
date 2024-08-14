@@ -19,18 +19,12 @@
     theme_store,
   } from "../../stores/eventState";
   import { onDestroy } from "svelte";
-  import { HandleUndo } from "../../stores/undoStore";
-  import Sun from "../graphics/Sun.svelte";
-  import Moon from "../graphics/Moon.svelte";
-  import Kiss from "../graphics/Kiss.svelte";
 
   let mode = "";
   let locked = true;
   let event_state = "";
   let arrow = true;
   let selected = [];
-
-  console.log("hello");
 
   const unsubscribe = theme_store.subscribe((value) => {
     mode = value;

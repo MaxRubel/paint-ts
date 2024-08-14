@@ -3,7 +3,7 @@
   import NavButton from "../graphics/NavButton.svelte";
   import { event_state_store } from "../../stores/eventState";
   import { signIn, signOut } from "../../utils/auth/firebase";
-  import { auth_store, authStore } from "../../utils/auth/auth_store";
+  import { authStore } from "../../utils/auth/auth_store";
 
   let menuOpen = false;
   let eventState: String;
@@ -63,11 +63,11 @@
   {#if !authState}
     <button class="clear-button" on:click={signIn}>Sign in</button>
   {/if}
-  <button class="clear-button">Open Project</button>
-  <!-- <button class="clear-button">Save Project</button> -->
-  <button class="clear-button">Color Palettes</button>
-  <button class="clear-button">Share</button>
   {#if authState}
+    <button class="clear-button">Open Project</button>
+    <button class="clear-button">Save Project</button>
+    <button class="clear-button">Color Palettes</button>
+    <button class="clear-button">Share</button>
     <button class="clear-button" on:click={signOut}>Sign Out</button>
   {/if}
 </div>
@@ -88,7 +88,6 @@
     top: 70px;
     left: 15px;
     font-size: 12pt;
-    /* padding: 30px 30px; */
     z-index: 900;
     border-radius: 10px;
     background-color: rgba(0, 0, 0, 0.266);
