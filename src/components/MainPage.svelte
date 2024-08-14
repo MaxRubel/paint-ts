@@ -102,7 +102,7 @@
   }
 
   function handleKeyup(e: KeyboardEvent) {
-    if (event_state.includes("typing")) return;
+    if (event_state.includes("typing") || event_state.includes("form")) return;
     if ((e.target as HTMLInputElement).id === "font-size-input-box") return;
     switch (e.key) {
       case "d":
@@ -248,7 +248,7 @@
     redrawCanvas();
   }
 
-  let timeoutId: number;
+  let timeoutId: NodeJS.Timeout;
 
   function handleLock(): void {
     locked ? locked_store.set(false) : locked_store.set(true);
