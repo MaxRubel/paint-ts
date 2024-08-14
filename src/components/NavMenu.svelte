@@ -3,7 +3,7 @@
   import NavButton from "../graphics/NavButton.svelte";
   import { event_state_store } from "../../stores/eventState";
   import { signIn, signOut } from "../../utils/auth/firebase";
-  import { auth_store } from "../../utils/auth/auth_store";
+  import { auth_store, authStore } from "../../utils/auth/auth_store";
 
   let menuOpen = false;
   let eventState: String;
@@ -13,9 +13,7 @@
     eventState = value;
   });
 
-  const unsubscribe2 = auth_store.subscribe((value) => {
-    authState = value;
-  });
+  const unsubscribe2 = authStore.subscribe((value) => (authState = value.user));
 
   onDestroy(() => {
     unsubscribe();
@@ -62,14 +60,14 @@
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
   <button class="clear-button">About Us</button>
-  {#if !authState.user}
+  {#if !authState}
     <button class="clear-button" on:click={signIn}>Sign in</button>
   {/if}
   <button class="clear-button">Open Project</button>
   <!-- <button class="clear-button">Save Project</button> -->
   <button class="clear-button">Color Palettes</button>
   <button class="clear-button">Share</button>
-  {#if authState.user}
+  {#if authState}
     <button class="clear-button" on:click={signOut}>Sign Out</button>
   {/if}
 </div>

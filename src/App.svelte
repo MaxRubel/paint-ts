@@ -1,20 +1,19 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { auth_store } from "../utils/auth/auth_store";
+  import { authStore } from "../utils/auth/auth_store";
   import MainPage from "./components/MainPage.svelte";
+  import { CheckUser } from "../api/user";
+  import { event_state_store } from "../stores/eventState";
 
-  let userAuth: any;
+  let user: any;
 
-  const unsubscribe = auth_store.subscribe((value) => {
-    userAuth = value;
-  });
-
+  const unsubscribe = authStore.subscribe((value) => (user = value.user));
   onDestroy(unsubscribe);
 
   $: {
-    if (userAuth.user) {
-      console.log("checking for user in db...");
-    }
+    CheckUser(user.uid).then((data: any) => {
+      if (!data.valid) event_state_store.set("needs_registration");
+    });
   }
 </script>
 

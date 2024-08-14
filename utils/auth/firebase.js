@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
-import { auth_store } from './auth_store'
+import { authStore } from './auth_store'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,9 +16,7 @@ export const signIn = async () => {
   const provider = new GoogleAuthProvider();
   try {
     const result = await signInWithPopup(auth, provider);
-    auth_store.update(currentState => {
-        return { ...currentState, user: result.user };
-    });
+    authStore.setUser(result.user);
     return result.user;
   } catch (error) {
     console.error("Error signing in", error);
@@ -29,9 +27,7 @@ export const signIn = async () => {
 export const signOut = async () => {
   try {
     await firebaseSignOut(auth);
-    auth_store.update(currentState => {
-        return { ...currentState, user: null, user_db: null };
-    });
+    authStore.clearUser();
   } catch (error) {
     console.error("Error signing out", error);
     throw error;
