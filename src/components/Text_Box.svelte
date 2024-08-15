@@ -7,17 +7,9 @@
     theme_store,
   } from "../../stores/eventState";
   import { createEventDispatcher } from "svelte";
-  import {
-    font_family_store,
-    font_size_store,
-    text_alignment,
-  } from "../../stores/textBoxStore";
+  import { font_family_store, font_size_store, text_alignment } from "../../stores/textBoxStore";
   import type { TextBoxType } from "../../utils/types/app_types";
-  import {
-    StartDragMany,
-    DragMany,
-    EndDragMany,
-  } from "../../utils/dragMultiple";
+  import { StartDragMany, DragMany, EndDragMany } from "../../utils/dragMultiple";
   import { AddUndoItem } from "../../stores/undoStore";
   import { updateTextBox } from "../../stores/textBoxStore";
   import { color_store } from "../../stores/colorStore";
@@ -78,9 +70,11 @@
   });
 
   const unsubscribe5 = color_store.subscribe((value) => {
+    if (!value) return;
     if (eventState.includes("typing")) {
       const [, boxId] = eventState.split("&");
       if (value !== fontColor && boxId === id) {
+        console.log("hello");
         AddUndoItem({
           action: "changedFontColor",
           data: { id, oldColor: fontColor },
@@ -409,12 +403,7 @@
     } else {
       event_state_store.set(oldState);
     }
-    if (
-      startX !== x ||
-      startY !== y ||
-      startHeight !== height ||
-      startWidth !== width
-    ) {
+    if (startX !== x || startY !== y || startHeight !== height || startWidth !== width) {
       AddUndoItem({
         action: "expanded",
         data: {

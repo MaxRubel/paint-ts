@@ -72,7 +72,11 @@
   const handleClick = (e: MouseEvent) => {
     switch (event_state) {
       case "creating_text":
-        createNewTextBox(e, canvas.offsetHeight, canvas.offsetWidth);
+        const textBoxId = createNewTextBox(e, canvas.offsetHeight, canvas.offsetWidth);
+        AddUndoItem({
+          action: "created_text_box",
+          data: textBoxId,
+        });
         break;
     }
   };

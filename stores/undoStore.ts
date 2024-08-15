@@ -13,6 +13,7 @@ export function ClearUndoStore() {
 }
 // Function to add a new Undo Item
 export function AddUndoItem(newItem: UndoType) {
+  console.log(newItem)
   undo_store.update(oldItems => {
     return [...oldItems, newItem];
   });
@@ -32,6 +33,9 @@ export function HandleUndo() {
   switch (lastAction.action) {
     case "drewBrush":
       undoBrushStroke(lastAction);
+      break;
+    case "created_text_box":
+      undoCreatedTextBox(lastAction);
       break;
     case "typed":
       undoTyping(lastAction);
@@ -79,6 +83,11 @@ function undoBrushStroke(lastAction: UndoBrushStroke) {
   SplicePaths(start, end);
 }
 
+function undoCreatedTextBox(lastAction: any){
+  const textBoxID = lastAction.data
+  deleteTextBox(textBoxID)
+}
+
 function undoTyping(lastAction: UndoTyping) {
   const oldState = get(event_state_store)
   const { id, start } = lastAction.data
@@ -119,46 +128,46 @@ function undoDeletedTextBoxes(lastAction: any) {
   })
 }
 
-function undoTextBoxAlignChange(lastAction) {
+function undoTextBoxAlignChange(lastAction: any) {
   const { id, align } = lastAction.data
   updateTextBox(id, { align })
 }
 
-function undoChangedFontColor(lastAction) {
+function undoChangedFontColor(lastAction: any) {
   const { id, oldColor } = lastAction.data
   updateTextBox(id, { fontColor: oldColor })
 }
 
-function undoChangedFont(lastAction) {
+function undoChangedFont(lastAction: any) {
   const { id, oldFont } = lastAction.data
   updateTextBox(id, { fontFamily: oldFont })
 }
 
-function undoChangedManyFonts(lastAction) {
+function undoChangedManyFonts(lastAction: any) {
   const undoArray = lastAction.data
-  undoArray.forEach((item) => {
+  undoArray.forEach((item: any) => {
     updateTextBox(item.id, { fontFamily: item.fontFamily })
   })
 }
 
-function undoChangedManyFontColors(lastAction) {
+function undoChangedManyFontColors(lastAction: any) {
   const undoArray = lastAction.data
-  undoArray.forEach((item) => {
+  undoArray.forEach((item: any) => {
     updateTextBox(item.id, { fontColor: item.fontColor })
   })
 }
 
-function undoChangedFontSizes(lastAction) {
+function undoChangedFontSizes(lastAction: any) {
   const undoArray = lastAction.data
-  undoArray.forEach((item) => {
+  undoArray.forEach((item: any) => {
     updateTextBox(item.id, { fontSize: item.oldFontSize })
     font_size_store.set(item.oldFontSize)
   })
 }
 
-function undoManyTextBoxAligned(lastAction) {
+function undoManyTextBoxAligned(lastAction: any) {
   const undoArray = lastAction.data
-  undoArray.forEach((item) => {
+  undoArray.forEach((item: any) => {
     updateTextBox(item.id, { align: item.align })
   })
 }

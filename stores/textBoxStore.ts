@@ -23,7 +23,7 @@ export function createNewTextBox(
   e: MouseEvent,
   boxHeight: number,
   boxWidth: number,
-) {
+):string {
   const newKey: string = uuidv4();
   let x = 0;
   let y = 0;
@@ -55,6 +55,7 @@ export function createNewTextBox(
   }));
 
   event_state_store.set(`typing&${newKey}`)
+  return newKey
 }
 
 export function updateTextBox(id: string, updates: any) {
