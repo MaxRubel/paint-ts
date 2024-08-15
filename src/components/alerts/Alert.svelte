@@ -3,8 +3,8 @@
   import { event_state_store } from "../../../stores/eventState";
 
   let eventState: string;
-  let message: string = "";
-  let top: number = -64;
+  let message = "";
+  let top = -64;
   let timeout: NodeJS.Timeout;
 
   const unsubcribe = event_state_store.subscribe((value) => {

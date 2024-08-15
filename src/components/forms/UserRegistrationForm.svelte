@@ -17,7 +17,7 @@
     authStore.setUser(resp);
 
     if (resp.id) {
-      event_state_store.set("arrow");
+      event_state_store.set(`alert: Welcome ${username}!`);
     }
   }
 
@@ -33,17 +33,10 @@
   <h2>Welcome to GroupDoodles!</h2>
   <p>We're happy to have you!</p>
   <p>Please choose a nickname:</p>
-  <input
-    type="text"
-    class="username_input"
-    placeholder="coolDude25"
-    bind:value={username}
-  />
+  <input type="text" class="username_input" placeholder="coolDude25" bind:value={username} />
   <div class="top">
     <button type="submit" class="submit-button"> Submit</button>
-    <button type="button" class="submit-button" on:click={handleCancel}
-      >Cancel</button
-    >
+    <button type="button" class="submit-button" on:click={handleCancel}>Cancel</button>
   </div>
 </form>
 
