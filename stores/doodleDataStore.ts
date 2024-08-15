@@ -29,7 +29,6 @@ export function CompileAndSaveDoodle(name: string, update: boolean){
         const oldName = get(doodle_info).name
 
         UpdateDoodle({id, name: oldName, user_id, data, date_created}).then((resp: any)=>{
-            console.log('save success', get(doodle_info))
             event_state_store.set("alert: Save was sucessful!")
         })
     }

@@ -10,7 +10,6 @@
   }
 
   function handleSubmit(e: any) {
-    console.log("i have been called");
     e.preventDefault();
     CompileAndSaveDoodle(name, false);
   }
