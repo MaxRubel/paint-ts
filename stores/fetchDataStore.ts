@@ -53,7 +53,6 @@ export function FetchAndLoadDoodle(id: number) {
     const canvas = document.getElementById("main-canvas")
     const ctx = GetCanvasContext()
     GetSingleDoodle(id).then((resp) => {
-        console.log(resp)
         ctx?.clearRect(0, 0, canvas?.width, canvas?.height);
         clearAllTextBoxes();
         ClearOldPathData();
