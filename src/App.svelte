@@ -7,14 +7,13 @@
   import UserRegistrationForm from "./components/forms/UserRegistrationForm.svelte";
   import FormRouter from "./components/forms/FormRouter.svelte";
   import Alert from "./components/alerts/Alert.svelte";
+  import DebugMenu from "./components/menus/DebugMenu.svelte";
 
   let user: any;
   let eventState: string;
 
   const unsubscribe = authStore.subscribe((value) => (user = value.user));
-  const unsubscribe2 = event_state_store.subscribe(
-    (value) => (eventState = value),
-  );
+  const unsubscribe2 = event_state_store.subscribe((value) => (eventState = value));
 
   onDestroy(() => {
     unsubscribe();
@@ -36,5 +35,6 @@
   <UserRegistrationForm />
 {/if}
 <Alert />
+<DebugMenu />
 <FormRouter />
 <MainPage />

@@ -1,11 +1,11 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import NavButton from "../graphics/NavButton.svelte";
-  import { event_state_store } from "../../stores/eventState";
-  import { signIn, signOut } from "../../utils/auth/firebase";
-  import { authStore } from "../../utils/auth/auth_store";
+  import NavButton from "../../graphics/NavButton.svelte";
+  import { event_state_store } from "../../../stores/eventState";
+  import { signIn, signOut } from "../../../utils/auth/firebase";
+  import { authStore } from "../../../utils/auth/auth_store";
   import { get } from "svelte/store";
-  import { CompileAndSaveDoodle, doodle_info } from "../../stores/doodleDataStore";
+  import { CompileAndSaveDoodle, fetched_doodle } from "../../../stores/doodleDataStore";
 
   export let handleClear: Function;
 
@@ -45,7 +45,7 @@
 
   function handleSaveDoodle() {
     menuOpen = false;
-    if (get(doodle_info).id) {
+    if (get(fetched_doodle).id) {
       CompileAndSaveDoodle("", true);
     } else {
       event_state_store.set("saving_new_project_form");

@@ -27,13 +27,11 @@
   import { get } from "svelte/store";
   import type { TextBoxMap } from "../../stores/textBoxStore";
   import { AddUndoItem, ClearUndoStore } from "../../stores/undoStore";
-  import SideBar from "./SideBar.svelte";
   import ToolBar2 from "./ToolBar2.svelte";
   import PageTurn from "./PageTurn.svelte";
   import BrushSettings from "./BrushSettings.svelte";
   import TextSettings from "./TextSettings.svelte";
-  import NavButton from "../graphics/NavButton.svelte";
-  import NavMenu from "./NavMenu.svelte";
+  import NavMenu from "./menus/NavMenu.svelte";
 
   let mode = "dark";
   let catSmootch = false;
