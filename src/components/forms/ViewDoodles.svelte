@@ -1,30 +1,37 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { GetDoodlesOfUser } from "../../../api/doodles";
   import { get } from "svelte/store";
   import { authStore } from "../../../utils/auth/auth_store";
   import Close from "../../graphics/Close.svelte";
   import { event_state_store } from "../../../stores/eventState";
-  import { FetchAndLoadDoodle } from "../../../stores/fetchDataStore";
+  import {
+    FetchAndLoadDoodle,
+    fetched_all,
+    GetAllUserDoodles,
+  } from "../../../stores/fetchDataStore";
 
-  let doodlesData: any = {
-    yourDoodles: [],
-    theirDoodles: [],
-  };
+  let doodlesData;
+
+  const unsubcribe = fetched_all.subscribe((value) => {
+    doodlesData = value;
+  });
 
   function handleClose() {
     event_state_store.set("arrow");
   }
 
   function handleOpenDoodle(id: number) {
+    console.log("yes, id: ", id);
     FetchAndLoadDoodle(id);
   }
 
   onMount(() => {
-    const uid = get(authStore).user.id;
-    GetDoodlesOfUser(uid).then((data) => {
-      doodlesData = data;
-    });
+    GetAllUserDoodles();
+  });
+
+  onDestroy(() => {
+    unsubcribe();
   });
 </script>
 

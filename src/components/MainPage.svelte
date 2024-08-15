@@ -31,14 +31,10 @@
   import PageTurn from "./PageTurn.svelte";
   import BrushSettings from "./BrushSettings.svelte";
   import TextSettings from "./TextSettings.svelte";
-<<<<<<< HEAD
   import NavMenu from "./menus/NavMenu.svelte";
-=======
-  import NavMenu from "./NavMenu.svelte";
-  import { doodle_info } from "../../stores/fetchDataStore";
+  import { fetched_single } from "../../stores/fetchDataStore";
   import { InitCanvas } from "../../stores/canvasStore";
   import { DrawImage } from "../../stores/canvasStore";
->>>>>>> main
 
   let mode = "dark";
   let catSmootch = false;
@@ -158,7 +154,7 @@
   function redrawCanvas(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     ReDrawBrushStrokes();
-    if (get(doodle_info).data?.canvasImage) {
+    if (get(fetched_single).data?.canvasImage) {
       DrawImage();
     }
   }

@@ -1,15 +1,25 @@
 import { get, writable } from "svelte/store";
 import { clearAllTextBoxes, textBoxesStore } from "./textBoxStore";
 import { authStore } from "../utils/auth/auth_store";
-import { CreateNewDoodle, GetSingleDoodle, UpdateDoodle } from "../api/doodles"
+import { CreateNewDoodle, GetDoodlesOfUser, GetSingleDoodle, UpdateDoodle } from "../api/doodles"
 import { event_state_store, selected_store } from "./eventState";
 import { ClearOldPathData, GetCanvasContext } from "../utils/drawBrushStroke";
 import { ClearUndoStore } from "./undoStore";
 import { DrawImage } from "./canvasStore";
 
 
-export const doodle_info = writable({})
+export const fetched_single = writable({collaborators: []})
+export const fetched_all = writable({yourDoodles: [], theirDoodles: []})
+
 export const loaded_data_store = writable({})
+
+export function GetAllUserDoodles(){
+    const uid = get(authStore).user.id;
+    GetDoodlesOfUser(uid).then((data: any) => {
+    console.log(data)
+     fetched_all.set(data)
+    });
+}
 
 export function CompileAndSaveDoodle(name: string, update: boolean) {
     const rectangles = get(textBoxesStore)
@@ -25,12 +35,12 @@ export function CompileAndSaveDoodle(name: string, update: boolean) {
 
     if (!update) {
         CreateNewDoodle({ name, user_id, data }).then((resp: any) => {
-            doodle_info.set(resp)
+            fetched_single.set(resp)
             event_state_store.set("alert: Save was sucessful!")
         })
     } else {
-        const { id, date_created } = get(doodle_info)
-        const oldName = get(doodle_info).name
+        const { id, date_created } = get(fetched_single)
+        const oldName = get(fetched_single).name
 
         UpdateDoodle({ id, name: oldName, user_id, data, date_created }).then((resp: any) => {
             event_state_store.set("alert: Save was sucessful!")
@@ -38,16 +48,18 @@ export function CompileAndSaveDoodle(name: string, update: boolean) {
     }
 }
 
-export function FetchAndLoadDoodle(id) {
+export function FetchAndLoadDoodle(id: number) {
+
     const canvas = document.getElementById("main-canvas")
     const ctx = GetCanvasContext()
     GetSingleDoodle(id).then((resp) => {
+        console.log(resp)
         ctx?.clearRect(0, 0, canvas?.width, canvas?.height);
         clearAllTextBoxes();
         ClearOldPathData();
         ClearUndoStore();
         const { id, name, date_created, collaborators, data } = resp
-        doodle_info.set({ id, name, date_created, collaborators, data })
+        fetched_single.set({ id, name, date_created, collaborators, data })
         textBoxesStore.set(data.rectangles)
         DrawImage();
         event_state_store.set("arrow")
