@@ -25,7 +25,7 @@ export const signIn = async () => {
     } else {
       authStore.setUser(googleUser.user)
     }
-    event_state_store.set("alert: Sign-in Succesful!")
+    event_state_store.set("alert: Sign-in succesful!")
     return googleUser.user;
   } catch (error) {
     console.error("Error signing in", error);

@@ -1,18 +1,19 @@
 <script>
   // @ts-nocheck
 
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   import { fly, fade } from "svelte/transition";
   import { brush_size_store } from "../../stores/brushStore";
   import { get } from "svelte/store";
+  import { event_state_store } from "../../stores/eventState";
 
   // Props
   let min = 1;
-  let max = 40;
+  let max = 45;
   let initialValue = get(brush_size_store);
   let id = null;
-  let value =
-    typeof initialValue === "string" ? parseInt(initialValue) : initialValue;
+  let value = typeof initialValue === "string" ? parseInt(initialValue) : initialValue;
+  let eventState;
 
   $: brush_size_store.set(value);
   // Node Bindings
@@ -28,6 +29,10 @@
   let thumbHover = false;
   let keydownAcceleration = 0;
   let accelerationTimer = null;
+
+  const unsubscribe = event_state_store.subscribe((value) => {
+    eventState = value;
+  });
 
   // Dispatch 'change' events
   const dispatch = createEventDispatcher();
@@ -70,8 +75,7 @@
   function onDragEnd(e) {
     // If using mouse - remove pointer event shield
     if (e.type === "mouseup") {
-      if (document.body.contains(mouseEventShield))
-        document.body.removeChild(mouseEventShield);
+      if (document.body.contains(mouseEventShield)) document.body.removeChild(mouseEventShield);
       // Needed to check whether thumb and mouse overlap after shield removed
       if (isMouseInElement(e, thumb)) thumbHover = true;
     }
@@ -116,32 +120,29 @@
 
   function calculateNewValue(clientX) {
     // Find distance between cursor and element's left cord (20px / 2 = 10px) - Center of thumb
-    let delta = clientX - elementX - 20;
+    let delta = clientX - (elementX + 10);
 
-    // Use width of the container for percent calc
-    let percent = (delta * 100) / container.clientWidth;
+    // Use width of the container minus (5px * 2 sides) offset for percent calc
+    let percent = (delta * 100) / (container.clientWidth - 10);
 
     // Limit percent 0 -> 100
     percent = percent < 0 ? 0 : percent > 100 ? 100 : percent;
 
     // Limit value min -> max
-    setValue(Math.round(((max - min) * percent) / 100) + min);
+    setValue(parseInt((percent * (max - min)) / 100) + min);
   }
 
   // Handles both dragging of touch/mouse as well as simple one-off click/touches
   function updateValueOnEvent(e) {
     // touchstart && mousedown are one-off updates, otherwise expect a currentPointer node
-    if (!currentThumb && e.type !== "touchstart" && e.type !== "mousedown")
-      return false;
+    if (!currentThumb && e.type !== "touchstart" && e.type !== "mousedown") return false;
 
     if (e.stopPropagation) e.stopPropagation();
     if (e.preventDefault) e.preventDefault();
 
     // Get client's x cord either touch or mouse
     const clientX =
-      e.type === "touchmove" || e.type === "touchstart"
-        ? e.touches[0].clientX
-        : e.clientX;
+      e.type === "touchmove" || e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
 
     calculateNewValue(clientX);
   }
@@ -153,12 +154,14 @@
   $: holding = Boolean(currentThumb);
 
   // Update progressbar and thumb styles to represent value
-  $: if (progressBar && thumb && container) {
+  $: if (progressBar && thumb && eventState === "drawing") {
+    resizeWindow();
     // Limit value min -> max
-    value = Math.max(min, Math.min(max, value));
+    value = value > min ? value : min;
+    value = value < max ? value : max;
 
     let percent = ((value - min) * 100) / (max - min);
-    let offsetLeft = (container.clientWidth * percent) / 100;
+    let offsetLeft = (container.clientWidth - 10) * (percent / 100) - 3;
 
     // Update thumb position + active range track width
     thumb.style.left = `${offsetLeft}px`;
@@ -202,11 +205,7 @@
         on:mouseout={() => (thumbHover = false)}
       >
         {#if holding || thumbHover}
-          <div
-            class="range__tooltip"
-            in:fly={{ y: 7, duration: 200 }}
-            out:fade={{ duration: 100 }}
-          >
+          <div class="range__tooltip" in:fly={{ y: 7, duration: 200 }} out:fade={{ duration: 100 }}>
             {value}
           </div>
         {/if}

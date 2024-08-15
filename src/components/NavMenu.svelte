@@ -7,7 +7,7 @@
   import { get } from "svelte/store";
   import { CompileAndSaveDoodle, doodle_info } from "../../stores/doodleDataStore";
 
-  export let handleClear;
+  export let handleClear: Function;
 
   let menuOpen = false;
   let eventState: String;
@@ -25,8 +25,10 @@
   });
 
   function toggleNavMenu() {
+    if (eventState.includes("form")) {
+      return;
+    }
     if (!menuOpen) {
-      event_state_store.set("nav-menu");
       menuOpen = true;
     } else {
       event_state_store.set("arrow");
@@ -42,18 +44,32 @@
   }
 
   function handleSaveDoodle() {
+    menuOpen = false;
     if (get(doodle_info).id) {
-      console.log("update doodle");
       CompileAndSaveDoodle("", true);
     } else {
       event_state_store.set("saving_new_project_form");
     }
   }
 
-  $: {
-    if (eventState !== "nav-menu") {
-      menuOpen = false;
-    }
+  function clearDoodle() {
+    handleClear();
+    menuOpen = false;
+  }
+
+  function handleViewDoodles() {
+    event_state_store.set("view_doodles_form");
+    menuOpen = false;
+  }
+
+  function handleSignIn() {
+    signIn();
+    menuOpen = false;
+  }
+
+  function handleSignOut() {
+    signOut();
+    menuOpen = false;
   }
 
   $: {
@@ -72,17 +88,17 @@
 </div>
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
-  <button class="clear-button">About Us</button>
+  <button class="clear-button" id="dd-menu">About Us</button>
   {#if !authState}
-    <button class="clear-button" on:click={signIn}>Sign in</button>
-    <button class="clear-button" on:click={handleClear}>Clear Doodle</button>
+    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear Doodle</button>
+    <button class="clear-button" id="dd-menu" on:click={handleSignIn}>Sign in</button>
   {:else}
-    <button class="clear-button">View Doodles</button>
-    <button class="clear-button" on:click={handleSaveDoodle}>Save Doodle</button>
-    <button class="clear-button">Color Palettes</button>
-    <button class="clear-button">Share</button>
-    <button class="clear-button" on:click={handleClear}>Clear Doodle</button>
-    <button class="clear-button" on:click={signOut}>Sign Out</button>
+    <button class="clear-button" id="dd-menu" on:click={handleViewDoodles}>Open Doodles</button>
+    <button class="clear-button" id="dd-menu" on:click={handleSaveDoodle}>Save Doodle</button>
+    <button class="clear-button" id="dd-menu">Color Palettes</button>
+    <button class="clear-button" id="dd-menu">Share</button>
+    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear Doodle</button>
+    <button class="clear-button" id="dd-menu" on:click={handleSignOut}>Sign Out</button>
   {/if}
 </div>
 
@@ -108,7 +124,7 @@
     font-size: 12pt;
     z-index: 900;
     border-radius: 10px;
-    background-color: rgba(0, 0, 0, 0.266);
+    background-color: rgb(31, 38, 43);
     display: none;
     border: 2px solid rgba(255, 255, 255, 0.198);
   }
