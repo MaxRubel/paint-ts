@@ -31,7 +31,14 @@
   import PageTurn from "./PageTurn.svelte";
   import BrushSettings from "./BrushSettings.svelte";
   import TextSettings from "./TextSettings.svelte";
+<<<<<<< HEAD
   import NavMenu from "./menus/NavMenu.svelte";
+=======
+  import NavMenu from "./NavMenu.svelte";
+  import { doodle_info } from "../../stores/fetchDataStore";
+  import { InitCanvas } from "../../stores/canvasStore";
+  import { DrawImage } from "../../stores/canvasStore";
+>>>>>>> main
 
   let mode = "dark";
   let catSmootch = false;
@@ -120,6 +127,7 @@
   onMount(() => {
     ctx = canvas?.getContext("2d");
     InitCtx(ctx);
+    InitCanvas(ctx);
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("keyup", handleKeyup);
     canvas?.addEventListener("click", handleClick);
@@ -150,19 +158,18 @@
   function redrawCanvas(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     ReDrawBrushStrokes();
+    if (get(doodle_info).data?.canvasImage) {
+      DrawImage();
+    }
   }
 
-  function handleClear(): void {
+  export function handleClear(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     clearAllTextBoxes();
     ClearOldPathData();
     ClearUndoStore();
-    event_state_store.set("alert: Doodle cleared!");
+    // ClearFromDataStore()
   }
-
-  // document.addEventListener("contextmenu", function (e) {
-  //   e.preventDefault();
-  // });
 
   let oldState: string;
 

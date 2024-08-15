@@ -43,11 +43,7 @@
   });
 
   $: {
-    if (
-      event_state === "arrow" ||
-      event_state === "selecting" ||
-      event_state === "selected"
-    ) {
+    if (event_state === "arrow" || event_state === "selecting" || event_state === "selected") {
       arrow = true;
     } else {
       arrow = false;
@@ -70,6 +66,7 @@
   >
     <CursorPointer />
   </button>
+
   <button
     on:click={handle_drawing_mode}
     class="width64"
@@ -78,11 +75,7 @@
     <Marker />
   </button>
   {#if event_state === "creating_text" || event_state.includes("typing")}
-    <button
-      on:click={handle_textbox_mode}
-      class="width64"
-      style="background-color:  #9096ff48"
-    >
+    <button on:click={handle_textbox_mode} class="width64" style="background-color:  #9096ff48">
       <TextIcon />
     </button>
   {:else}

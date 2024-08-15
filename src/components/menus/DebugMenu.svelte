@@ -8,6 +8,7 @@
   let lockedStore: boolean;
   let selectedStore: any;
   let selectedAmount: number;
+  let fetchedDrawing;
 
   const unsubscribe = brush_size_store.subscribe((value) => {
     brushSize = value;

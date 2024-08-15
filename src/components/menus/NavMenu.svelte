@@ -90,14 +90,14 @@
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
   <button class="clear-button" id="dd-menu">About Us</button>
   {#if !authState}
-    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear Doodle</button>
+    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear doodle</button>
     <button class="clear-button" id="dd-menu" on:click={handleSignIn}>Sign in</button>
   {:else}
-    <button class="clear-button" id="dd-menu" on:click={handleViewDoodles}>Open Doodles</button>
-    <button class="clear-button" id="dd-menu" on:click={handleSaveDoodle}>Save Doodle</button>
-    <button class="clear-button" id="dd-menu">Color Palettes</button>
+    <button class="clear-button" id="dd-menu" on:click={handleViewDoodles}>Open</button>
+    <button class="clear-button" id="dd-menu" on:click={handleSaveDoodle}>Save</button>
     <button class="clear-button" id="dd-menu">Share</button>
     <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear Doodle</button>
+    <button class="clear-button" id="dd-menu">View Color Palettes</button>
     <button class="clear-button" id="dd-menu" on:click={handleSignOut}>Sign Out</button>
   {/if}
 </div>

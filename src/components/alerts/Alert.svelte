@@ -39,15 +39,14 @@
     justify-content: center;
     align-items: center;
     z-index: 1001;
-    height: 30px;
+    height: 22px;
     left: 120px;
-    border-radius: 10px;
     padding: 15px;
-    background-color: white;
     transition: all 0.6s ease;
-    background-color: white;
-    border-radius: 12px;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
     border: 2px solid rgba(255, 255, 255, 0.198);
-    color: black;
+    background-color: rgb(31, 38, 43, 0.97);
+    color: rgb(255, 255, 255);
   }
 </style>
