@@ -5,6 +5,7 @@
   import { authStore } from "../../../utils/auth/auth_store";
   import Close from "../../graphics/Close.svelte";
   import { event_state_store } from "../../../stores/eventState";
+  import { FetchAndLoadDoodle } from "../../../stores/fetchDataStore";
 
   let doodlesData: any = {
     yourDoodles: [],
@@ -13,6 +14,10 @@
 
   function handleClose() {
     event_state_store.set("arrow");
+  }
+
+  function handleOpenDoodle(id: number) {
+    FetchAndLoadDoodle(id);
   }
 
   onMount(() => {
@@ -47,7 +52,12 @@
         {#each doodlesData.yourDoodles as doodle (doodle.id)}
           <tr>
             <td>
-              <button class="clear-button doodle-button">
+              <button
+                class="clear-button doodle-button"
+                on:click={() => {
+                  handleOpenDoodle(doodle.id);
+                }}
+              >
                 {doodle.name}
               </button>
             </td>
