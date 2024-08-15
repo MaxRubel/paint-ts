@@ -1,7 +1,7 @@
 <script lang="ts">
   import SaveIcon from "../../graphics/SaveIcon.svelte";
   import { event_state_store } from "../../../stores/eventState";
-  import { CompileAndSaveDoodle } from "../../../stores/doodleDataStore";
+  import { CompileAndSaveDoodle } from "../../../stores/fetchDataStore";
 
   let name: string = "";
 
