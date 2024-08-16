@@ -1,12 +1,9 @@
 import { get, writable } from "svelte/store";
-import { GetCanvasContext } from "../utils/drawBrushStroke";
-import { fetched_single } from "./fetchDataStore";
-
-export const canvas_store = writable({})
-
-export function InitCanvas(canvas) {
-  canvas_store.update((preVal) => ({ ...preVal, canvas }))
-}
+import { ClearOldPathData, GetCanvasContext } from "../utils/drawBrushStroke";
+import { EmptyFetch, fetched_single } from "./fetchDataStore";
+import { clearAllTextBoxes } from "./textBoxStore";
+import { ClearUndoStore } from "./undoStore";
+import { ClearRedoItems } from "./redoStore";
 
 export function DrawImage() {
   const ctx = GetCanvasContext()
@@ -17,4 +14,15 @@ export function DrawImage() {
     ctx?.drawImage(img, 0, 0);
   };
   img.src = dataURL;
+}
+
+export function ClearEverything(){
+  const ctx = GetCanvasContext()
+  const canvas: HTMLCanvasElement = document.getElementById('main-canvas') as HTMLCanvasElement;
+  ctx?.clearRect(0, 0, canvas?.width, canvas?.height);
+  clearAllTextBoxes();
+  ClearOldPathData();
+  ClearUndoStore();
+  ClearRedoItems();
+  fetched_single.set(EmptyFetch)
 }

@@ -54,17 +54,6 @@ export function HandleRedo(){
         case "redoChangedFontSingle":
             redoChangedFontSingle(redoItem);
             break;
-        // case "redoManyFontChanges":
-        //     resetManyTextBoxes(redoItem)
-        //     break;
-        // case "redoChangedManyFontColors":
-        //     resetManyTextBoxes(redoItem)
-        //     break;
-        // case "redoChangeFontSizes":
-        //     resetManyTextBoxes(redoItem)
-        //     break;
-        // case "redoManyTextBoxAligned":
-        //     resetManyTextBoxes(redoItem)
     }
     if(
         redoItem.action === "redoManyFontChanges" ||

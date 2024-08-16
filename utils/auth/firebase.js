@@ -5,6 +5,7 @@ import { authStore } from './auth_store'
 import { CheckUser } from '../../api/user';
 import { get } from 'svelte/store';
 import { event_state_store } from '../../stores/eventState';
+import { alert_store } from '../../stores/alertStore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -25,7 +26,7 @@ export const signIn = async () => {
     } else {
       authStore.setUser(googleUser.user)
     }
-    event_state_store.set("alert: Sign-in succesful!")
+    alert_store.set("alert: Sign-in succesful!")
     return googleUser.user;
   } catch (error) {
     console.error("Error signing in", error);
@@ -37,7 +38,7 @@ export const signOut = async () => {
   try {
     await firebaseSignOut(auth);
     authStore.clearUser();
-    event_state_store.set("alert: You are logged out!")
+    alert_store.set("alert: You are logged out!")
   } catch (error) {
     console.error("Error signing out", error);
     throw error;

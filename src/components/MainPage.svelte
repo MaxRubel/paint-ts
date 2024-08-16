@@ -33,15 +33,11 @@
   import TextSettings from "./TextSettings.svelte";
   import NavMenu from "./menus/NavMenu.svelte";
   import { fetched_single } from "../../stores/fetchDataStore";
-  import { InitCanvas } from "../../stores/canvasStore";
   import { DrawImage } from "../../stores/canvasStore";
   import { ClearRedoItems } from "../../stores/redoStore";
 
-  let mode = "dark";
-  let catSmootch = false;
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
-  let size = 7;
   let textBoxes: TextBoxMap;
   let cursor = "arrow";
   let event_state = "arrow";
@@ -58,11 +54,7 @@
     event_state = value;
   });
 
-  const unsubscribe3 = theme_store.subscribe((value: string) => {
-    mode = value;
-  });
-
-  const unsubscribe4 = locked_store.subscribe((value: boolean) => {
+  const unsubscribe3 = locked_store.subscribe((value: boolean) => {
     locked = value;
   });
 
@@ -126,9 +118,8 @@
   }
 
   onMount(() => {
-    ctx = canvas?.getContext("2d");
+    ctx = canvas.getContext("2d");
     InitCtx(ctx);
-    InitCanvas(ctx);
     window.addEventListener("resize", resizeCanvas);
     window.addEventListener("keyup", handleKeyup);
     canvas?.addEventListener("click", handleClick);
@@ -143,7 +134,6 @@
     unsubcribe();
     unsubcribe2();
     unsubscribe3();
-    unsubscribe4();
 
     window.removeEventListener("resize", resizeCanvas);
     window.removeEventListener("keyup", handleKeyup);
@@ -170,7 +160,6 @@
     ClearOldPathData();
     ClearUndoStore();
     ClearRedoItems();
-    // ClearFromDataStore()
   }
 
   let oldState: string;
@@ -197,7 +186,7 @@
         }
         break;
       case "drawing":
-        DrawBrushStroke(ctx, size, e);
+        DrawBrushStroke(ctx, e);
         break;
       case "rectangle-draw":
         xStart = e.clientX;
@@ -214,7 +203,7 @@
 
     switch (event_state) {
       case "drawing":
-        DrawBrushStroke(ctx, size, e);
+        DrawBrushStroke(ctx, e);
         break;
       case "rectangle-draw":
         DrawRectangle(ctx, canvas, e, xStart, yStart);
@@ -243,29 +232,10 @@
     }
   }
 
-  function handleDark(): void {
-    if (mode === "light") {
-      theme_store.set("dark");
-    } else {
-      theme_store.set("light");
-    }
-    redrawCanvas();
-  }
-
   let timeoutId: NodeJS.Timeout;
 
   function handleLock(): void {
     locked ? locked_store.set(false) : locked_store.set(true);
-  }
-
-  function handleSmootches(): void {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    catSmootch = true;
-    timeoutId = setTimeout(() => {
-      catSmootch = false;
-    }, 2600);
   }
 
   //----bottom-tool-bar-------------------
@@ -314,19 +284,8 @@
 <main>
   <NavMenu {handleClear} />
   <!-- <SideBar /> -->
-  <ToolBar2
-    {handle_arrow_mode}
-    {handle_drawing_mode}
-    {handle_textbox_mode}
-    {handleClear}
-    {handleDark}
-    {handleLock}
-    {handleSmootches}
-  />
+  <ToolBar2 {handle_arrow_mode} {handle_drawing_mode} {handle_textbox_mode} {handleLock} />
   <div class="canvas-container">
-    {#if catSmootch}
-      <img src="/high5.webp" alt="meh" class="image" />
-    {/if}
     {#each Object.values(textBoxes) as textBox (textBox.id)}
       <TextBox data={textBox} />
     {/each}
@@ -334,8 +293,6 @@
       id="main-canvas"
       style="cursor: {cursor}"
       class="full-size"
-      class:light={mode === "light"}
-      class:dark={mode === "dark"}
       bind:this={canvas}
       on:pointerdown={handlePointerDown}
       on:pointerup={handlePointerUp}
@@ -354,28 +311,11 @@
     width: 100vw;
   }
 
-  .image {
-    filter: brightness(70%);
-    position: fixed;
-    top: 40px;
-    left: 40px;
-    z-index: 1000;
-    height: 50vh;
-  }
-
   .full-size {
     position: absolute;
     height: 100vh;
     width: 100vw;
     top: 0px;
     left: 0px;
-  }
-
-  canvas.light {
-    background-color: lightblue;
-  }
-
-  canvas.dark {
-    background-color: rgb(40, 49, 52);
   }
 </style>

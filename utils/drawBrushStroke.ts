@@ -30,7 +30,6 @@ export function GetCanvasContext(){
 
 export function DrawBrushStroke(
   context: CanvasRenderingContext2D,
-  size: number,
   e: PointerEvent,
 ): void {
   points.push([e.clientX - 6, e.clientY - 6, e.pressure]);
@@ -45,7 +44,6 @@ export function DrawBrushStroke(
     smoothing: 0.5,
     streamline: 0.5,
   });
-
   const pathData = getSvgPathFromStroke(stroke);
   const canvasPath = new Path2D(pathData);
   color = get(color_store)

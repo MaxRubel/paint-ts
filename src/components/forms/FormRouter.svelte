@@ -3,6 +3,7 @@
   import { event_state_store } from "../../../stores/eventState";
   import SavingNewProjectForm from "./SavingNewProjectForm.svelte";
   import ViewDoodles from "./ViewDoodles.svelte";
+  import SaveConfirmForm from "./SaveConfirmForm.svelte";
 
   let eventState: string;
 
@@ -13,9 +14,12 @@
   });
 </script>
 
-{#if eventState === "saving_new_project_form"}
+{#if eventState.includes("saving_new_project_form")}
   <SavingNewProjectForm />
 {/if}
 {#if eventState === "view_doodles_form"}
   <ViewDoodles />
+{/if}
+{#if eventState.includes("save_confirm_form")}
+  <SaveConfirmForm />
 {/if}
