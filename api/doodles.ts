@@ -1,4 +1,4 @@
-const endpoint = import.meta.env.VITE_DJANGO_DB_URL
+const endpoint = (import.meta as any).env.VITE_DJANGO_DB_URL
 
 export const CreateNewDoodle = (payload: any) => new Promise((resolve, reject) => {
   fetch(`${endpoint}/doodles`, {
@@ -48,6 +48,19 @@ export const GetSingleDoodle = (id: number) => new Promise((resolve, reject) => 
     },
   })
     .then((response) => response.json())
+    .then((data) => {
+      resolve(data);
+    })
+    .catch(reject);
+});
+
+export const DeleteDoodle = (id: number) => new Promise((resolve, reject) => {
+  fetch(`${endpoint}/doodles/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
     .then((data) => {
       resolve(data);
     })

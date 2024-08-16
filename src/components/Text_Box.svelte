@@ -74,7 +74,6 @@
     if (eventState.includes("typing")) {
       const [, boxId] = eventState.split("&");
       if (value !== fontColor && boxId === id) {
-        console.log("hello");
         AddUndoItem({
           action: "changedFontColor",
           data: { id, oldColor: fontColor },

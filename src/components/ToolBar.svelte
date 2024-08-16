@@ -47,11 +47,7 @@
   });
 
   $: {
-    if (
-      event_state === "arrow" ||
-      event_state === "selecting" ||
-      event_state === "selected"
-    ) {
+    if (event_state === "arrow" || event_state === "selecting" || event_state === "selected") {
       arrow = true;
     } else {
       arrow = false;
@@ -80,7 +76,7 @@
       <button
         on:click={handle_arrow_mode}
         class="smallside centered"
-        style="background-color: {arrow ? '#9096ff' : ''}; padding: 18px"
+        style="background-color: {arrow ? '#2C3E50' : ''}; padding: 18px"
       >
         <CursorPointer />
       </button>
@@ -92,11 +88,7 @@
         <Marker />
       </button>
       {#if event_state === "creating_text" || event_state.includes("typing")}
-        <button
-          on:click={handle_textbox_mode}
-          class="width64"
-          style="background-color:  #9096ff"
-        >
+        <button on:click={handle_textbox_mode} class="width64" style="background-color:  #9096ff">
           <TextIcon />
         </button>
       {:else}
@@ -115,11 +107,7 @@
     <!-- <button> <GearIcon /> </button> -->
     <div class="side-bar">
       <button class="bigside" on:click={HandleUndo}>Undo</button>
-      <button
-        on:click={handleDark}
-        class="centered width64"
-        style="padding: 10px"
-      >
+      <button on:click={handleDark} class="centered width64" style="padding: 10px">
         {#if mode === "light"}
           <Moon />
         {:else}

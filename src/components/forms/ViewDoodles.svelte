@@ -1,15 +1,17 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { GetDoodlesOfUser } from "../../../api/doodles";
-  import { get } from "svelte/store";
-  import { authStore } from "../../../utils/auth/auth_store";
+  import { DeleteDoodle } from "../../../api/doodles";
   import Close from "../../graphics/Close.svelte";
   import { event_state_store } from "../../../stores/eventState";
   import {
     FetchAndLoadDoodle,
     fetched_all,
+    fetched_single,
     GetAllUserDoodles,
   } from "../../../stores/fetchDataStore";
+  import TrashCan from "../../graphics/TrashCan.svelte";
+  import { get } from "svelte/store";
+  import { ClearEverything } from "../../../stores/canvasStore";
 
   let doodlesData: any;
 
@@ -22,8 +24,18 @@
   }
 
   function handleOpenDoodle(id: number) {
-    console.log("yes, id: ", id);
     FetchAndLoadDoodle(id);
+  }
+
+  function handleDelete(id: number) {
+    if (window.confirm("Are you sure you want to delete this doodle?")) {
+      DeleteDoodle(id).then(() => {
+        GetAllUserDoodles();
+        if (id === get(fetched_single).id) {
+          ClearEverything();
+        }
+      });
+    }
   }
 
   onMount(() => {
@@ -54,6 +66,7 @@
         <tr>
           <th>Name</th>
           <th>Created On</th>
+          <th>Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -70,6 +83,16 @@
               </button>
             </td>
             <td>{doodle.date_created}</td>
+            <td style="width: 80px">
+              <button
+                class="clear-button trash centered"
+                on:click={() => {
+                  handleDelete(doodle.id);
+                }}
+              >
+                <TrashCan />
+              </button>
+            </td>
           </tr>
         {/each}
       </tbody>
@@ -82,6 +105,11 @@
     z-index: 1003;
     min-height: 400px;
     width: 700px;
+  }
+
+  .trash {
+    width: 50px;
+    padding: 0px;
   }
 
   .doodle-button {

@@ -10,20 +10,20 @@ import { alert_store } from "./alertStore";
 
 export interface ProjectType {
     name: string
-    id: string
+    id: number
     date_created: string
     data: any
     collaborators: any[]
 }
 
-interface AllProjects{
+interface AllProjects {
     yourDoodles: ProjectType[]
     theirDoodles: ProjectType[]
 }
 
 export const EmptyFetch: ProjectType = {
     name: "",
-    id: "",
+    id: 0,
     date_created: "",
     data: null,
     collaborators: []
@@ -31,16 +31,16 @@ export const EmptyFetch: ProjectType = {
 
 export const fetched_single = writable<ProjectType>(EmptyFetch);
 
-export const fetched_all = writable<AllProjects>({yourDoodles: [], theirDoodles: []})
+export const fetched_all = writable<AllProjects>({ yourDoodles: [], theirDoodles: [] })
 
-export function GetAllUserDoodles(){
+export function GetAllUserDoodles() {
     const uid = get(authStore).user.id;
     GetDoodlesOfUser(uid).then((data: any) => {
-     fetched_all.set(data)
+        fetched_all.set(data)
     });
 }
 
-export function CompileAndSaveDoodle(name: string, update: boolean) {
+export async function CompileAndSaveDoodle(name: string, update: boolean) {
     const rectangles = get(textBoxesStore)
     const canvas: HTMLCanvasElement = document.getElementById('main-canvas') as HTMLCanvasElement;
     if (!canvas) {
@@ -53,19 +53,18 @@ export function CompileAndSaveDoodle(name: string, update: boolean) {
     const user_id = get(authStore).user.id
 
     if (!update) {
-        CreateNewDoodle({ name, user_id, data }).then((resp: any) => {
-            fetched_single.set(resp)
-            alert_store.set("alert: Save was sucessful!")
-        })
+        const resp: any = await CreateNewDoodle({ name, user_id, data });
+        fetched_single.set(resp);
+        alert_store.set("alert: Save was successful!");
     } else {
-        const { id, date_created } = get(fetched_single)
-        const oldName = get(fetched_single).name
-        UpdateDoodle({ id, name: oldName, user_id, data, date_created }).then((resp: any) => {
-            alert_store.set("alert: Save was sucessful!")
-        })
+        const { id, date_created } = get(fetched_single);
+        const oldName = get(fetched_single).name;
+        const resp = await UpdateDoodle({ id, name: oldName, user_id, data, date_created });
+        alert_store.set("alert: Save was successful!");
     }
-    undo_store.set([])
-    event_state_store.set("arrow")
+
+    undo_store.set([]);
+    event_state_store.set("arrow");
 }
 
 export function FetchAndLoadDoodle(id: number) {

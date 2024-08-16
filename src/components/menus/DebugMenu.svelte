@@ -79,7 +79,7 @@
   <h4 class="centered">Data</h4>
   {#if fetchedDrawing.id}
     <div class="drawing">
-      <div class="pre-wrap centered">-----------Drawing-----------</div>
+      <div class="pre-wrap centered">---------Drawing---------</div>
       <div class="extend"><strong>id: </strong>&nbsp;&nbsp;{fetchedDrawing.id}</div>
       <div class="extend"><strong>name: </strong>&nbsp;&nbsp;{fetchedDrawing.name}</div>
       <div class="extend">
@@ -90,11 +90,11 @@
       </div>
     </div>
   {:else}
-    <div class="pre-wrap centered">------------Drawing------------</div>
+    <div class="pre-wrap centered">---------Drawing---------</div>
     <div>No drawing is loaded...</div>
   {/if}
   <div class="many-fetched">
-    <div class="top centered">-----------User Data-----------</div>
+    <div class="top centered">--------User Data--------</div>
     <div class="centered" style="font-size: 14px;">Fetched drawings:</div>
     <div class="fetched-container">
       {#each fetchedMany.yourDoodles as doodle}

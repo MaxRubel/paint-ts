@@ -35,7 +35,7 @@ a:hover {
   color: white;
   /* height: 45px; */
   width: auto;
-  padding: 24px 20px;
+  padding: 10px 20px;
   width: 200px;
   display: flex;
   align-items: center;
@@ -73,7 +73,8 @@ button {
 }
 
 button:hover {
-  background-color: #9096ff16;
+  background-color: #4a4a4a;
+  /* background-color: #282d62; */
   transition: all .2s ease;
 }
 

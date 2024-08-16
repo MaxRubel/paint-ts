@@ -59,7 +59,7 @@
   <button
     on:click={handle_arrow_mode}
     class="smallside centered"
-    style="background-color: {arrow ? '#9096ff48' : ''}; padding: 18px"
+    style="background-color: {arrow ? '#00695C' : ''}; padding: 18px"
   >
     <CursorPointer />
   </button>
@@ -67,12 +67,12 @@
   <button
     on:click={handle_drawing_mode}
     class="width64"
-    style="background-color: {event_state === 'drawing' ? '#9096ff48' : ''}"
+    style="background-color: {event_state === 'drawing' ? '#00695C' : ''}"
   >
     <Marker />
   </button>
   {#if event_state === "creating_text" || event_state.includes("typing")}
-    <button on:click={handle_textbox_mode} class="width64" style="background-color:  #9096ff48">
+    <button on:click={handle_textbox_mode} class="width64" style="background-color:  #00695C">
       <TextIcon />
     </button>
   {:else}
