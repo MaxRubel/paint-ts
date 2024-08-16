@@ -14,11 +14,7 @@
     updateTextBox,
   } from "../../stores/textBoxStore";
   import { get } from "svelte/store";
-  import {
-    event_state_store,
-    selected_store,
-    theme_store,
-  } from "../../stores/eventState";
+  import { event_state_store, selected_store, theme_store } from "../../stores/eventState";
   import { AddUndoItem } from "../../stores/undoStore";
 
   export let colorBarisOpen = false;
@@ -54,9 +50,7 @@
   const unsubcribe = color_store.subscribe((value) => {
     if (!value) {
       const mode = get(theme_store);
-      mode === "dark"
-        ? (colorStoreReturn = "#D3D3D3")
-        : (colorStoreReturn = "#D3D3D3");
+      mode === "dark" ? (colorStoreReturn = "#D3D3D3") : (colorStoreReturn = "#D3D3D3");
     } else {
       colorStoreReturn = rgbStringToHex(value);
     }
@@ -165,9 +159,7 @@
           Align
           <div class="text-position" style="margin-top: 11px">
             <button id="left" on:click={handleAlignment}> <TextLeft /> </button>
-            <button id="center" on:click={handleAlignment}
-              ><TextCenter /></button
-            >
+            <button id="center" on:click={handleAlignment}><TextCenter /></button>
             <button id="right" on:click={handleAlignment}><TextRight /></button>
           </div>
         </div>
@@ -177,13 +169,11 @@
             class="font-box"
             style="width: 160px; margin-top: 22px"
             id=""
-            on:change={handleFontChange}
+            on:select={handleFontChange}
           >
             <option class="font-box" value="Arial">Arial</option>
             <option class="font-box" value="Patrick Hand">Patrick Hand</option>
-            <option class="font-box" value="Times New Roman"
-              >Times New Roman</option
-            >
+            <option class="font-box" value="Times New Roman">Times New Roman</option>
           </select>
         </div>
       </div>

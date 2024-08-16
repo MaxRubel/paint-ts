@@ -13,7 +13,7 @@ export interface TextBoxMap {
 
 export const textBoxesStore = writable<TextBoxMap>({});
 
-export const text_alignment = writable("")
+export const text_alignment = writable("center")
 
 export const font_family_store = writable("Arial")
 
@@ -36,8 +36,7 @@ export function createNewTextBox(
     y = e.clientY - 40;
   }
   const fontColor = get(color_store)
-  const aligGet = get(text_alignment)
-  const align = aligGet ? aligGet : 'center'
+  const align = get(text_alignment)
   const newBox: TextBoxType = {
     id: newKey,
     type: 'textbox',

@@ -67,6 +67,12 @@ export function EndBrushStroke() {
   });
 }
 
+export function InsertOldBrushStrokes(oldStrokes: any){
+  const length = oldStrokes.data.pathArray.length
+  paths.splice(oldStrokes.data.start, length, ...oldStrokes.data.pathArray )
+  ReDrawBrushStrokes()
+}
+
 export function ReDrawBrushStrokes() {
   if (ctx) {
     if(get(fetched_single).id){

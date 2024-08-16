@@ -194,17 +194,17 @@
     //   textareaElement.selectionStart,
     //   textareaElement.selectionStart,
     // );
-    // if (eventState.includes("typing")) {
-    //   if (oldValue !== textareaElement.value) {
-    //     AddUndoItem({
-    //       action: "typed",
-    //       data: {
-    //         id,
-    //         start: oldValue ? oldValue : "",
-    //       },
-    //     });
-    //   }
-    // }
+    if (eventState.includes("typing")) {
+      if (oldValue !== textareaElement.value) {
+        AddUndoItem({
+          action: "typed",
+          data: {
+            id,
+            start: oldValue ? oldValue : "",
+          },
+        });
+      }
+    }
     // if (eventState === "selecting") {
     //   hidden = true;
     // }

@@ -84,9 +84,7 @@
   }
 
   let oldFontSize = 24;
-  function handleSizeChange(
-    e: Event & { currentTarget: EventTarget & HTMLInputElement },
-  ) {
+  function handleSizeChange(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
     const target = e.currentTarget;
     const value = Number(target.value);
 
@@ -185,7 +183,11 @@
   });
 
   $: {
-    if (eventState === "creating_text" || eventState.includes("typing")) {
+    if (
+      eventState === "creating_text" ||
+      eventState.includes("typing") ||
+      eventState === "selected"
+    ) {
       isVisible = true;
     } else {
       isVisible = false;
@@ -197,17 +199,10 @@
   <div class="content-wrapper">
     <div class="font-container centered">
       Font
-      <select
-        class="font-box"
-        id=""
-        value={fontFamily}
-        on:click={handleFontChange}
-        on:change={handleFontChange}
-      >
+      <select class="font-box" id="" value={fontFamily} on:change={handleFontChange}>
         <option class="font-box" value="Arial">Arial</option>
         <option class="font-box" value="Patrick Hand">Patrick Hand</option>
-        <option class="font-box" value="Times New Roman">Times New Roman</option
-        >
+        <option class="font-box" value="Times New Roman">Times New Roman</option>
       </select>
     </div>
     <div class="size-container centered">

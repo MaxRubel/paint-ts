@@ -4,6 +4,7 @@
   import { event_state_store, locked_store, selected_store } from "../../../stores/eventState";
   import { fetched_all, fetched_single } from "../../../stores/fetchDataStore";
   import { undo_store } from "../../../stores/undoStore";
+  import { redo_store } from "../../../stores/redoStore";
 
   let brushSize: Number;
   let eventState: string;
@@ -13,7 +14,7 @@
   let fetchedDrawing: any;
   let fetchedMany: any;
   let undoArraySize: number;
-
+  let redoArraySize: number;
   const unsubscribe = brush_size_store.subscribe((value) => {
     brushSize = value;
   });
@@ -49,6 +50,10 @@
     undoArraySize = value.length;
   });
 
+  const unsubscribe8 = redo_store.subscribe((value) => {
+    redoArraySize = value.length;
+  });
+
   onDestroy(() => {
     unsubscribe();
     unsubscribe2();
@@ -57,6 +62,7 @@
     unsubscribe5();
     unsubscribe6();
     unsubscribe7();
+    unsubscribe8();
   });
 </script>
 
@@ -69,6 +75,7 @@
   <div class="extend"><strong>Locked</strong>&nbsp;&nbsp;{lockedStore}</div>
   <div class="extend"><strong>Brush Size:</strong>&nbsp;&nbsp;{brushSize}</div>
   <div class="extend"><strong>Undo Items</strong>&nbsp;&nbsp;{undoArraySize}</div>
+  <div class="extend"><strong>Redo Items</strong>&nbsp;&nbsp;{redoArraySize}</div>
   <h4 class="centered">Data</h4>
   {#if fetchedDrawing.id}
     <div class="drawing">
@@ -87,15 +94,18 @@
     <div>No drawing is loaded...</div>
   {/if}
   <div class="many-fetched">
-    <div class="top centered">------------User Data------------</div>
-    {#each fetchedMany.yourDoodles as doodle}
-      <div style="font-size: 14px; ">
-        <div><strong>id:</strong> {doodle.id}</div>
-        <div><strong>name:</strong> {doodle.name}</div>
-        <div><strong>date_created:</strong> {doodle.date_created}</div>
-        <div><strong>collabs:</strong> {doodle.collaborators.length}</div>
-      </div>
-    {/each}
+    <div class="top centered">-----------User Data-----------</div>
+    <div class="centered" style="font-size: 14px;">Fetched drawings:</div>
+    <div class="fetched-container">
+      {#each fetchedMany.yourDoodles as doodle}
+        <div style="font-size: 14px; margin-bottom: 6px">
+          <div><strong>id:</strong> {doodle.id}</div>
+          <div><strong>name:</strong> {doodle.name}</div>
+          <div><strong>date_created:</strong> {doodle.date_created}</div>
+          <div><strong>collabs:</strong> {doodle.collaborators.length}</div>
+        </div>
+      {/each}
+    </div>
   </div>
 </div>
 
@@ -117,7 +127,7 @@
   }
 
   .top {
-    margin-top: 40px;
+    margin-top: 10px;
   }
 
   .extend {
@@ -128,5 +138,10 @@
 
   .pre-wrap {
     white-space: pre-wrap;
+  }
+
+  .fetched-container {
+    overflow: auto;
+    max-height: 300px;
   }
 </style>

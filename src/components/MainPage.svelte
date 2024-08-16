@@ -35,6 +35,7 @@
   import { fetched_single } from "../../stores/fetchDataStore";
   import { InitCanvas } from "../../stores/canvasStore";
   import { DrawImage } from "../../stores/canvasStore";
+  import { ClearRedoItems } from "../../stores/redoStore";
 
   let mode = "dark";
   let catSmootch = false;
@@ -168,6 +169,7 @@
     clearAllTextBoxes();
     ClearOldPathData();
     ClearUndoStore();
+    ClearRedoItems();
     // ClearFromDataStore()
   }
 

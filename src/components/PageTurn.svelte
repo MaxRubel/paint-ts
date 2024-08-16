@@ -1,4 +1,5 @@
 <script>
+  import { HandleRedo } from "../../stores/redoStore";
   import { HandleUndo } from "../../stores/undoStore";
   import Redo from "../graphics/Redo.svelte";
   import Undo from "../graphics/Undo.svelte";
@@ -6,7 +7,7 @@
 
 <div class="page-turn">
   <button on:click={HandleUndo}> <Undo /> </button>
-  <button> <Redo /> </button>
+  <button on:click={HandleRedo}> <Redo /> </button>
 </div>
 
 <style>
