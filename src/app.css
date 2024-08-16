@@ -78,6 +78,13 @@ button:hover {
   transition: all .2s ease;
 }
 
+.close-button {
+  transform: translateY(-10px);
+  display: flex;
+  justify-content: flex-end;
+  width: 44px;
+  padding: 0px;
+}
 
 @media (prefers-color-scheme: light) {
   :root {

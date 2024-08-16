@@ -7,15 +7,23 @@
   import iro from "@jaames/iro";
   import { color_store } from "../../stores/colorStore";
   import { get } from "svelte/store";
+  import { authStore } from "../../utils/auth/auth_store";
 
   let arrayOfColors = [];
   let eventState;
   let colorPicker;
   let isVisible;
+  let auth;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
   });
+
+  const unsubcribe2 = authStore.subscribe((value) => {
+    auth = value.user;
+  });
+
+  $: console.log(auth);
 
   function handleChangeColor(origin) {
     let newColorF;
@@ -63,7 +71,14 @@
     arrayOfColors = arrayOfColors;
   }
 
-  onDestroy(unsubcribe);
+  function openPaletteWindow() {
+    event_state_store.set("color_palette_form&from_brush");
+  }
+
+  onDestroy(() => {
+    unsubcribe();
+    unsubcribe2();
+  });
 
   onMount(() => {
     colorPicker = new iro.ColorPicker("#picker2", {
@@ -85,7 +100,7 @@
   });
 
   $: {
-    if (eventState === "drawing") {
+    if (eventState === "drawing" || eventState.includes("from_brush")) {
       isVisible = true;
     } else {
       isVisible = false;
@@ -126,7 +141,9 @@
           </div>
         {/each}
       </div>
-      <button class="clear-button centered">Edit</button>
+      {#if auth?.id}
+        <button class="clear-button centered" on:click={openPaletteWindow}> Edit </button>
+      {/if}
     </div>
   </div>
 </div>
