@@ -8,7 +8,6 @@
     deleteTextBox,
   } from "../../stores/textBoxStore";
   import { event_state_store, locked_store, selected_store } from "../../stores/eventState";
-  import { theme_store } from "../../stores/eventState";
   import { DrawRectangle } from "../../utils/drawRectangle";
   import {
     ClearOldPathData,
