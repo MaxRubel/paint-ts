@@ -126,6 +126,7 @@
           </div>
         {/each}
       </div>
+      <button class="clear-button centered">Edit</button>
     </div>
   </div>
 </div>
@@ -135,7 +136,7 @@
     position: fixed;
     color: white;
     border-radius: 20px;
-    height: 548px;
+    height: 590px;
     background-color: rgba(0, 0, 0, 0.266);
     left: 15px;
     padding: 20px;
@@ -187,14 +188,15 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     grid-auto-rows: min-content;
-    padding: 10px;
+    margin-top: 10px;
+    /* padding: 10px; */
     /* border: 1px solid rgba(255, 255, 255, 0.731); */
     border-radius: 10pt;
     flex-grow: 1;
-    width: 170px;
+    width: 180px;
     gap: 5px;
     align-content: start;
-    height: 100%;
+    /* height: 100%; */
   }
 
   .color-button {

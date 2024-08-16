@@ -29,14 +29,14 @@
 <form class="new-project-form cool" on:submit={handleSubmit}>
   <div class="row">
     <SaveIcon />
-    <h3>Save Your Project</h3>
+    <h3>Save Your Drawing</h3>
   </div>
   <div class="lower-half">
-    <div class="input-label">Name this doodle</div>
-    <input type="text" placeholder="Enter doodle name" bind:value={name} />
+    <div class="input-label">Name?</div>
+    <input type="text" placeholder="Cool Drawing" bind:value={name} />
   </div>
   <div class="button-row">
-    <button type="submit">Submit</button>
+    <button type="submit" class="submit-btn">Submit</button>
     <button type="button" on:click={handleCancel}>Cancel</button>
   </div>
 </form>
@@ -49,6 +49,10 @@
     left: 50%;
     transform: translateX(-50%);
     height: 400px;
+  }
+
+  .submit-btn {
+    background-color: rgb(96, 61, 34);
   }
 
   h3 {

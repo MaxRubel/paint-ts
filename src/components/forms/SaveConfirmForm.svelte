@@ -27,7 +27,7 @@
       event_state_store.set("view_doodles_form");
     } else if (eventState.includes("new_doodle")) {
       ClearEverything();
-      alert_store.set("alert:New doodle created!");
+      alert_store.set("alert:New drawing created!");
     }
   }
 
@@ -37,7 +37,7 @@
 </script>
 
 <div class="overlay" />
-<div class="save-confirm-form fixed-center cool">
+<form class="save-confirm-form fixed-center cool">
   <div class="grid">
     <div><h4>Do you want to save this doodle first?</h4></div>
     <div class="right">
@@ -45,14 +45,21 @@
     </div>
   </div>
   <div class="row">
-    <button on:click={handleYes}>Yes</button>
+    <button class="orange" on:click={handleYes}>Yes</button>
     <button on:click={handleNo}>No</button>
   </div>
-</div>
+</form>
 
 <style>
   button {
     width: auto;
+  }
+
+  .orange {
+    background-color: rgb(96, 49, 14);
+  }
+  .orange:hover {
+    background-color: #4a4a4a;
   }
 
   .grid {

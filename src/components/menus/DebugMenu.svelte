@@ -116,7 +116,7 @@
     top: 50px;
     right: 0;
     width: 200px;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(192, 189, 189);
     overflow-y: auto;
     padding: 15px;
     border-radius: 10px;

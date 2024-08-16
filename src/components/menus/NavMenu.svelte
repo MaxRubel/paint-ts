@@ -39,7 +39,7 @@
       fetched_single.set(EmptyFetch);
       handleClear();
       menuOpen = false;
-      alert_store.set("alert:New doodle created!");
+      alert_store.set("alert:New drawing created!");
     }
   }
 
@@ -112,20 +112,20 @@
 </script>
 
 <div class="nav-button">
-  <button on:click={toggleNavMenu}><NavButton /></button>
+  <button class="nav-button-btn" on:click={toggleNavMenu}><NavButton /></button>
 </div>
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
   <button class="clear-button divide-bottom" id="dd-menu">About Us</button>
   {#if !authState}
-    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear doodle</button>
+    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear drawing</button>
     <button class="clear-button" id="dd-menu" on:click={handleSignIn}>Sign in</button>
   {:else}
     <button class="clear-button" id="dd-menu" on:click={handleNew}>New</button>
     <button class="clear-button" id="dd-menu" on:click={handleViewDoodles}>Open</button>
     <button class="clear-button" id="dd-menu" on:click={handleSaveDoodle}>Save</button>
     <button class="clear-button divide-bottom" id="dd-menu">Share</button>
-    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear Doodle</button>
+    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear Drawing</button>
     <button class="clear-button" id="dd-menu">View Color Palettes</button>
     <button class="clear-button signout" id="dd-menu" on:click={handleSignOut}>Sign Out</button>
   {/if}
@@ -145,15 +145,19 @@
     z-index: 900;
   }
 
+  .nav-button-btn {
+    /* background-color: rgb(96, 61, 34); */
+  }
+
   .dropdown-menu {
     position: fixed;
     color: white;
-    top: 70px;
+    top: 68px;
     left: 15px;
     font-size: 12pt;
     z-index: 900;
     border-radius: 10px;
-    background-color: rgb(31, 38, 43);
+    background-color: rgb(31, 39, 39);
     display: none;
     border: 2px solid rgba(255, 255, 255, 0.198);
   }
