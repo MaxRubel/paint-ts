@@ -5,8 +5,10 @@
   import { signIn, signOut } from "../../../utils/auth/firebase";
   import { authStore } from "../../../utils/auth/auth_store";
   import { get } from "svelte/store";
-  import { CompileAndSaveDoodle } from "../../../stores/doodleDataStore";
+  import { CompileAndSaveDoodle, EmptyFetch } from "../../../stores/fetchDataStore";
   import { fetched_single } from "../../../stores/fetchDataStore";
+  import { undo_store } from "../../../stores/undoStore";
+  import { alert_store } from "../../../stores/alertStore";
 
   export let handleClear: Function;
 
@@ -24,6 +26,22 @@
     unsubscribe();
     unsubscribe2();
   });
+
+  function handleNew() {
+    const undoHistory = get(undo_store).length;
+    if (undoHistory === 0 && !get(fetched_single).id) {
+      menuOpen = false;
+      return;
+    }
+    if (undoHistory > 0) {
+      event_state_store.set("save_confirm_form&new_doodle");
+    } else {
+      fetched_single.set(EmptyFetch);
+      handleClear();
+      menuOpen = false;
+      alert_store.set("alert:New doodle created!");
+    }
+  }
 
   function toggleNavMenu() {
     if (eventState.includes("form")) {
@@ -46,8 +64,13 @@
 
   function handleSaveDoodle() {
     menuOpen = false;
+    if (get(undo_store).length === 0) {
+      alert_store.set("alert:No changes have been made.");
+      return;
+    }
     if (get(fetched_single).id) {
       CompileAndSaveDoodle("", true);
+      undo_store.set([]);
     } else {
       event_state_store.set("saving_new_project_form");
     }
@@ -59,7 +82,11 @@
   }
 
   function handleViewDoodles() {
-    event_state_store.set("view_doodles_form");
+    if (get(undo_store).length > 0) {
+      event_state_store.set("save_confirm_form&view_doodles_form");
+    } else {
+      event_state_store.set("view_doodles_form");
+    }
     menuOpen = false;
   }
 
@@ -94,7 +121,7 @@
     <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear doodle</button>
     <button class="clear-button" id="dd-menu" on:click={handleSignIn}>Sign in</button>
   {:else}
-    <button class="clear-button" id="dd-menu">New</button>
+    <button class="clear-button" id="dd-menu" on:click={handleNew}>New</button>
     <button class="clear-button" id="dd-menu" on:click={handleViewDoodles}>Open</button>
     <button class="clear-button" id="dd-menu" on:click={handleSaveDoodle}>Save</button>
     <button class="clear-button" id="dd-menu">Share</button>

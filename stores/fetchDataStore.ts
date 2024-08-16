@@ -4,26 +4,45 @@ import { authStore } from "../utils/auth/auth_store";
 import { CreateNewDoodle, GetDoodlesOfUser, GetSingleDoodle, UpdateDoodle } from "../api/doodles"
 import { event_state_store, selected_store } from "./eventState";
 import { ClearOldPathData, GetCanvasContext } from "../utils/drawBrushStroke";
-import { ClearUndoStore } from "./undoStore";
+import { ClearUndoStore, undo_store } from "./undoStore";
 import { DrawImage } from "./canvasStore";
+import { alert_store } from "./alertStore";
 
+export interface ProjectType {
+    name: string
+    id: string
+    date_created: string
+    data: any
+    collaborators: any[]
+}
 
-export const fetched_single = writable({collaborators: []})
-export const fetched_all = writable({yourDoodles: [], theirDoodles: []})
+interface AllProjects{
+    yourDoodles: ProjectType[]
+    theirDoodles: ProjectType[]
+}
 
-export const loaded_data_store = writable({})
+export const EmptyFetch: ProjectType = {
+    name: "",
+    id: "",
+    date_created: "",
+    data: null,
+    collaborators: []
+}
+
+export const fetched_single = writable<ProjectType>(EmptyFetch);
+
+export const fetched_all = writable<AllProjects>({yourDoodles: [], theirDoodles: []})
 
 export function GetAllUserDoodles(){
     const uid = get(authStore).user.id;
     GetDoodlesOfUser(uid).then((data: any) => {
-    console.log(data)
      fetched_all.set(data)
     });
 }
 
 export function CompileAndSaveDoodle(name: string, update: boolean) {
     const rectangles = get(textBoxesStore)
-    const canvas = document.getElementById('main-canvas')
+    const canvas: HTMLCanvasElement = document.getElementById('main-canvas') as HTMLCanvasElement;
     if (!canvas) {
         console.error("Oopsies, canvas was not initialized properly")
         return
@@ -36,23 +55,24 @@ export function CompileAndSaveDoodle(name: string, update: boolean) {
     if (!update) {
         CreateNewDoodle({ name, user_id, data }).then((resp: any) => {
             fetched_single.set(resp)
-            event_state_store.set("alert: Save was sucessful!")
+            alert_store.set("alert: Save was sucessful!")
         })
     } else {
         const { id, date_created } = get(fetched_single)
         const oldName = get(fetched_single).name
-
         UpdateDoodle({ id, name: oldName, user_id, data, date_created }).then((resp: any) => {
-            event_state_store.set("alert: Save was sucessful!")
+            alert_store.set("alert: Save was sucessful!")
         })
     }
+    undo_store.set([])
+    event_state_store.set("arrow")
 }
 
 export function FetchAndLoadDoodle(id: number) {
 
-    const canvas = document.getElementById("main-canvas")
+    const canvas: HTMLCanvasElement = document.getElementById('main-canvas') as HTMLCanvasElement;
     const ctx = GetCanvasContext()
-    GetSingleDoodle(id).then((resp) => {
+    GetSingleDoodle(id).then((resp: any) => {
         ctx?.clearRect(0, 0, canvas?.width, canvas?.height);
         clearAllTextBoxes();
         ClearOldPathData();

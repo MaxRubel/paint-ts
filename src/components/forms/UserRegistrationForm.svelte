@@ -45,16 +45,6 @@
     z-index: 1002;
   }
 
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.516);
-    z-index: 1001;
-  }
-
   .username_input {
     height: 25px;
     width: 200px;

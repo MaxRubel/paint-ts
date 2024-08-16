@@ -1,8 +1,5 @@
 <script lang="ts">
-  export let handleClear;
-  export let handleDark;
   export let handleLock;
-  export let handleSmootches;
   export let handle_arrow_mode;
   export let handle_drawing_mode;
   export let handle_textbox_mode;

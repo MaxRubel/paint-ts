@@ -11,7 +11,7 @@
     GetAllUserDoodles,
   } from "../../../stores/fetchDataStore";
 
-  let doodlesData;
+  let doodlesData: any;
 
   const unsubcribe = fetched_all.subscribe((value) => {
     doodlesData = value;
@@ -35,6 +35,7 @@
   });
 </script>
 
+<div class="overlay" />
 <div class="fixed-center cool view-doodles">
   <div class="row">
     <div id="empty-grid-spot" />

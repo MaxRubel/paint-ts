@@ -2,8 +2,10 @@
   import SaveIcon from "../../graphics/SaveIcon.svelte";
   import { event_state_store } from "../../../stores/eventState";
   import { CompileAndSaveDoodle } from "../../../stores/fetchDataStore";
+  import { get } from "svelte/store";
 
   let name: string = "";
+  let nextForm = "";
 
   function handleCancel() {
     event_state_store.set("arrow");
@@ -11,10 +13,17 @@
 
   function handleSubmit(e: any) {
     e.preventDefault();
+    if (get(event_state_store).includes("view_doodles_form_after")) {
+      nextForm = "view_doodles_form";
+    }
     CompileAndSaveDoodle(name, false);
+    if (nextForm === "view_doodles_form") {
+      event_state_store.set(nextForm);
+    }
   }
 </script>
 
+<div class="overlay" />
 <form class="new-project-form cool" on:submit={handleSubmit}>
   <div class="row">
     <SaveIcon />
@@ -32,7 +41,7 @@
 
 <style>
   .new-project-form {
-    z-index: 1001;
+    z-index: 1003;
     position: fixed;
     top: 20%;
     left: 50%;

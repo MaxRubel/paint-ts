@@ -1,24 +1,25 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { event_state_store } from "../../../stores/eventState";
+  import { alert_store } from "../../../stores/alertStore";
 
-  let eventState: string;
+  let alert: string;
   let message = "";
   let top = -64;
   let timeout: NodeJS.Timeout;
 
-  const unsubcribe = event_state_store.subscribe((value) => {
-    eventState = value;
+  const unsubcribe = alert_store.subscribe((value) => {
+    alert = value;
   });
 
   $: {
-    if (eventState.includes("alert")) {
-      message = eventState.split(":")[1];
+    if (alert.includes("alert")) {
+      message = alert.split(":")[1];
       top = 0;
       timeout = setTimeout(() => {
         top = -64;
       }, 2000);
-      event_state_store.set("arrow");
+      alert_store.set("");
     }
   }
 
