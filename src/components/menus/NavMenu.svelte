@@ -1,11 +1,12 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import NavButton from "../graphics/NavButton.svelte";
-  import { event_state_store } from "../../stores/eventState";
-  import { signIn, signOut } from "../../utils/auth/firebase";
-  import { authStore } from "../../utils/auth/auth_store";
+  import NavButton from "../../graphics/NavButton.svelte";
+  import { event_state_store } from "../../../stores/eventState";
+  import { signIn, signOut } from "../../../utils/auth/firebase";
+  import { authStore } from "../../../utils/auth/auth_store";
   import { get } from "svelte/store";
-  import { CompileAndSaveDoodle, doodle_info } from "../../stores/fetchDataStore";
+  import { CompileAndSaveDoodle } from "../../../stores/doodleDataStore";
+  import { fetched_single } from "../../../stores/fetchDataStore";
 
   export let handleClear: Function;
 
@@ -45,7 +46,7 @@
 
   function handleSaveDoodle() {
     menuOpen = false;
-    if (get(doodle_info).id) {
+    if (get(fetched_single).id) {
       CompileAndSaveDoodle("", true);
     } else {
       event_state_store.set("saving_new_project_form");
@@ -93,6 +94,7 @@
     <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear doodle</button>
     <button class="clear-button" id="dd-menu" on:click={handleSignIn}>Sign in</button>
   {:else}
+    <button class="clear-button" id="dd-menu">New</button>
     <button class="clear-button" id="dd-menu" on:click={handleViewDoodles}>Open</button>
     <button class="clear-button" id="dd-menu" on:click={handleSaveDoodle}>Save</button>
     <button class="clear-button" id="dd-menu">Share</button>

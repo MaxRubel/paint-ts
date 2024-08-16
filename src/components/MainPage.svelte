@@ -31,10 +31,11 @@
   import PageTurn from "./PageTurn.svelte";
   import BrushSettings from "./BrushSettings.svelte";
   import TextSettings from "./TextSettings.svelte";
-  import NavMenu from "./NavMenu.svelte";
-  import { doodle_info } from "../../stores/fetchDataStore";
+  import NavMenu from "./menus/NavMenu.svelte";
+  import { fetched_single } from "../../stores/fetchDataStore";
   import { InitCanvas } from "../../stores/canvasStore";
   import { DrawImage } from "../../stores/canvasStore";
+  import { ClearRedoItems } from "../../stores/redoStore";
 
   let mode = "dark";
   let catSmootch = false;
@@ -72,7 +73,11 @@
   const handleClick = (e: MouseEvent) => {
     switch (event_state) {
       case "creating_text":
-        createNewTextBox(e, canvas.offsetHeight, canvas.offsetWidth);
+        const textBoxId = createNewTextBox(e, canvas.offsetHeight, canvas.offsetWidth);
+        AddUndoItem({
+          action: "created_text_box",
+          data: textBoxId,
+        });
         break;
     }
   };
@@ -154,7 +159,7 @@
   function redrawCanvas(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
     ReDrawBrushStrokes();
-    if (get(doodle_info).data?.canvasImage) {
+    if (get(fetched_single).data?.canvasImage) {
       DrawImage();
     }
   }
@@ -164,6 +169,7 @@
     clearAllTextBoxes();
     ClearOldPathData();
     ClearUndoStore();
+    ClearRedoItems();
     // ClearFromDataStore()
   }
 

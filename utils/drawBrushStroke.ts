@@ -5,6 +5,8 @@ import { theme_store } from "../stores/eventState";
 import { AddUndoItem } from "../stores/undoStore";
 import { color_store } from "../stores/colorStore";
 import { brush_size_store } from "../stores/brushStore";
+import { fetched_single } from "../stores/fetchDataStore";
+import { DrawImage } from "../stores/canvasStore";
 
 let points: [number, number, number][] = [];
 let paths: { pathData: string, color: string }[] = [];
@@ -65,8 +67,17 @@ export function EndBrushStroke() {
   });
 }
 
+export function InsertOldBrushStrokes(oldStrokes: any){
+  const length = oldStrokes.data.pathArray.length
+  paths.splice(oldStrokes.data.start, length, ...oldStrokes.data.pathArray )
+  ReDrawBrushStrokes()
+}
+
 export function ReDrawBrushStrokes() {
   if (ctx) {
+    if(get(fetched_single).id){
+      DrawImage()
+    }
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     paths.forEach((path: any) => {
       const canvasPath = new Path2D(path.pathData);
