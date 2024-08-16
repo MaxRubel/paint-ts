@@ -99,10 +99,7 @@
       Stroke
       <div class="centered" style="margin-top: 5px;"><Slider /></div>
     </div>
-    <div
-      style="margin-top: 10px; flex-direction: column"
-      class="centered color-container"
-    >
+    <div style="margin-top: 10px; flex-direction: column" class="centered color-container">
       Color
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
@@ -142,7 +139,7 @@
     background-color: rgba(0, 0, 0, 0.266);
     left: 15px;
     padding: 20px;
-    top: 400px;
+    top: 50%;
     transform: translateY(-50%);
     display: none;
     flex-direction: column;

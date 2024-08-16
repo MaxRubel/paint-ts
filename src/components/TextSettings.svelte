@@ -282,7 +282,7 @@
     background-color: rgba(0, 0, 0, 0.266);
     left: 15px;
     padding: 20px;
-    top: 400px;
+    top: 50%;
     transform: translateY(-50%);
     display: none;
     flex-direction: column;

@@ -11,12 +11,14 @@
     event_state_store.set("arrow");
   }
 
-  function handleSubmit(e: any) {
+  async function handleSubmit(e: any) {
     e.preventDefault();
     if (get(event_state_store).includes("view_doodles_form_after")) {
       nextForm = "view_doodles_form";
     }
-    CompileAndSaveDoodle(name, false);
+
+    await CompileAndSaveDoodle(name, false);
+
     if (nextForm === "view_doodles_form") {
       event_state_store.set(nextForm);
     }

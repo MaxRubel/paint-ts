@@ -116,7 +116,7 @@
 </div>
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
-  <button class="clear-button" id="dd-menu">About Us</button>
+  <button class="clear-button divide-bottom" id="dd-menu">About Us</button>
   {#if !authState}
     <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear doodle</button>
     <button class="clear-button" id="dd-menu" on:click={handleSignIn}>Sign in</button>
@@ -124,10 +124,10 @@
     <button class="clear-button" id="dd-menu" on:click={handleNew}>New</button>
     <button class="clear-button" id="dd-menu" on:click={handleViewDoodles}>Open</button>
     <button class="clear-button" id="dd-menu" on:click={handleSaveDoodle}>Save</button>
-    <button class="clear-button" id="dd-menu">Share</button>
+    <button class="clear-button divide-bottom" id="dd-menu">Share</button>
     <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear Doodle</button>
     <button class="clear-button" id="dd-menu">View Color Palettes</button>
-    <button class="clear-button" id="dd-menu" on:click={handleSignOut}>Sign Out</button>
+    <button class="clear-button signout" id="dd-menu" on:click={handleSignOut}>Sign Out</button>
   {/if}
 </div>
 
@@ -160,5 +160,17 @@
 
   .menuOpen {
     display: block;
+  }
+
+  .divide-bottom {
+    border-radius: 0px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.198);
+  }
+
+  .signout {
+    padding-top: 25px;
+    padding-bottom: 25px;
+    border-radius: 0px;
+    border-top: 2px solid rgba(255, 255, 255, 0.198);
   }
 </style>

@@ -1,29 +1,34 @@
 import { get, writable } from "svelte/store";
-import { GetVectorPaths, InsertOldBrushStrokes } from "../utils/drawBrushStroke";
+import { InsertOldBrushStrokes } from "../utils/drawBrushStroke";
 import { AddUndoItem } from "./undoStore";
-import { createNewTextBox, deleteTextBox, textBoxesStore } from "./textBoxStore";
-import type { TextBoxType } from "../utils/types/app_types";
+import { deleteTextBox, textBoxesStore } from "./textBoxStore";
+import type { TextBoxType, UndoType } from "../utils/types/app_types";
 
-export const redo_store = writable([])
+interface RedoItem {
+    action: string
+    data: any
+    undoItem: UndoType
+}
 
-export function AddRedoItem(redoItem: any){
-    console.log("redo item added :", redoItem)
+export const redo_store = writable<RedoItem[]>([]);
+
+export function AddRedoItem(redoItem: any) {
     redo_store.update(oldItems => {
         return [...oldItems, redoItem];
-      });
+    });
 }
 
 
-export function ClearRedoItems(){
+export function ClearRedoItems() {
     redo_store.set([])
 }
 
-export function HandleRedo(){
+export function HandleRedo() {
     const redoArray = get(redo_store)
-    if(redoArray.length===0)return
-    const redoItem = redoArray[redoArray.length -1]
-    
-    switch(redoItem.action){
+    if (redoArray.length === 0) return
+    const redoItem: RedoItem = redoArray[redoArray.length - 1]
+
+    switch (redoItem.action) {
         case "drawBushStroke":
             InsertOldBrushStrokes(redoItem)
             break;
@@ -31,7 +36,7 @@ export function HandleRedo(){
             createOldTextBox(redoItem)
             break;
         case "addOldTyped":
-            addOldText(redoItem) 
+            addOldText(redoItem)
             break;
         case "redoDrag":
             redoDrag(redoItem)
@@ -55,103 +60,102 @@ export function HandleRedo(){
             redoChangedFontSingle(redoItem);
             break;
     }
-    if(
+    if (
         redoItem.action === "redoManyFontChanges" ||
-        redoItem.action === "redoChangedManyFontColors" || 
-        redoItem.action === "redoChangeFontSizes" || 
+        redoItem.action === "redoChangedManyFontColors" ||
+        redoItem.action === "redoChangeFontSizes" ||
         redoItem.action === "redoManyTextBoxAligned"
-    ){
+    ) {
         resetManyTextBoxes(redoItem)
     }
     AddUndoItem(redoItem.undoItem);
     popLastItem();
 }
 
-function createOldTextBox(undoItem: any){
+function createOldTextBox(undoItem: any) {
     textBoxesStore.update((prevVal) => ({
         ...prevVal,
         [undoItem.data.id]: undoItem.data
-      }));
+    }));
 }
 
-function addOldText(undoItem: any){
+function addOldText(undoItem: any) {
     textBoxesStore.update((prevVal) => ({
         ...prevVal,
         [undoItem.data.id]: undoItem.data
-      }));
+    }));
 }
 
-function redoDrag(undoItem: any){
+function redoDrag(undoItem: any) {
     textBoxesStore.update((prevVal) => ({
         ...prevVal,
         [undoItem.data.id]: undoItem.data
-      }));
+    }));
 }
 
-function redoDragMultiple(redoItem: any){
-    redoItem.data.forEach((textbox: TextBoxType)=>{
+function redoDragMultiple(redoItem: any) {
+    redoItem.data.forEach((textbox: TextBoxType) => {
         textBoxesStore.update((prevVal) => ({
             ...prevVal,
             [textbox.id]: textbox
-          }));
+        }));
     })
 }
 
-function redoExpand(redoItem: any){
-    const {data} = redoItem
+function redoExpand(redoItem: any) {
+    const { data } = redoItem
     textBoxesStore.update((prevVal) => ({
         ...prevVal,
         [data.id]: data
-      }));
+    }));
 }
 
-function redoDelete(redoItem: any){
-    const {data} = redoItem.undoItem
-    data.forEach((textbox: TextBoxType)=>{
+function redoDelete(redoItem: any) {
+    const { data } = redoItem.undoItem
+    data.forEach((textbox: TextBoxType) => {
         deleteTextBox(textbox.id)
     })
 }
 
-function redoSingleAlignChange(redoItem: any){
-    const {data} = redoItem
+function redoSingleAlignChange(redoItem: any) {
+    const { data } = redoItem
     textBoxesStore.update((prevVal) => ({
         ...prevVal,
         [data.id]: data
-      }));
+    }));
 }
 
-function redoFontChangeColor(redoItem: any){
-    const {data} = redoItem
+function redoFontChangeColor(redoItem: any) {
+    const { data } = redoItem
     textBoxesStore.update((prevVal) => ({
         ...prevVal,
         [data.id]: data
-      }));   
+    }));
 }
 
-function redoChangedFontSingle(redoItem: any){
-    const {data} = redoItem
+function redoChangedFontSingle(redoItem: any) {
+    const { data } = redoItem
     textBoxesStore.update((prevVal) => ({
         ...prevVal,
         [data.id]: data
-      }));   
+    }));
 }
 
-function resetManyTextBoxes(redoItem: any){
-    const {data} = redoItem
-    data.forEach((textbox: TextBoxType)=>{
+function resetManyTextBoxes(redoItem: any) {
+    const { data } = redoItem
+    data.forEach((textbox: TextBoxType) => {
         textBoxesStore.update((prevVal) => ({
             ...prevVal,
             [textbox.id]: textbox
-          }));   
+        }));
     })
 }
 
-function popLastItem(){
+function popLastItem() {
     redo_store.update(oldItems => {
         if (oldItems.length > 0) {
-          const lastItem = oldItems[oldItems.length - 1]
-          return oldItems.slice(0, -1);
+            return oldItems.slice(0, -1);
         }
         return oldItems;
-      });
+    });
 }

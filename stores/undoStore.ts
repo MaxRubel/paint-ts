@@ -14,7 +14,6 @@ export function ClearUndoStore() {
 }
 // Function to add a new Undo Item
 export function AddUndoItem(newItem: UndoType) {
-  console.log("undo item added", newItem)
   undo_store.update(oldItems => {
     return [...oldItems, newItem];
   });
@@ -82,18 +81,18 @@ function undoBrushStroke(lastAction: UndoBrushStroke) {
   const { start, end } = lastAction.data;
   const pathArray = GetVectorPaths().slice(start, end + 1)
   AddRedoItem({
-      action: "drawBushStroke",
-      data: {
-          pathArray,
-          start,
-          end
-      },
-      undoItem: lastAction
+    action: "drawBushStroke",
+    data: {
+      pathArray,
+      start,
+      end
+    },
+    undoItem: lastAction
   })
   SplicePaths(start, end);
 }
 
-function undoCreatedTextBox(lastAction: any){
+function undoCreatedTextBox(lastAction: any) {
   const textBoxID = lastAction.data
   AddRedoItem({
     action: "createTextBox",
@@ -129,8 +128,8 @@ function undoDragSingle(lastAction: UndoDragSingle) {
 
 function handleUndoDragMultiple(lastAction: any) {
   const { data } = lastAction
-  const dataArray:TextBoxType[] = []
-  data.forEach((textbox: TextBoxType)=>{ 
+  const dataArray: TextBoxType[] = []
+  data.forEach((textbox: TextBoxType) => {
     const fetched = get(textBoxesStore)[textbox.id]
     dataArray.push(fetched)
   })
@@ -233,13 +232,13 @@ function undoManyTextBoxAligned(lastAction: any) {
   })
 }
 
-function packageMultipleRedos(action: string, undoItem: any){
+function packageMultipleRedos(action: string, undoItem: any) {
   const undoArray = undoItem.data
   const data: any[] = []
-  undoArray.forEach((textBox: TextBoxType)=>{
+  undoArray.forEach((textBox: TextBoxType) => {
     data.push(get(textBoxesStore)[textBox.id])
   })
-  AddRedoItem({action, data, undoItem})
+  AddRedoItem({ action, data, undoItem })
 }
 
 function popLastItem() {
