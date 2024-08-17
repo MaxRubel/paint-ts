@@ -21,6 +21,8 @@
 
     if (nextForm === "view_doodles_form") {
       event_state_store.set(nextForm);
+    } else {
+      event_state_store.set("arrow");
     }
   }
 </script>
@@ -32,7 +34,7 @@
     <h3>Save Your Drawing</h3>
   </div>
   <div class="lower-half">
-    <div class="input-label">Name?</div>
+    <div class="input-label">Save As:</div>
     <input type="text" placeholder="Cool Drawing" bind:value={name} />
   </div>
   <div class="button-row">

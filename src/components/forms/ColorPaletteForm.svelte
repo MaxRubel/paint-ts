@@ -114,7 +114,9 @@
 <form class="color-palette-form cool" on:submit|preventDefault={SaveColorPalette}>
   <div class="top-row">
     <div id="empty" />
-    <div class="center-top"><h3 style="text-align: center;">Palette</h3></div>
+    <div class="center-top">
+      <h3 style="text-align: center; margin-top: 0px">Palette</h3>
+    </div>
     <div class="top-right">
       <button
         type="button"
@@ -199,6 +201,9 @@
     left: 50%;
     z-index: 1000;
     background-color: rgb(25, 29, 31);
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 35px;
   }
 
   .input-row {
@@ -245,10 +250,14 @@
     height: 310px;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(4, 1fr);
+    border: 1px solid lightgray;
+    border-radius: 10px;
+    padding: 10px;
+    width: 322px;
   }
 
   .moved {
-    transform: translate(10px, -10px);
+    transform: translate(-10px, -10px);
     width: 50px;
   }
 

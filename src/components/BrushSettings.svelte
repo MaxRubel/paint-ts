@@ -126,6 +126,8 @@
     }
   }
 
+  // $: console.log(smallPaletteMenu);
+
   function closeSmallMenu() {
     smallPaletteMenu = false;
   }
@@ -138,14 +140,14 @@
     for (let i = 0; i < activePalette.colors.length; i++) {
       const element = document.getElementById(`brush-settings-color-button&${i}`);
       if (element) {
-        element.style.border = "none";
+        element.style.border = "1px solid transparent";
         element.style.outline = "none";
       }
     }
   }
   function addBorder(element: HTMLElement) {
     clearSmallBorders();
-    element.style.border = "2px solid lightgrey";
+    element.style.border = "1px solid lightgrey";
     element.style.outline = "2px solid white";
   }
   $: {
@@ -268,15 +270,16 @@
 
     <div class="palette">
       <button
+        id="small-palette-menu-opener"
         class="clear-button"
         on:mouseenter={toggleOnDrop}
         on:mouseleave={toggleOffDrop}
         on:click={handleOpenSmallPaletteMenu}
       >
-        Palette &nbsp;
-        {#if dropArrow}
+        Palette
+        <!-- {#if dropArrow}
           <DownArrow />
-        {/if}
+        {/if} -->
       </button>
       <div class="recent-choices">
         {#each activePalette.colors as color, index}

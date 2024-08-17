@@ -59,12 +59,11 @@ export async function CompileAndSaveDoodle(name: string, update: boolean) {
     } else {
         const { id, date_created } = get(fetched_single);
         const oldName = get(fetched_single).name;
-        const resp = await UpdateDoodle({ id, name: oldName, user_id, data, date_created });
+        await UpdateDoodle({ id, name: oldName, user_id, data, date_created });
         alert_store.set("alert: Save was successful!");
     }
 
     undo_store.set([]);
-    event_state_store.set("arrow");
 }
 
 export function FetchAndLoadDoodle(id: number) {
