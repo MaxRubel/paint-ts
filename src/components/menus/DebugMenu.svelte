@@ -5,6 +5,13 @@
   import { fetched_all, fetched_single } from "../../../stores/fetchDataStore";
   import { undo_store } from "../../../stores/undoStore";
   import { redo_store } from "../../../stores/redoStore";
+  import {
+    active_palette_store,
+    editting_tile_store,
+    type PaletteType,
+  } from "../../../stores/paletteStore";
+  import { get } from "svelte/store";
+  import { color_store } from "../../../stores/colorStore";
 
   let brushSize: Number;
   let eventState: string;
@@ -15,6 +22,10 @@
   let fetchedMany: any;
   let undoArraySize: number;
   let redoArraySize: number;
+  let activePalette: PaletteType;
+  let edittingTile: number | null;
+  let activeColor: string;
+
   const unsubscribe = brush_size_store.subscribe((value) => {
     brushSize = value;
   });
@@ -54,6 +65,18 @@
     redoArraySize = value.length;
   });
 
+  const unsubscribe9 = active_palette_store.subscribe((value) => {
+    activePalette = value;
+  });
+
+  const unsubscribe10 = editting_tile_store.subscribe((value) => {
+    edittingTile = value;
+  });
+
+  const unsubscribe11 = color_store.subscribe((value) => {
+    activeColor = value;
+  });
+
   onDestroy(() => {
     unsubscribe();
     unsubscribe2();
@@ -63,6 +86,9 @@
     unsubscribe6();
     unsubscribe7();
     unsubscribe8();
+    unsubscribe9();
+    unsubscribe10();
+    unsubscribe11();
   });
 </script>
 
@@ -104,6 +130,21 @@
           <div><strong>date_created:</strong> {doodle.date_created}</div>
           <div><strong>collabs:</strong> {doodle.collaborators.length}</div>
         </div>
+      {/each}
+    </div>
+  </div>
+  <div class="palette">
+    <div class="top centered">--------Palette--------</div>
+    <div style="font-size: 14px;"><strong>Active Color: &nbsp;</strong> {activeColor}</div>
+    {#if !activePalette.id}
+      Palette has not been saved
+    {/if}
+    <div><strong>Name: &nbsp;</strong> {activePalette.name}</div>
+    <div><strong>Editting Item: &nbsp;</strong> {edittingTile}</div>
+    <div>
+      <div><strong>Colors &nbsp;</strong></div>
+      {#each activePalette.colors as color}
+        <div style="font-size: 12px;">{color}</div>
       {/each}
     </div>
   </div>

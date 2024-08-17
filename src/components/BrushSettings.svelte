@@ -1,19 +1,31 @@
-<script>
-  // @ts-nocheck
-
+<script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { event_state_store } from "../../stores/eventState";
+  import { event_state_store, selected_store } from "../../stores/eventState";
   import Slider from "./Slider.svelte";
   import iro from "@jaames/iro";
   import { color_store } from "../../stores/colorStore";
   import { get } from "svelte/store";
   import { authStore } from "../../utils/auth/auth_store";
+  import {
+    active_palette_store,
+    editting_tile_store,
+    PopFirstColor,
+    PushColorIntoActivePalette,
+    UpdateColorTile,
+  } from "../../stores/paletteStore";
+  import type { PaletteType } from "../../stores/paletteStore";
+  import { updateTextBox, textBoxesStore } from "../../stores/textBoxStore";
+  import { AddUndoItem } from "../../stores/undoStore";
+  import type { TextBoxType } from "../../utils/types/app_types";
 
-  let arrayOfColors = [];
-  let eventState;
-  let colorPicker;
-  let isVisible;
-  let auth;
+  let eventState: string = "";
+  let colorPicker: any;
+  let isVisible: boolean = false;
+  let auth: any;
+  let activePalette: PaletteType;
+  let draggingColor: Boolean;
+  let color: string;
+  let edittingTile: number | null;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -23,9 +35,15 @@
     auth = value.user;
   });
 
-  $: console.log(auth);
+  const unsubscribe3 = active_palette_store.subscribe((value: PaletteType) => {
+    activePalette = value;
+  });
 
-  function handleChangeColor(origin) {
+  const unsubscribe4 = editting_tile_store.subscribe((value) => {
+    edittingTile = value;
+  });
+
+  function handleChangeColor(origin: string) {
     let newColorF;
     if (origin === "box") {
       const newColor = colorPicker.color.rgb;
@@ -33,14 +51,25 @@
     } else {
       newColorF = origin;
     }
-
+    if (edittingTile !== null) {
+      if (edittingTile >= 16) {
+        UpdateColorTile(newColorF, 15);
+        return;
+      }
+      UpdateColorTile(newColorF, edittingTile);
+      return;
+    } else {
+      PushColorIntoActivePalette(newColorF);
+      console.log("yessssssss");
+      editting_tile_store.set(activePalette.colors.length);
+    }
     color_store.set(newColorF);
     const eventState = get(event_state_store);
 
     if (eventState === "selected") {
       const selectedArray = get(selected_store);
-      const undoArray = [];
-      selectedArray.forEach((item) => {
+      const undoArray: any[] = [];
+      selectedArray.forEach((item: TextBoxType) => {
         const [, id] = item.id.split("&");
         if (item.id.includes("textbox")) {
           const ogTextbox = get(textBoxesStore)[id];
@@ -60,27 +89,25 @@
         });
       }
     }
-
-    if (arrayOfColors.includes(newColorF)) return;
-
-    if (arrayOfColors.length === 16) {
-      arrayOfColors.shift();
-      arrayOfColors = arrayOfColors;
-    }
-    arrayOfColors.push(newColorF);
-    arrayOfColors = arrayOfColors;
+    if (draggingColor) return;
+    if (activePalette.colors.includes(newColorF)) return;
+    if (activePalette.id) return;
+    PushColorIntoActivePalette(newColorF);
   }
 
   function openPaletteWindow() {
-    event_state_store.set("color_palette_form&from_brush");
+    event_state_store.set("color_palette_form&drawing");
   }
 
   onDestroy(() => {
     unsubcribe();
     unsubcribe2();
+    unsubscribe3();
+    unsubscribe4();
   });
 
   onMount(() => {
+    // @ts-ignore
     colorPicker = new iro.ColorPicker("#picker2", {
       width: 200,
       layout: [
@@ -100,12 +127,14 @@
   });
 
   $: {
-    if (eventState === "drawing" || eventState.includes("from_brush")) {
+    if (eventState.includes("drawing")) {
       isVisible = true;
     } else {
       isVisible = false;
     }
   }
+
+  let creatingNew = false;
 </script>
 
 <div class="color-bar-3" class:isVisible>
@@ -120,8 +149,35 @@
       <div
         class="color-picker"
         id="picker2"
-        on:mouseup={() => {
+        on:pointerdown={() => {
+          draggingColor = true;
+          if (edittingTile === null) {
+            creatingNew = true;
+            console.log("creating new");
+            editting_tile_store.set(activePalette.colors.length);
+          }
           handleChangeColor("box");
+        }}
+        on:mousemove={() => {
+          if (draggingColor) {
+            handleChangeColor("box");
+          }
+        }}
+        on:pointermove={() => {
+          if (draggingColor) {
+            handleChangeColor("box");
+          }
+        }}
+        on:pointerup={() => {
+          handleChangeColor("box");
+          draggingColor = false;
+          //@ts-ignore
+          color_store.set(activePalette.colors[edittingTile]);
+          if (creatingNew) {
+            console.log("yes");
+            editting_tile_store.set(null);
+            creatingNew = false;
+          }
         }}
       />
     </div>
@@ -129,7 +185,7 @@
     <div class="palette">
       Palette
       <div class="recent-choices">
-        {#each arrayOfColors as color}
+        {#each activePalette.colors as color}
           <div class="color-box">
             <button
               class="color-button"
@@ -154,7 +210,7 @@
     color: white;
     border-radius: 20px;
     height: 590px;
-    background-color: rgba(0, 0, 0, 0.266);
+    background-color: rgb(25, 29, 31);
     left: 15px;
     padding: 20px;
     top: 50%;

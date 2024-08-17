@@ -54,8 +54,8 @@
     <div class="centered">
       <h3 class="centered">Open</h3>
     </div>
-    <div class="close-button centered">
-      <button class="clear-button closer centered" on:click={handleClose}>
+    <div class="top-right">
+      <button class="clear-button closer centered moved" on:click={handleClose}>
         <Close />
       </button>
     </div>
@@ -124,15 +124,14 @@
     width: 100%;
   }
 
-  .close-button {
-    transform: translateY(-10px);
-    display: flex;
-    justify-content: flex-end;
-  }
-
   .closer {
     width: 44px;
     padding: 0px;
+  }
+
+  .top-right {
+    display: flex;
+    justify-content: flex-end;
   }
 
   .table-container {
@@ -156,5 +155,10 @@
   th {
     background-color: #f2f2f2;
     color: black;
+  }
+
+  .moved {
+    transform: translate(10px, -10px);
+    width: 50px;
   }
 </style>
