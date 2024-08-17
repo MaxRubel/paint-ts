@@ -119,6 +119,10 @@
   }
 
   function handleOpenSmallPaletteMenu() {
+    if (eventState === "color_palette_form&drawing") {
+      event_state_store.set("drawing");
+      return;
+    }
     if (smallPaletteMenu) {
       smallPaletteMenu = false;
     } else {
