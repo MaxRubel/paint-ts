@@ -12,7 +12,7 @@ export interface PaletteType {
     date_created: string
 }
 
-const initialPalette: PaletteType = {
+export const initialPalette: PaletteType = {
     id: 0,
     user_id: get(authStore).user.id,
     owner: null,

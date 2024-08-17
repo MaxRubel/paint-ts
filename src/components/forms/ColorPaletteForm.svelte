@@ -5,6 +5,8 @@
     active_palette_store,
     DeleteColorPalette,
     editting_tile_store,
+    initialPalette,
+    PushColorIntoActivePalette,
     RemoveFromColorsArray,
     SaveColorPalette,
     UpdatePaletteName,
@@ -67,6 +69,16 @@
     color_store.set(activePalette.colors[index]);
   }
 
+  function handleDelete() {
+    if (activePalette.id) {
+      DeleteColorPalette();
+    } else {
+      if (window.confirm("Are you sure you want to clear this palette?")) {
+        active_palette_store.set(initialPalette);
+      }
+    }
+  }
+
   function handleRemove(e: Event) {
     if (edittingItem !== null) {
       RemoveFromColorsArray(edittingItem);
@@ -81,19 +93,28 @@
     }
   }
 
+  function handleAdd() {
+    if (activePalette.colors.length < 16) {
+      PushColorIntoActivePalette("rgb(255, 255, 255)");
+      editting_tile_store.set(activePalette.colors.length - 1);
+    }
+  }
+
   $: {
     //border around selected box
     //event listener to click out
     if (edittingItem !== null) {
       document.addEventListener("pointerdown", unfocusButton);
-      const element = document.getElementById(
-        `color-button-palette-form&${String(edittingItem)}`,
-      );
-      if (element) {
-        clearBorders();
-        element.style.border = "2px solid lightgray";
-        element.style.outline = "2px solid white";
-      }
+      setTimeout(() => {
+        const element = document.getElementById(
+          `color-button-palette-form&${String(edittingItem)}`,
+        );
+        if (element) {
+          clearBorders();
+          element.style.border = "2px solid lightgray";
+          element.style.outline = "2px solid white";
+        }
+      }, 1);
     } else {
       document.removeEventListener("pointerdown", unfocusButton);
       clearBorders();
@@ -144,15 +165,9 @@
       <button type="button" class="clear-button small">
         <Folder />
       </button>
-      {#if activePalette.id}
-        <button
-          type="button"
-          class="clear-button small"
-          on:click={DeleteColorPalette}
-        >
-          <TrashCanBig />
-        </button>
-      {/if}
+      <button type="button" class="clear-button small" on:click={handleDelete}>
+        <TrashCanBig />
+      </button>
     </div>
     <div class="palette-grid">
       {#each activePalette.colors as color, index}
@@ -168,6 +183,13 @@
       {/each}
     </div>
     <div class="options-menu right">
+      <button
+        type="button"
+        id="remove-button"
+        class="clear-button remove"
+        on:click={handleAdd}
+        >add
+      </button>
       <button
         type="button"
         id="remove-button"
@@ -203,7 +225,7 @@
     background-color: rgb(25, 29, 31);
     padding-left: 0px;
     padding-right: 0px;
-    padding-bottom: 35px;
+    padding-bottom: 40px;
   }
 
   .input-row {
@@ -227,6 +249,7 @@
     justify-content: flex-start;
     gap: 10px;
     align-items: center;
+    justify-content: center;
   }
 
   /* .right {
@@ -236,6 +259,13 @@
   .remove {
     width: auto;
     height: 80px;
+    width: 94px;
+    border: 1px solid white;
+  }
+
+  .remove:hover,
+  .remove:focus {
+    border: 1px solid white;
   }
 
   .small {
@@ -282,5 +312,9 @@
     border-radius: 8px;
     cursor: pointer;
     transition: none;
+  }
+
+  .right {
+    justify-content: center;
   }
 </style>
