@@ -76,9 +76,7 @@
     }
   }
   function handleRemove(e: Event) {
-    // e.stopPropagation();
     if (editting !== null) {
-      console.log("yaas");
       RemoveFromColorsArray(editting);
     }
     editting_tile_store.set(null);
@@ -211,9 +209,9 @@
     align-items: center;
   }
 
-  .right {
+  /* .right {
     justify-content: center;
-  }
+  } */
 
   .remove {
     width: auto;
