@@ -1,6 +1,9 @@
 <script>
   import { get } from "svelte/store";
-  import { CompileAndSaveDoodle, fetched_single } from "../../../stores/fetchDataStore";
+  import {
+    CompileAndSaveDoodle,
+    fetched_single,
+  } from "../../../stores/fetchDataStore";
   import Close from "../../graphics/Close.svelte";
   import { undo_store } from "../../../stores/undoStore";
   import { event_state_store } from "../../../stores/eventState";
@@ -13,7 +16,9 @@
       oldEventState = get(event_state_store);
       CompileAndSaveDoodle("", true);
       undo_store.set([]);
-      if (oldEventState.includes("view_doodles_form")) event_state_store.set("view_doodles_form");
+      if (oldEventState.includes("view_doodles_form")) {
+        event_state_store.set("view_doodles_form");
+      }
       if (oldEventState.includes("new_doodle")) {
         ClearEverything();
       }

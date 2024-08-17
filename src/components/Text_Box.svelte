@@ -7,12 +7,17 @@
     theme_store,
   } from "../../stores/eventState";
   import { createEventDispatcher } from "svelte";
-  import { font_family_store, font_size_store, text_alignment } from "../../stores/textBoxStore";
+  import {
+    font_family_store,
+    font_size_store,
+    text_alignment,
+  } from "../../stores/textBoxStore";
   import type { TextBoxType } from "../../utils/types/app_types";
   import { StartDragMany, DragMany, EndDragMany } from "../../utils/dragMultiple";
   import { AddUndoItem } from "../../stores/undoStore";
   import { updateTextBox } from "../../stores/textBoxStore";
   import { color_store } from "../../stores/colorStore";
+  import { get } from "svelte/store";
   export let data: TextBoxType;
 
   let { id } = data;
@@ -268,6 +273,11 @@
         width < window.innerWidth * 0.5
       ) {
         width = width + 50;
+        if (get(locked_store)) {
+          width = Math.round((width + 40) / 20) * 20;
+        } else {
+          width = width + 50;
+        }
         updateTextBox(id, { x, y, width, height });
         return;
       }
@@ -277,6 +287,11 @@
           tooSmol = true;
           return;
         } else {
+          if (get(locked_store)) {
+            height = textareaElement.scrollHeight + 20;
+          } else {
+            height = textareaElement.scrollHeight + 20;
+          }
           height = textareaElement.scrollHeight + 20;
           updateTextBox(id, { ...data, x, y, width, height });
           tooSmol = false;
@@ -402,7 +417,12 @@
     } else {
       event_state_store.set(oldState);
     }
-    if (startX !== x || startY !== y || startHeight !== height || startWidth !== width) {
+    if (
+      startX !== x ||
+      startY !== y ||
+      startHeight !== height ||
+      startWidth !== width
+    ) {
       AddUndoItem({
         action: "expanded",
         data: {

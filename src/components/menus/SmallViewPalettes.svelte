@@ -22,9 +22,10 @@
     closeSmallMenu();
   }
 
-  function handleUnfocus(e) {
+  function handleUnfocus(e: any) {
     if (!e.target.id.includes("small-palette-menu")) {
       closeSmallMenu();
+      console.log(e.target.id);
     }
   }
 
