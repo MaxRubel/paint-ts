@@ -8,6 +8,7 @@
   import { authStore } from "../../utils/auth/auth_store";
   import {
     active_palette_store,
+    ClearPalette,
     editting_tile_store,
     PushColorIntoActivePalette,
     UpdateColorTile,
@@ -16,6 +17,9 @@
   import { updateTextBox, textBoxesStore } from "../../stores/textBoxStore";
   import { AddUndoItem } from "../../stores/undoStore";
   import type { TextBoxType } from "../../utils/types/app_types";
+  import SideArrow from "../graphics/SideArrow.svelte";
+  import DownArrow from "../graphics/DownArrow.svelte";
+  import SmallViewPalettes from "./menus/SmallViewPalettes.svelte";
 
   let eventState: string = "";
   let colorPicker: any;
@@ -23,7 +27,6 @@
   let auth: any;
   let activePalette: PaletteType;
   let draggingColor: Boolean;
-  let color: string;
   let edittingTile: number | null;
 
   const unsubcribe = event_state_store.subscribe((value) => {
@@ -97,6 +100,31 @@
     event_state_store.set("color_palette_form&drawing");
   }
 
+  let dropArrow = false;
+  let smallPaletteMenu = false;
+  function toggleOnDrop() {
+    dropArrow = true;
+  }
+  function toggleOffDrop() {
+    dropArrow = false;
+  }
+
+  function handleOpenSmallPaletteMenu() {
+    if (smallPaletteMenu) {
+      smallPaletteMenu = false;
+    } else {
+      smallPaletteMenu = true;
+    }
+  }
+
+  function closeSmallMenu() {
+    smallPaletteMenu = false;
+  }
+
+  function handleNewPalette() {
+    ClearPalette();
+  }
+
   onDestroy(() => {
     unsubcribe();
     unsubcribe2();
@@ -136,12 +164,18 @@
 </script>
 
 <div class="color-bar-3" class:isVisible>
+  {#if smallPaletteMenu}
+    <SmallViewPalettes {closeSmallMenu} />
+  {/if}
   <div class="content-wrapper">
     <div class="slider centered" style="flex-direction: column">
       Stroke
       <div class="centered" style="margin-top: 5px;"><Slider /></div>
     </div>
-    <div style="margin-top: 10px; flex-direction: column" class="centered color-container">
+    <div
+      style="margin-top: 10px; flex-direction: column"
+      class="centered color-container"
+    >
       Color
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
@@ -174,7 +208,17 @@
     </div>
 
     <div class="palette">
-      Palette
+      <button
+        class="clear-button"
+        on:mouseenter={toggleOnDrop}
+        on:mouseleave={toggleOffDrop}
+        on:click={handleOpenSmallPaletteMenu}
+      >
+        Palette &nbsp;
+        {#if dropArrow}
+          <DownArrow />
+        {/if}
+      </button>
       <div class="recent-choices">
         {#each activePalette.colors as color}
           <div class="color-box">
@@ -188,9 +232,16 @@
           </div>
         {/each}
       </div>
-      {#if auth?.id}
-        <button class="clear-button centered" on:click={openPaletteWindow}> Edit </button>
-      {/if}
+      <div class="smol-row">
+        {#if auth?.id && activePalette.colors.length > 0}
+          <button class="clear-button centered smol" on:click={handleNewPalette}>
+            New
+          </button>
+          <button class="clear-button centered smol" on:click={openPaletteWindow}>
+            Edit
+          </button>
+        {/if}
+      </div>
     </div>
   </div>
 </div>
@@ -253,18 +304,24 @@
     grid-template-columns: repeat(4, 1fr);
     grid-auto-rows: min-content;
     margin-top: 10px;
-    /* padding: 10px; */
-    /* border: 1px solid rgba(255, 255, 255, 0.731); */
     border-radius: 10pt;
     flex-grow: 1;
     width: 180px;
     gap: 5px;
     align-content: start;
-    /* height: 100%; */
   }
 
   .color-button {
     width: 30px;
     height: 30px;
+  }
+
+  .smol {
+    width: 122px;
+  }
+
+  .smol-row {
+    display: flex;
+    gap: 0px;
   }
 </style>

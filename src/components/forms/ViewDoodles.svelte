@@ -114,6 +114,7 @@
 
   .doodle-button {
     width: 100%;
+    justify-content: flex-start;
   }
 
   .row {
