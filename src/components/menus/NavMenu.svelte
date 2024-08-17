@@ -116,18 +116,29 @@
 </div>
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
-  <button class="clear-button divide-bottom" id="dd-menu">About Us</button>
+  <button class="clear-button nav-button-btn divide-bottom" id="dd-menu">About Us</button>
   {#if !authState}
-    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear drawing</button>
-    <button class="clear-button" id="dd-menu" on:click={handleSignIn}>Sign in</button>
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}
+      >Clear drawing</button
+    >
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleSignIn}>Sign in</button
+    >
   {:else}
-    <button class="clear-button" id="dd-menu" on:click={handleNew}>New</button>
-    <button class="clear-button" id="dd-menu" on:click={handleViewDoodles}>Open</button>
-    <button class="clear-button" id="dd-menu" on:click={handleSaveDoodle}>Save</button>
-    <button class="clear-button divide-bottom" id="dd-menu">Share</button>
-    <button class="clear-button" id="dd-menu" on:click={clearDoodle}>Clear Drawing</button>
-    <button class="clear-button" id="dd-menu">View Color Palettes</button>
-    <button class="clear-button signout" id="dd-menu" on:click={handleSignOut}>Sign Out</button>
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleNew}>New</button>
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleViewDoodles}
+      >Open</button
+    >
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleSaveDoodle}
+      >Save</button
+    >
+    <button class="clear-button nav-button-btn divide-bottom" id="dd-menu">Share</button>
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}
+      >Clear Drawing</button
+    >
+    <button class="clear-button nav-button-btn" id="dd-menu">View Color Palettes</button>
+    <button class="clear-button nav-button-btn signout" id="dd-menu" on:click={handleSignOut}
+      >Sign Out</button
+    >
   {/if}
 </div>
 
@@ -141,12 +152,12 @@
     top: 15px;
     left: 15px;
     height: 44px;
-    width: 44px;
+
     z-index: 900;
   }
 
   .nav-button-btn {
-    /* background-color: rgb(96, 61, 34); */
+    justify-content: flex-start;
   }
 
   .dropdown-menu {
@@ -157,7 +168,7 @@
     font-size: 12pt;
     z-index: 900;
     border-radius: 10px;
-    background-color: rgb(31, 39, 39);
+    background-color: rgb(31, 35, 39);
     display: none;
     border: 2px solid rgba(255, 255, 255, 0.198);
   }

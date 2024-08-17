@@ -4,6 +4,7 @@
   import SavingNewProjectForm from "./SavingNewProjectForm.svelte";
   import ViewDoodles from "./ViewDoodles.svelte";
   import SaveConfirmForm from "./SaveConfirmForm.svelte";
+  import ColorPaletteForm from "./ColorPaletteForm.svelte";
 
   let eventState: string;
 
@@ -22,4 +23,7 @@
 {/if}
 {#if eventState.includes("save_confirm_form")}
   <SaveConfirmForm />
+{/if}
+{#if eventState.includes("color_palette_form")}
+  <ColorPaletteForm />
 {/if}
