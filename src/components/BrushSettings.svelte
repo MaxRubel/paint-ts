@@ -9,7 +9,6 @@
   import {
     active_palette_store,
     editting_tile_store,
-    PopFirstColor,
     PushColorIntoActivePalette,
     UpdateColorTile,
   } from "../../stores/paletteStore";
@@ -60,7 +59,6 @@
       return;
     } else {
       PushColorIntoActivePalette(newColorF);
-      console.log("yessssssss");
       editting_tile_store.set(activePalette.colors.length);
     }
     color_store.set(newColorF);
@@ -153,17 +151,11 @@
           draggingColor = true;
           if (edittingTile === null) {
             creatingNew = true;
-            console.log("creating new");
             editting_tile_store.set(activePalette.colors.length);
           }
           handleChangeColor("box");
         }}
         on:mousemove={() => {
-          if (draggingColor) {
-            handleChangeColor("box");
-          }
-        }}
-        on:pointermove={() => {
           if (draggingColor) {
             handleChangeColor("box");
           }
@@ -174,7 +166,6 @@
           //@ts-ignore
           color_store.set(activePalette.colors[edittingTile]);
           if (creatingNew) {
-            console.log("yes");
             editting_tile_store.set(null);
             creatingNew = false;
           }
