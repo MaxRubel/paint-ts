@@ -19,7 +19,7 @@
 
   let activePalette: PaletteType;
   let nameInput: string;
-  let editting: number | null;
+  let edittingItem: number | null;
   let oldEventState = get(event_state_store);
 
   const unsubcribe = active_palette_store.subscribe((value: PaletteType) => {
@@ -30,7 +30,7 @@
   });
 
   const unsubcribe2 = editting_tile_store.subscribe((value: number | null) => {
-    editting = value;
+    edittingItem = value;
   });
 
   function handleClose() {
@@ -62,22 +62,14 @@
     }
   }
 
-  function handleClick(index: number, e: Event) {
+  function handleClick(index: number) {
     editting_tile_store.set(index);
     color_store.set(activePalette.colors[index]);
-    clearBorders();
-    const target = e.target as HTMLElement;
-    if (target && target.id) {
-      const element = document.getElementById(target.id);
-      if (element) {
-        element.style.border = "2px solid lightgray";
-        element.style.outline = "2px solid white";
-      }
-    }
   }
+
   function handleRemove(e: Event) {
-    if (editting !== null) {
-      RemoveFromColorsArray(editting);
+    if (edittingItem !== null) {
+      RemoveFromColorsArray(edittingItem);
     }
     editting_tile_store.set(null);
   }
@@ -90,10 +82,21 @@
   }
 
   $: {
-    if (editting) {
+    //border around selected box
+    //event listener to click out
+    if (edittingItem !== null) {
       document.addEventListener("pointerdown", unfocusButton);
+      const element = document.getElementById(
+        `color-button-palette-form&${String(edittingItem)}`,
+      );
+      if (element) {
+        clearBorders();
+        element.style.border = "2px solid lightgray";
+        element.style.outline = "2px solid white";
+      }
     } else {
       document.removeEventListener("pointerdown", unfocusButton);
+      clearBorders();
     }
   }
 
@@ -113,7 +116,11 @@
     <div id="empty" />
     <div class="center-top"><h3 style="text-align: center;">Palette</h3></div>
     <div class="top-right">
-      <button type="button" class="clear-button moved close-button centered" on:click={handleClose}>
+      <button
+        type="button"
+        class="clear-button moved close-button centered"
+        on:click={handleClose}
+      >
         <Close />
       </button>
     </div>
@@ -136,7 +143,11 @@
         <Folder />
       </button>
       {#if activePalette.id}
-        <button type="button" class="clear-button small" on:click={DeleteColorPalette}>
+        <button
+          type="button"
+          class="clear-button small"
+          on:click={DeleteColorPalette}
+        >
           <TrashCanBig />
         </button>
       {/if}
@@ -146,8 +157,8 @@
         <button
           class="big-color"
           id={`color-button-palette-form&${String(index)}`}
-          on:click={(e) => {
-            handleClick(index, e);
+          on:pointerdown={() => {
+            handleClick(index);
           }}
           type="button"
           style="background-color: {color};"
@@ -155,9 +166,13 @@
       {/each}
     </div>
     <div class="options-menu right">
-      <button type="button" id="remove-button" class="clear-button remove" on:click={handleRemove}
-        >remove</button
-      >
+      <button
+        type="button"
+        id="remove-button"
+        class="clear-button remove"
+        on:click={handleRemove}
+        >remove
+      </button>
     </div>
   </div>
 </form>
@@ -257,5 +272,6 @@
     width: 70px;
     border-radius: 8px;
     cursor: pointer;
+    transition: none;
   }
 </style>

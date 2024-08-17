@@ -17,7 +17,6 @@
   import { updateTextBox, textBoxesStore } from "../../stores/textBoxStore";
   import { AddUndoItem } from "../../stores/undoStore";
   import type { TextBoxType } from "../../utils/types/app_types";
-  import SideArrow from "../graphics/SideArrow.svelte";
   import DownArrow from "../graphics/DownArrow.svelte";
   import SmallViewPalettes from "./menus/SmallViewPalettes.svelte";
 
@@ -28,6 +27,7 @@
   let activePalette: PaletteType;
   let draggingColor: Boolean;
   let edittingTile: number | null;
+  let activeColor: string;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -43,6 +43,10 @@
 
   const unsubscribe4 = editting_tile_store.subscribe((value) => {
     edittingTile = value;
+  });
+
+  const unsubscribe5 = color_store.subscribe((value) => {
+    activeColor = value;
   });
 
   function handleChangeColor(origin: string) {
@@ -61,7 +65,6 @@
       UpdateColorTile(newColorF, edittingTile);
       return;
     } else {
-      PushColorIntoActivePalette(newColorF);
       editting_tile_store.set(activePalette.colors.length);
     }
     color_store.set(newColorF);
@@ -75,10 +78,7 @@
         if (item.id.includes("textbox")) {
           const ogTextbox = get(textBoxesStore)[id];
           if (ogTextbox.fontColor !== newColorF) {
-            undoArray.push({
-              id,
-              fontColor: ogTextbox.fontColor,
-            });
+            undoArray.push({ id, fontColor: ogTextbox.fontColor });
             updateTextBox(id, { fontColor: newColorF });
           }
         }
@@ -94,6 +94,15 @@
     if (activePalette.colors.includes(newColorF)) return;
     if (activePalette.id) return;
     PushColorIntoActivePalette(newColorF);
+  }
+
+  function handleClickSmall(color: string, index: number) {
+    clearSmallBorders();
+    if (!eventState.includes("color_palette_form")) {
+      color_store.set(color);
+    } else {
+      editting_tile_store.set(index);
+    }
   }
 
   function openPaletteWindow() {
@@ -125,11 +134,49 @@
     ClearPalette();
   }
 
-  onDestroy(() => {
+  function clearSmallBorders() {
+    for (let i = 0; i < activePalette.colors.length; i++) {
+      const element = document.getElementById(`brush-settings-color-button&${i}`);
+      if (element) {
+        element.style.border = "none";
+        element.style.outline = "none";
+      }
+    }
+  }
+  function addBorder(element: HTMLElement) {
+    clearSmallBorders();
+    element.style.border = "2px solid lightgrey";
+    element.style.outline = "2px solid white";
+  }
+  $: {
+    if (eventState === "drawing") {
+      const index = activePalette.colors.findIndex((item) => item === activeColor);
+      const element = document.getElementById(
+        `brush-settings-color-button&${index}`,
+      );
+      if (element) {
+        addBorder(element);
+      }
+    } else if (eventState.includes("color_palette_form")) {
+      if (edittingTile !== null) {
+        const element = document.getElementById(
+          `brush-settings-color-button&${edittingTile}`,
+        );
+        if (element) {
+          addBorder(element);
+        }
+      } else {
+        clearSmallBorders();
+      }
+    }
+  }
+
+  $: onDestroy(() => {
     unsubcribe();
     unsubcribe2();
     unsubscribe3();
     unsubscribe4();
+    unsubscribe5();
   });
 
   onMount(() => {
@@ -161,6 +208,7 @@
   }
 
   let creatingNew = false;
+  let mouseHasLeftWhileDragging = false;
 </script>
 
 <div class="color-bar-3" class:isVisible>
@@ -194,14 +242,25 @@
             handleChangeColor("box");
           }
         }}
+        on:mouseleave={() => {
+          if (creatingNew) {
+            mouseHasLeftWhileDragging = true;
+          }
+        }}
+        on:mouseenter={() => {
+          if (creatingNew && mouseHasLeftWhileDragging) {
+            mouseHasLeftWhileDragging = false;
+          }
+        }}
         on:pointerup={() => {
           handleChangeColor("box");
           draggingColor = false;
           //@ts-ignore
           color_store.set(activePalette.colors[edittingTile]);
-          if (creatingNew) {
+          if (creatingNew || mouseHasLeftWhileDragging) {
             editting_tile_store.set(null);
             creatingNew = false;
+            mouseHasLeftWhileDragging = false;
           }
         }}
       />
@@ -220,12 +279,13 @@
         {/if}
       </button>
       <div class="recent-choices">
-        {#each activePalette.colors as color}
+        {#each activePalette.colors as color, index}
           <div class="color-box">
             <button
               class="color-button"
-              on:click={() => {
-                handleChangeColor(color);
+              id={`brush-settings-color-button&${index}`}
+              on:mousedown={() => {
+                handleClickSmall(color, index);
               }}
               style="background-color: {color};"
             ></button>
@@ -251,7 +311,7 @@
     position: fixed;
     color: white;
     border-radius: 20px;
-    height: 590px;
+    height: 610px;
     background-color: rgb(25, 29, 31);
     left: 15px;
     padding: 20px;
@@ -314,6 +374,7 @@
   .color-button {
     width: 30px;
     height: 30px;
+    transition: none;
   }
 
   .smol {
@@ -323,5 +384,6 @@
   .smol-row {
     display: flex;
     gap: 0px;
+    margin-top: 10px;
   }
 </style>
