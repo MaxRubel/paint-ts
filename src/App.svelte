@@ -35,6 +35,5 @@
   <UserRegistrationForm />
 {/if}
 <Alert />
-<DebugMenu />
 <FormRouter />
 <MainPage />

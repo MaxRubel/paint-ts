@@ -7,7 +7,7 @@
   color-scheme: light dark;
   color: rgba(255, 255, 255);
   /* background-color: rgb(42, 50, 53); */
-  background-color: rgb(31, 36, 37);
+  background-color: rgb(31, 34, 37);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -85,6 +85,10 @@ button:hover {
   display: flex;
   width: 44px;
   padding: 0px;
+}
+
+.heh {
+  background-color: #535bf2;
 }
 
 @media (prefers-color-scheme: light) {

@@ -44,6 +44,8 @@
   }
 
   function toggleNavMenu() {
+    console.log("clicked");
+    console.log(menuOpen);
     if (eventState.includes("form")) {
       return;
     }
@@ -81,6 +83,11 @@
     menuOpen = false;
   }
 
+  function openViewLargePalettes() {
+    event_state_store.set("large_view_palettes");
+    menuOpen = false;
+  }
+
   function handleViewDoodles() {
     if (get(undo_store).length > 0) {
       event_state_store.set("save_confirm_form&view_doodles_form");
@@ -112,32 +119,59 @@
 </script>
 
 <div class="nav-button">
-  <button class="nav-button-btn" on:click={toggleNavMenu}><NavButton /></button>
+  <button
+    class="nav-button-btn"
+    style:color={menuOpen ? "#535bf2" : ""}
+    on:click={toggleNavMenu}><NavButton /></button
+  >
 </div>
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
-  <button class="clear-button nav-button-btn divide-bottom" id="dd-menu">About Us</button>
+  <button class="clear-button nav-button-btn divide-bottom" id="dd-menu"
+    >About Us</button
+  >
   {#if !authState}
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}
       >Clear drawing</button
     >
-    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleSignIn}>Sign in</button
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleSignIn}
+      >Sign in</button
     >
   {:else}
-    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleNew}>New</button>
-    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleViewDoodles}
-      >Open</button
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleNew}>
+      New
+    </button>
+    <button
+      class="clear-button nav-button-btn"
+      id="dd-menu"
+      on:click={handleViewDoodles}
     >
-    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleSaveDoodle}
-      >Save</button
+      Open
+    </button>
+    <button
+      class="clear-button nav-button-btn"
+      id="dd-menu"
+      on:click={handleSaveDoodle}
     >
-    <button class="clear-button nav-button-btn divide-bottom" id="dd-menu">Share</button>
-    <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}
-      >Clear Drawing</button
+      Save
+    </button>
+    <button class="clear-button nav-button-btn divide-bottom" id="dd-menu">
+      Share
+    </button>
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}>
+      Clear Drawing
+    </button>
+    <button
+      class="clear-button nav-button-btn"
+      id="dd-menu"
+      on:click={openViewLargePalettes}
     >
-    <button class="clear-button nav-button-btn" id="dd-menu">View Color Palettes</button>
-    <button class="clear-button nav-button-btn signout" id="dd-menu" on:click={handleSignOut}
-      >Sign Out</button
+      View Color Palettes
+    </button>
+    <button
+      class="clear-button nav-button-btn signout"
+      id="dd-menu"
+      on:click={handleSignOut}>Sign Out</button
     >
   {/if}
 </div>

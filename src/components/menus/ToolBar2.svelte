@@ -4,17 +4,17 @@
   export let handle_drawing_mode;
   export let handle_textbox_mode;
 
-  import Lock from "../graphics/Lock.svelte";
-  import Unlock from "../graphics/Unlock.svelte";
-  import CursorPointer from "../graphics/CursorPointer.svelte";
-  import Marker from "../graphics/Marker.svelte";
-  import TextIcon from "../graphics/TextIcon.svelte";
+  import Lock from "../../graphics/Lock.svelte";
+  import Unlock from "../../graphics/Unlock.svelte";
+  import CursorPointer from "../../graphics/CursorPointer.svelte";
+  import Marker from "../../graphics/Marker.svelte";
+  import TextIcon from "../../graphics/TextIcon.svelte";
   import {
     event_state_store,
     locked_store,
     selected_store,
     theme_store,
-  } from "../../stores/eventState";
+  } from "../../../stores/eventState";
   import { onDestroy } from "svelte";
 
   let mode = "";
@@ -40,7 +40,11 @@
   });
 
   $: {
-    if (event_state === "arrow" || event_state === "selecting" || event_state === "selected") {
+    if (
+      event_state === "arrow" ||
+      event_state === "selecting" ||
+      event_state === "selected"
+    ) {
       arrow = true;
     } else {
       arrow = false;
@@ -59,7 +63,7 @@
   <button
     on:click={handle_arrow_mode}
     class="smallside centered"
-    style="background-color: {arrow ? '#00695C' : ''}; padding: 18px"
+    style="background-color: {arrow ? '#535bf2' : ''}; padding: 18px"
   >
     <CursorPointer />
   </button>
@@ -67,12 +71,16 @@
   <button
     on:click={handle_drawing_mode}
     class="width64"
-    style="background-color: {event_state === 'drawing' ? '#00695C' : ''}"
+    style="background-color: {event_state === 'drawing' ? '#535bf2' : ''}"
   >
     <Marker />
   </button>
   {#if event_state === "creating_text" || event_state.includes("typing")}
-    <button on:click={handle_textbox_mode} class="width64" style="background-color:  #00695C">
+    <button
+      on:click={handle_textbox_mode}
+      class="width64"
+      style="background-color:  #535bf2"
+    >
       <TextIcon />
     </button>
   {:else}
