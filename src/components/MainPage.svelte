@@ -7,7 +7,11 @@
     clearAllTextBoxes,
     deleteTextBox,
   } from "../../stores/textBoxStore";
-  import { event_state_store, locked_store, selected_store } from "../../stores/eventState";
+  import {
+    event_state_store,
+    locked_store,
+    selected_store,
+  } from "../../stores/eventState";
   import { DrawRectangle } from "../../utils/drawRectangle";
   import {
     ClearOldPathData,
@@ -26,7 +30,7 @@
   import { get } from "svelte/store";
   import type { TextBoxMap } from "../../stores/textBoxStore";
   import { AddUndoItem, ClearUndoStore } from "../../stores/undoStore";
-  import ToolBar2 from "./ToolBar2.svelte";
+  import ToolBar2 from "./menus/ToolBar2.svelte";
   import PageTurn from "./PageTurn.svelte";
   import BrushSettings from "./BrushSettings.svelte";
   import TextSettings from "./TextSettings.svelte";
@@ -34,6 +38,7 @@
   import { fetched_single } from "../../stores/fetchDataStore";
   import { DrawImage } from "../../stores/canvasStore";
   import { ClearRedoItems } from "../../stores/redoStore";
+  import DebugMenu from "./menus/DebugMenu.svelte";
 
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
@@ -64,7 +69,11 @@
   const handleClick = (e: MouseEvent) => {
     switch (event_state) {
       case "creating_text":
-        const textBoxId = createNewTextBox(e, canvas.offsetHeight, canvas.offsetWidth);
+        const textBoxId = createNewTextBox(
+          e,
+          canvas.offsetHeight,
+          canvas.offsetWidth,
+        );
         AddUndoItem({
           action: "created_text_box",
           data: textBoxId,
@@ -282,8 +291,13 @@
 
 <main>
   <NavMenu {handleClear} />
-  <!-- <SideBar /> -->
-  <ToolBar2 {handle_arrow_mode} {handle_drawing_mode} {handle_textbox_mode} {handleLock} />
+  <!-- <DebugMenu /> -->
+  <ToolBar2
+    {handle_arrow_mode}
+    {handle_drawing_mode}
+    {handle_textbox_mode}
+    {handleLock}
+  />
   <div class="canvas-container">
     {#each Object.values(textBoxes) as textBox (textBox.id)}
       <TextBox data={textBox} />

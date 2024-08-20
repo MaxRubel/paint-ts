@@ -5,6 +5,7 @@
   import ViewDoodles from "./ViewDoodles.svelte";
   import SaveConfirmForm from "./SaveConfirmForm.svelte";
   import ColorPaletteForm from "./ColorPaletteForm.svelte";
+  import LargeViewPalettes from "../menus/LargeViewPalettes.svelte";
 
   let eventState: string;
 
@@ -26,4 +27,7 @@
 {/if}
 {#if eventState.includes("color_palette_form")}
   <ColorPaletteForm />
+{/if}
+{#if eventState.includes("large_view_palettes")}
+  <LargeViewPalettes />
 {/if}
