@@ -87,7 +87,7 @@ export async function SaveColorPalette(event: SubmitEvent) {
             ...resp, user_id: resp.owner.id
         })
     } else {
-        UpdatePalette(activePalette)
+        UpdatePalette({ ...activePalette, user_id: get(authStore).user.id })
     }
     alert_store.set("alert:Palette saved sucessfully! ")
 }

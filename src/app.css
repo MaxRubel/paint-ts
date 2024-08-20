@@ -87,6 +87,12 @@ button:hover {
   padding: 0px;
 }
 
+.clear-button:hover,
+.close-button:hover {
+  background-color: #6b6b6b63;
+}
+
+
 .heh {
   background-color: #535bf2;
 }

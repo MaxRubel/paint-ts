@@ -120,7 +120,7 @@
 
 <div class="nav-button">
   <button
-    class="nav-button-btn"
+    class="nav-button-btn-main"
     style:color={menuOpen ? "#535bf2" : ""}
     on:click={toggleNavMenu}><NavButton /></button
   >
@@ -186,12 +186,16 @@
     top: 15px;
     left: 15px;
     height: 44px;
-
     z-index: 900;
+  }
+
+  .nav-button-btn-main {
+    justify-content: flex-start;
   }
 
   .nav-button-btn {
     justify-content: flex-start;
+    border-radius: 0px;
   }
 
   .dropdown-menu {
