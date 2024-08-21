@@ -16,6 +16,8 @@
   import { AddUndoItem } from "../../stores/undoStore";
   import iro from "@jaames/iro";
   import { color_store } from "../../stores/colorStore";
+  import PaletteInSettings from "./PaletteInSettings.svelte";
+  import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
 
   let isVisible = false;
   let eventState: string;
@@ -84,7 +86,9 @@
   }
 
   let oldFontSize = 24;
-  function handleSizeChange(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+  function handleSizeChange(
+    e: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ) {
     const target = e.currentTarget;
     const value = Number(target.value);
 
@@ -160,26 +164,6 @@
 
   onMount(() => {
     // @ts-ignore
-    colorPicker = new iro.ColorPicker("#picker-text", {
-      width: 150,
-      layout: [
-        {
-          component: iro.ui.Box,
-          options: {
-            width: 100,
-            height: 100,
-          },
-        },
-        {
-          component: iro.ui.Slider,
-          options: {
-            sliderType: "hue",
-            width: 100,
-          },
-        },
-      ],
-      layoutDirection: "horizontal",
-    });
   });
 
   $: {
@@ -243,33 +227,8 @@
         >
       </div>
     </div>
-    <div class="color-container centered">
-      Color
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div
-        class="color-picker"
-        id="picker-text"
-        on:mouseup={() => {
-          handleChangeColor("box");
-        }}
-      />
-    </div>
-    <div class="palette centered">
-      Palette
-      <div class="recent-choices">
-        <!-- {#each arrayOfColors as color}
-          <div class="color-box">
-            <button
-              class="color-button"
-              on:click={() => {
-                handleChangeColor(color);
-              }}
-              style="background-color: {color};"
-            ></button>
-          </div>
-        {/each} -->
-      </div>
-    </div>
+    <ColorPickerInSettings location={"text-color-picker"} width={100} />
+    <PaletteInSettings />
   </div>
 </div>
 
@@ -278,7 +237,7 @@
     position: fixed;
     color: white;
     border-radius: 20px;
-    height: 548px;
+    height: 610px;
     background-color: rgba(0, 0, 0, 0.266);
     left: 15px;
     padding: 20px;
@@ -345,41 +304,5 @@
     justify-content: space-between;
     border-bottom: 2px solid rgba(255, 255, 255, 0.198);
     padding-bottom: 15px;
-  }
-
-  .color-container {
-    padding-bottom: 10px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.198);
-  }
-
-  .color-picker {
-    margin-top: 5px;
-  }
-
-  .recent-choices {
-    margin-top: 10px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: min-content;
-    padding: 10px;
-    /* border: 1px solid rgba(255, 255, 255); */
-    border-radius: 10pt;
-    /* flex-grow: 1; */
-    /* height: 80%; */
-    width: 180px;
-    gap: 5px;
-    align-content: start;
-    height: 135px;
-  }
-
-  .color-container {
-    flex-direction: column;
-    margin-top: 10px;
-  }
-
-  .palette {
-    flex-direction: column;
-    margin-top: 10px;
-    width: 208px;
   }
 </style>
