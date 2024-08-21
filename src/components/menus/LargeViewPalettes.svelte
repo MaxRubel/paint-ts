@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
+    SyncLocalPalettes,
     user_palettes_store,
     type PaletteType,
   } from "../../../stores/paletteStore";
@@ -17,14 +18,18 @@
     event_state_store.set("arrow");
   }
 
+  const unsubscribe = user_palettes_store.subscribe((value) => {
+    userPalettes = value;
+  });
+
   onMount(() => {
     userPalettes = get(user_palettes_store);
     if (userPalettes.length === 0) {
-      GetPalletesOfUser(get(authStore).user.id).then((data: any) => {
-        userPalettes = data;
-      });
+      SyncLocalPalettes();
     }
   });
+
+  onDestroy(unsubscribe);
 </script>
 
 <div class="large-open-palette-window cool">
@@ -66,10 +71,6 @@
   .top-row {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-  }
-
-  .this-button {
-    background-color: red;
   }
 
   .palettes-container {

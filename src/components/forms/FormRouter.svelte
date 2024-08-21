@@ -25,7 +25,7 @@
 {#if eventState.includes("save_confirm_form")}
   <SaveConfirmForm />
 {/if}
-{#if eventState.includes("color_palette_form")}
+{#if eventState.includes("color_palette_edit")}
   <ColorPaletteForm />
 {/if}
 {#if eventState.includes("large_view_palettes")}

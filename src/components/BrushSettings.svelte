@@ -98,7 +98,7 @@
 
   function handleClickSmall(color: string, index: number) {
     clearSmallBorders();
-    if (!eventState.includes("color_palette_form")) {
+    if (!eventState.includes("color_palette_edit")) {
       color_store.set(color);
     } else {
       editting_tile_store.set(index);
@@ -106,7 +106,7 @@
   }
 
   function openPaletteWindow() {
-    event_state_store.set("color_palette_form&drawing");
+    event_state_store.set("color_palette_edit&drawing");
   }
 
   let dropArrow = false;
@@ -119,7 +119,7 @@
   }
 
   function handleOpenSmallPaletteMenu() {
-    if (eventState === "color_palette_form&drawing") {
+    if (eventState === "color_palette_edit&drawing") {
       event_state_store.set("drawing");
       return;
     }
@@ -163,7 +163,7 @@
       if (element) {
         addBorder(element);
       }
-    } else if (eventState.includes("color_palette_form")) {
+    } else if (eventState.includes("color_palette_edit")) {
       if (edittingTile !== null) {
         const element = document.getElementById(
           `brush-settings-color-button&${edittingTile}`,

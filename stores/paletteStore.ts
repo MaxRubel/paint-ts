@@ -1,7 +1,8 @@
 import { get, writable } from "svelte/store";
-import { CreateNewPalette, DeletePalette, UpdatePalette } from "../api/palette"
+import { CreateNewPalette, DeletePalette, GetPalletesOfUser, UpdatePalette } from "../api/palette"
 import { authStore } from "../utils/auth/auth_store";
 import { alert_store } from "./alertStore";
+import { GetDoodlesOfUser } from "../api/doodles";
 
 export interface PaletteType {
     id: number
@@ -90,6 +91,7 @@ export async function SaveColorPalette(event: SubmitEvent) {
         UpdatePalette({ ...activePalette, user_id: get(authStore).user.id })
     }
     alert_store.set("alert:Palette saved sucessfully! ")
+    SyncLocalPalettes()
 }
 
 export function DeleteColorPalette() {
@@ -105,4 +107,21 @@ export function DeleteColorPalette() {
 export function ClearPalette() {
     active_palette_store.set(initialPalette)
     editting_tile_store.set(null)
+}
+
+export function SyncLocalPalettes(){
+    const userId = get(authStore).user.id
+    GetPalletesOfUser(userId).then((data: any)=>{
+        user_palettes_store.set(data)
+    })
+}
+
+export function SetPaletteById(id: number){
+    const palettes = get(user_palettes_store)
+    const thisPalette = palettes.find((item)=> item.id === id)
+    if(thisPalette){
+        active_palette_store.set(thisPalette)
+    } else {
+        console.error("error selecting palette")
+    }
 }

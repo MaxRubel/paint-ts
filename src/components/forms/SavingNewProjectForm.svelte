@@ -54,7 +54,7 @@
   }
 
   .submit-btn {
-    background-color: rgb(96, 61, 34);
+    background-color: #535bf2;
   }
 
   h3 {

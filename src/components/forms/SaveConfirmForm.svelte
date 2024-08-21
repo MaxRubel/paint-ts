@@ -61,7 +61,7 @@
   }
 
   .orange {
-    background-color: rgb(96, 49, 14);
+    background-color: #535bf2;
   }
   .orange:hover {
     background-color: #4a4a4a;

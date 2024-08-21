@@ -1,12 +1,27 @@
-<script>
-  import { onMount } from "svelte";
+<script lang="ts">
+  import { get } from "svelte/store";
+  import { color_store } from "../../stores/colorStore";
+  import { event_state_store } from "../../stores/eventState";
+  import type { PaletteType } from "../../stores/paletteStore";
+  import { active_palette_store, SetPaletteById } from "../../stores/paletteStore";
+  import TinyPaletteMenu from "./menus/TinyPaletteMenu.svelte";
 
-  export let palette;
+  export let palette: PaletteType;
 
   let mouseIsOver = false;
+
+  function handleClick() {
+    //set the active color of the first of the new palette if changing palette
+    if (palette.id !== get(active_palette_store).id) {
+      color_store.set(palette.colors[0]);
+    }
+    SetPaletteById(palette.id);
+    event_state_store.set("drawing");
+  }
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
   class="small-palette"
   on:mouseenter={() => {
@@ -15,6 +30,7 @@
   on:mouseleave={() => {
     mouseIsOver = false;
   }}
+  on:click={handleClick}
   class:mouseIsOver
 >
   <div class="small-header">{palette.name}</div>
@@ -23,6 +39,9 @@
       <div class="small-color" style="background-color: {color};" />
     {/each}
   </div>
+  {#if mouseIsOver}
+    <TinyPaletteMenu paletteId={palette.id} />
+  {/if}
 </div>
 
 <style>
@@ -30,6 +49,7 @@
     padding: 10px;
     border: 1px solid white;
     border-radius: 10px;
+    position: relative;
   }
 
   .small-header {
