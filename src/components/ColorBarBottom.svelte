@@ -6,7 +6,6 @@
   import TextLeft from "../graphics/TextLeft.svelte";
   import TextRight from "../graphics/TextRight.svelte";
   import iro from "@jaames/iro";
-  import { color_store } from "../../stores/colorStore";
   import {
     ChangeTextFont,
     text_alignment,
@@ -14,8 +13,13 @@
     updateTextBox,
   } from "../../stores/textBoxStore";
   import { get } from "svelte/store";
-  import { event_state_store, selected_store, theme_store } from "../../stores/eventState";
+  import {
+    event_state_store,
+    selected_store,
+    theme_store,
+  } from "../../stores/eventState";
   import { AddUndoItem } from "../../stores/undoStore";
+  import { active_color_store } from "../../stores/paletteStore";
 
   export let colorBarisOpen = false;
 
@@ -47,10 +51,12 @@
     return "#" + toHex(r) + toHex(g) + toHex(b);
   }
 
-  const unsubcribe = color_store.subscribe((value) => {
+  const unsubcribe = active_color_store.subscribe((value) => {
     if (!value) {
       const mode = get(theme_store);
-      mode === "dark" ? (colorStoreReturn = "#D3D3D3") : (colorStoreReturn = "#D3D3D3");
+      mode === "dark"
+        ? (colorStoreReturn = "#D3D3D3")
+        : (colorStoreReturn = "#D3D3D3");
     } else {
       colorStoreReturn = rgbStringToHex(value);
     }
@@ -92,7 +98,7 @@
       newColorF = origin;
     }
 
-    color_store.set(newColorF);
+    active_color_store.set(newColorF);
     const eventState = get(event_state_store);
 
     if (eventState === "selected") {

@@ -1,16 +1,17 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import {
+    active_color_store,
     active_palette_store,
     ClearPalette,
     editting_tile_store,
   } from "../../stores/paletteStore";
   import { event_state_store } from "../../stores/eventState";
-  import { color_store } from "../../stores/colorStore";
   import { authStore } from "../../utils/auth/auth_store";
-  import { get } from "svelte/store";
 
-  let activePalette: any = { colors: [] };
+  let activePalette: any = {
+    colors: [],
+  };
   let eventState: string;
   let auth: any;
   let edittingTile: number | null;
@@ -19,12 +20,6 @@
 
   const unsubscribe = active_palette_store.subscribe((value) => {
     activePalette = value;
-    const palette = get(active_palette_store);
-    console.log(palette);
-    console.log(get(color_store));
-    activeColorIndex = palette.colors.findIndex((item: string | null) => {
-      item === get(color_store);
-    });
   });
 
   const unsubcribe2 = event_state_store.subscribe((value) => {
@@ -39,7 +34,7 @@
     edittingTile = value;
   });
 
-  const unsubscribe5 = color_store.subscribe((value) => {
+  const unsubscribe5 = active_color_store.subscribe((value) => {
     activeColor = value;
   });
 
@@ -53,9 +48,11 @@
 
   let dropArrow = false;
   let smallPaletteMenu = false;
+
   function toggleOnDrop() {
     dropArrow = true;
   }
+
   function toggleOffDrop() {
     dropArrow = false;
   }
@@ -83,27 +80,26 @@
   }
 
   function clearSmallBorders() {
-    // for (let i = 0; i < activePalette.colors.length; i++) {
-    //   const element = document.getElementById(`small-color-button&${i}`);
-    //   if (element) {
-    //     element.style.border = "1px solid transparent";
-    //     element.style.outline = "none";
-    //   }
-    // }
-    // console.log("clear small borders has fired");
+    for (let i = 0; i < activePalette.colors.length; i++) {
+      const element = document.getElementById(`small-color-button&${i}`);
+      if (element) {
+        element.style.border = "1px solid transparent";
+        element.style.outline = "none";
+      }
+    }
   }
 
   function addBorder(element: HTMLElement) {
-    clearSmallBorders();
     element.style.border = "1px solid lightgrey";
     element.style.outline = "2px solid white";
-    // console.log("adding border to: ", element.id);
-    // console.log("new style is: ", element.style.border);
+    console.log("adding border to: ", element.id);
+    console.log("new style is: ", element.style.border);
+    console.log(element.style.cssText);
   }
 
   function handleClickSmall(color: string, index: number) {
     if (!eventState.includes("color_palette_edit")) {
-      color_store.set(color);
+      active_color_store.set(color);
     } else {
       editting_tile_store.set(index);
     }
@@ -111,12 +107,11 @@
     const element = document.getElementById(`small-color-button&${index}`);
     if (element) {
       addBorder(element);
-      element.classList.add("selected");
-      console.log("added selected");
     }
   }
 
   $: {
+    //mark the correct border upon changing the parent menu
     if (!eventState.includes("color_palette_edit")) {
       const index = activePalette.colors.findIndex(
         (item: any) => item === activeColor,
@@ -126,6 +121,7 @@
         addBorder(element);
       }
     } else {
+      //if editting a tile in the edit palette menu, mark the correct border
       if (edittingTile !== null) {
         const element = document.getElementById(
           `small-color-button&${edittingTile}`,
@@ -159,8 +155,7 @@
           on:mousedown={() => {
             handleClickSmall(color, index);
           }}
-          style="background-color: {color}; 
-          border: {activeColorIndex === index ? '4px solid green' : 'none'}"
+          style="background-color: {color}"
         ></button>
       </div>
     {/each}
@@ -184,7 +179,7 @@
     justify-content: center;
     align-items: center;
     margin-top: 10px;
-    /* height: 240px; */
+    height: 240px;
   }
 
   .recent-choices {
@@ -193,7 +188,7 @@
     grid-auto-rows: min-content;
     margin-top: 10px;
     border-radius: 10pt;
-    /* flex-grow: 1; */
+    flex-grow: 1;
     width: 180px;
     gap: 5px;
     align-content: start;
@@ -203,7 +198,6 @@
     width: 30px;
     height: 30px;
     transition: none;
-    z-index: 1010;
   }
 
   .smol {

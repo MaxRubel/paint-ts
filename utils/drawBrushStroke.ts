@@ -3,10 +3,10 @@ import { getSvgPathFromStroke } from "./getSvgPathFromStroke";
 import { get } from "svelte/store";
 import { theme_store } from "../stores/eventState";
 import { AddUndoItem } from "../stores/undoStore";
-import { color_store } from "../stores/colorStore";
 import { brush_size_store } from "../stores/brushStore";
 import { fetched_single } from "../stores/fetchDataStore";
 import { DrawImage } from "../stores/canvasStore";
+import { active_color_store } from "../stores/paletteStore";
 
 let points: [number, number, number][] = [];
 let paths: { pathData: string, color: string }[] = [];
@@ -46,7 +46,7 @@ export function DrawBrushStroke(
   });
   const pathData = getSvgPathFromStroke(stroke);
   const canvasPath = new Path2D(pathData);
-  color = get(color_store)
+  color = get(active_color_store)
   if (!color) {
     color = get(theme_store) === 'dark' ? 'lightgray' : 'black'
   }

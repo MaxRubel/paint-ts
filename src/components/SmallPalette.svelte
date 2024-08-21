@@ -1,9 +1,12 @@
 <script lang="ts">
   import { get } from "svelte/store";
-  import { color_store } from "../../stores/colorStore";
   import { event_state_store } from "../../stores/eventState";
   import type { PaletteType } from "../../stores/paletteStore";
-  import { active_palette_store, SetPaletteById } from "../../stores/paletteStore";
+  import {
+    active_color_store,
+    active_palette_store,
+    SetPaletteById,
+  } from "../../stores/paletteStore";
   import TinyPaletteMenu from "./menus/TinyPaletteMenu.svelte";
 
   export let palette: PaletteType;
@@ -13,7 +16,7 @@
   function handleClick() {
     //set the active color of the first of the new palette if changing palette
     if (palette.id !== get(active_palette_store).id) {
-      color_store.set(palette.colors[0]);
+      active_color_store.set(palette.colors[0]);
     }
     SetPaletteById(palette.id);
     event_state_store.set("drawing");

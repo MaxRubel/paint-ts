@@ -2,9 +2,9 @@
   import { onDestroy } from "svelte";
   import { event_state_store } from "../../stores/eventState";
   import Slider from "./Slider.svelte";
-  import { color_store } from "../../stores/colorStore";
   import { authStore } from "../../utils/auth/auth_store";
   import {
+    active_color_store,
     active_palette_store,
     editting_tile_store,
   } from "../../stores/paletteStore";
@@ -36,7 +36,7 @@
     edittingTile = value;
   });
 
-  const unsubscribe5 = color_store.subscribe((value) => {
+  const unsubscribe5 = active_color_store.subscribe((value) => {
     activeColor = value;
   });
 

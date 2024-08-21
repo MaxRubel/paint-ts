@@ -14,18 +14,14 @@
   import TextRight from "../graphics/TextRight.svelte";
   import { get } from "svelte/store";
   import { AddUndoItem } from "../../stores/undoStore";
-  import iro from "@jaames/iro";
-  import { color_store } from "../../stores/colorStore";
-  import PaletteInSettings from "./PaletteInSettings.svelte";
   import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
+  import PaletteInSettings from "./PaletteInSettings.svelte";
 
   let isVisible = false;
   let eventState: string;
   let fontSize: number;
   let textAlignment: string;
-  let colorPicker: any;
   let fontFamily = "";
-  let arrayOfColors: any[] = [];
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -116,52 +112,6 @@
     oldFontSize = value;
   }
 
-  function handleChangeColor(origin: string) {
-    let newColorF;
-    if (origin === "box") {
-      const newColor = colorPicker.color.rgb;
-      newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-    } else {
-      newColorF = origin;
-    }
-
-    color_store.set(newColorF);
-    const eventState = get(event_state_store);
-
-    if (eventState === "selected") {
-      const selectedArray = get(selected_store);
-      const undoArray: any[] = [];
-      selectedArray.forEach((item) => {
-        const [, id] = item.id.split("&");
-        if (item.id.includes("textbox")) {
-          const ogTextbox = get(textBoxesStore)[id];
-          if (ogTextbox.fontColor !== newColorF) {
-            undoArray.push({
-              id,
-              fontColor: ogTextbox.fontColor,
-            });
-            updateTextBox(id, { fontColor: newColorF });
-          }
-        }
-      });
-      if (undoArray.length > 0) {
-        AddUndoItem({
-          action: "changedManyFontColors",
-          data: undoArray,
-        });
-      }
-    }
-
-    if (arrayOfColors.includes(newColorF)) return;
-
-    if (arrayOfColors.length === 16) {
-      arrayOfColors.shift();
-      arrayOfColors = arrayOfColors;
-    }
-    arrayOfColors.push(newColorF);
-    arrayOfColors = arrayOfColors;
-  }
-
   onMount(() => {
     // @ts-ignore
   });
@@ -246,6 +196,7 @@
     display: none;
     flex-direction: column;
     border: 2px solid rgba(255, 255, 255, 0.198);
+    width: 208px;
   }
 
   .font-container {
@@ -288,7 +239,7 @@
     padding: 0px;
     background-color: transparent;
     color: rgb(255, 255, 255);
-    border: 1px solid;
+    border: 1px solid white;
   }
 
   .text-position {

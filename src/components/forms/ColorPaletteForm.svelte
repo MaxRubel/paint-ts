@@ -2,6 +2,7 @@
   import { onDestroy, onMount } from "svelte";
   import type { PaletteType } from "../../../stores/paletteStore";
   import {
+    active_color_store,
     active_palette_store,
     DeleteColorPalette,
     editting_tile_store,
@@ -17,7 +18,6 @@
   import TrashCanBig from "../../graphics/TrashCanBig.svelte";
   import { event_state_store } from "../../../stores/eventState";
   import { get } from "svelte/store";
-  import { color_store } from "../../../stores/colorStore";
 
   let activePalette: PaletteType;
   let nameInput: string;
@@ -66,7 +66,7 @@
 
   function handleClick(index: number) {
     editting_tile_store.set(index);
-    color_store.set(activePalette.colors[index]);
+    active_color_store.set(activePalette.colors[index]);
   }
 
   function handleDelete() {

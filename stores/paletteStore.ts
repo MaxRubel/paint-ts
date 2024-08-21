@@ -26,7 +26,11 @@ export const active_palette_store = writable(<PaletteType>initialPalette)
 
 export const user_palettes_store = writable(<PaletteType[]>[])
 
+export const active_color_store = writable(<string>'rgb(255, 255, 255)')
+
 export const editting_tile_store = writable(<number | null>null)
+
+export const border_index_store = writable(<number | null>null)
 
 export function PushColorIntoActivePalette(newValue: string) {
     active_palette_store.update((prevVal) => {

@@ -1,13 +1,13 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import {
+    active_color_store,
     active_palette_store,
     editting_tile_store,
     PushColorIntoActivePalette,
     UpdateColorTile,
     type PaletteType,
   } from "../../stores/paletteStore";
-  import { color_store } from "../../stores/colorStore";
   import { get } from "svelte/store";
   import { event_state_store, selected_store } from "../../stores/eventState";
   import { textBoxesStore, updateTextBox } from "../../stores/textBoxStore";
@@ -40,7 +40,7 @@
     edittingTile = value;
   });
 
-  const unsubscribe5 = color_store.subscribe((value) => {
+  const unsubscribe5 = active_color_store.subscribe((value) => {
     activeColor = value;
   });
 
@@ -92,7 +92,7 @@
     } else {
       editting_tile_store.set(activePalette.colors.length);
     }
-    color_store.set(newColorF);
+    active_color_store.set(newColorF);
     const eventState = get(event_state_store);
 
     if (eventState === "selected") {
@@ -158,7 +158,7 @@
       handleChangeColor("box");
       draggingColor = false;
       //@ts-ignore
-      color_store.set(activePalette.colors[edittingTile]);
+      active_color_store.set(activePalette.colors[edittingTile]);
       if (creatingNew || mouseHasLeftWhileDragging) {
         editting_tile_store.set(null);
         creatingNew = false;
