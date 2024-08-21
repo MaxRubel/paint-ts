@@ -6,8 +6,6 @@
     type PaletteType,
   } from "../../../stores/paletteStore";
   import { get } from "svelte/store";
-  import { GetPalletesOfUser } from "../../../api/palette";
-  import { authStore } from "../../../utils/auth/auth_store";
   import SmallPalette from "../SmallPalette.svelte";
   import Close from "../../graphics/Close.svelte";
   import { event_state_store } from "../../../stores/eventState";

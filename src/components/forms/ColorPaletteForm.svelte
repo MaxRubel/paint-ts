@@ -4,6 +4,7 @@
   import {
     active_color_store,
     active_palette_store,
+    border_index_store,
     DeleteColorPalette,
     editting_tile_store,
     initialPalette,
@@ -55,12 +56,19 @@
     if (target.classList.contains("IroBox")) return;
     if (target.classList.contains("IroSliderGradient")) return;
     if (target.classList.contains("IroSliderGradient")) return;
-    if (target.closest("#picker2")) {
+    if (
+      target.closest("#text-color-picker") ||
+      target.closest("brush-color-picker") ||
+      target.tagName.toLowerCase() === "circle" ||
+      target.tagName.toLowerCase() === "svg"
+    ) {
       return;
     }
     if (!target.id || !target.id.includes("color-button-palette-form")) {
       clearBorders();
       editting_tile_store.set(null);
+      // console.log("unfocus");
+      console.log("tag name: ", target.tagName);
     }
   }
 
@@ -94,7 +102,6 @@
   }
 
   function handleOpenPalette() {
-    console.log("hellooooo");
     event_state_store.set("large_view_palettes");
   }
 
@@ -128,6 +135,17 @@
 
   onMount(() => {
     document.addEventListener("pointerdown", handleContinueDrawing);
+    //select the item from the active color
+    const borderIndex = get(border_index_store);
+    if (borderIndex) {
+      const element = document.getElementById(
+        `color-button-palette-form&${borderIndex}`,
+      );
+      if (element) {
+        element.style.border = "2px solid lightgray";
+        element.style.outline = "2px solid white";
+      }
+    }
   });
 
   onDestroy(() => {

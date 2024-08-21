@@ -3,20 +3,24 @@
   import {
     active_color_store,
     active_palette_store,
+    border_index_store,
     ClearPalette,
     editting_tile_store,
   } from "../../stores/paletteStore";
-  import { event_state_store } from "../../stores/eventState";
+  import { event_state_store, selected_store } from "../../stores/eventState";
   import { authStore } from "../../utils/auth/auth_store";
+  import { get } from "svelte/store";
+  import { textBoxesStore, updateTextBox } from "../../stores/textBoxStore";
+  import { AddUndoItem } from "../../stores/undoStore";
 
   let activePalette: any = {
     colors: [],
   };
   let eventState: string;
   let auth: any;
-  let edittingTile: number | null;
   let activeColor: string;
-  let activeColorIndex: number;
+  let edittingTile: number | null;
+  let borderIndex: number | null;
 
   const unsubscribe = active_palette_store.subscribe((value) => {
     activePalette = value;
@@ -38,12 +42,17 @@
     activeColor = value;
   });
 
+  const unsubscribe6 = editting_tile_store.subscribe((value) => {
+    edittingTile = value;
+  });
+
   onDestroy(() => {
     unsubscribe();
     unsubcribe2();
     unsubscribe3();
     unsubscribe4();
     unsubscribe5();
+    unsubscribe6();
   });
 
   let dropArrow = false;
@@ -69,10 +78,9 @@
     }
   }
 
-  $: console.log(activeColorIndex);
-
   function openPaletteWindow() {
-    event_state_store.set("color_palette_edit_form&drawing");
+    event_state_store.set(`color_palette_edit_form&${eventState}`);
+    editting_tile_store.set(borderIndex);
   }
 
   function handleNewPalette() {
@@ -92,12 +100,10 @@
   function addBorder(element: HTMLElement) {
     element.style.border = "1px solid lightgrey";
     element.style.outline = "2px solid white";
-    console.log("adding border to: ", element.id);
-    console.log("new style is: ", element.style.border);
-    console.log(element.style.cssText);
   }
 
   function handleClickSmall(color: string, index: number) {
+    border_index_store.set(index);
     if (!eventState.includes("color_palette_edit")) {
       active_color_store.set(color);
     } else {
@@ -108,31 +114,40 @@
     if (element) {
       addBorder(element);
     }
-  }
 
-  $: {
-    //mark the correct border upon changing the parent menu
-    if (!eventState.includes("color_palette_edit")) {
-      const index = activePalette.colors.findIndex(
-        (item: any) => item === activeColor,
-      );
-      const element = document.getElementById(`small-color-button&${index}`);
-      if (element) {
-        addBorder(element);
-      }
-    } else {
-      //if editting a tile in the edit palette menu, mark the correct border
-      if (edittingTile !== null) {
-        const element = document.getElementById(
-          `small-color-button&${edittingTile}`,
-        );
-        if (element) {
-          addBorder(element);
+    if (eventState === "selected") {
+      const selectedArray = get(selected_store);
+      const undoArray: any[] = [];
+      selectedArray.forEach((item) => {
+        const [, id] = item.id.split("&");
+        if (item.id.includes("textbox")) {
+          const ogTextbox = get(textBoxesStore)[id];
+          const oldColor = ogTextbox.fontColor;
+          if (oldColor !== activeColor) {
+            undoArray.push({
+              id,
+              fontColor: ogTextbox.fontColor,
+            });
+            updateTextBox(id, { fontColor: activeColor });
+          }
         }
-      } else {
-        clearSmallBorders();
+      });
+      if (undoArray.length > 0) {
+        AddUndoItem({
+          action: "changedManyFontColors",
+          data: undoArray,
+        });
       }
     }
+  }
+
+  $: if (eventState.includes("color_palette_edit_form")) {
+    borderIndex = edittingTile;
+  } else {
+    const index = activePalette.colors.findIndex(
+      (item: string) => item === activeColor,
+    );
+    borderIndex = index;
   }
 </script>
 
@@ -155,7 +170,11 @@
           on:mousedown={() => {
             handleClickSmall(color, index);
           }}
-          style="background-color: {color}"
+          style="background-color: {color}; outline: {borderIndex === index
+            ? '2px solid white'
+            : 'none'};
+            border: {borderIndex === index ? '1px solid lightgrey' : 'none'}
+            "
         ></button>
       </div>
     {/each}

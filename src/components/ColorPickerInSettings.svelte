@@ -3,6 +3,7 @@
   import {
     active_color_store,
     active_palette_store,
+    border_index_store,
     editting_tile_store,
     PushColorIntoActivePalette,
     UpdateColorTile,
@@ -27,6 +28,11 @@
   let draggingColor: Boolean;
   let creatingNew = false;
   let mouseHasLeftWhileDragging = false;
+  let eventState: string;
+
+  const unsubcribe = event_state_store.subscribe((value: string) => {
+    eventState = value;
+  });
 
   const unsubcribe2 = authStore.subscribe((value) => {
     auth = value.user;
@@ -45,6 +51,7 @@
   });
 
   onDestroy(() => {
+    unsubcribe();
     unsubcribe2();
     unsubscribe3();
     unsubscribe4();
@@ -75,13 +82,9 @@
   });
 
   function handleChangeColor(origin: string) {
-    let newColorF;
-    if (origin === "box") {
-      const newColor = colorPicker.color.rgb;
-      newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-    } else {
-      newColorF = origin;
-    }
+    const newColor = colorPicker.color.rgb;
+    const newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+    active_color_store.set(newColorF);
     if (edittingTile !== null) {
       if (edittingTile >= 16) {
         UpdateColorTile(newColorF, 15);
@@ -92,7 +95,7 @@
     } else {
       editting_tile_store.set(activePalette.colors.length);
     }
-    active_color_store.set(newColorF);
+    border_index_store.set(get(active_palette_store).colors.length - 1);
     const eventState = get(event_state_store);
 
     if (eventState === "selected") {
@@ -136,6 +139,7 @@
       if (edittingTile === null) {
         creatingNew = true;
         editting_tile_store.set(activePalette.colors.length);
+        border_index_store.set(activePalette.colors.length);
       }
       handleChangeColor("box");
     }}
@@ -158,9 +162,13 @@
       handleChangeColor("box");
       draggingColor = false;
       //@ts-ignore
-      active_color_store.set(activePalette.colors[edittingTile]);
+      // active_color_store.set(activePalette.colors[edittingTile]);
+      if (creatingNew && eventState.includes("color_palette_edit_form")) {
+        console.log("hi");
+      }
       if (creatingNew || mouseHasLeftWhileDragging) {
-        editting_tile_store.set(null);
+        border_index_store.set(edittingTile);
+        // editting_tile_store.set(null);
         creatingNew = false;
         mouseHasLeftWhileDragging = false;
       }

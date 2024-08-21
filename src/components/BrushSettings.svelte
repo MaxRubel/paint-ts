@@ -19,6 +19,7 @@
   let activePalette: PaletteType;
   let edittingTile: number | null;
   let activeColor: string;
+  let colorPicker: any;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -42,8 +43,6 @@
 
   let smallPaletteMenu = false;
 
-  // $: console.log(smallPaletteMenu);
-
   function closeSmallMenu() {
     smallPaletteMenu = false;
   }
@@ -62,6 +61,11 @@
     } else {
       isVisible = false;
     }
+  }
+
+  function initColorPicker(value: any) {
+    colorPicker = value;
+    console.log("color picked init");
   }
 </script>
 

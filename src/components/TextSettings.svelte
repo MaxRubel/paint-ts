@@ -22,6 +22,7 @@
   let fontSize: number;
   let textAlignment: string;
   let fontFamily = "";
+  let colorPicker: any;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -118,7 +119,7 @@
 
   $: {
     if (
-      eventState === "creating_text" ||
+      eventState.includes("creating_text") ||
       eventState.includes("typing") ||
       eventState === "selected"
     ) {

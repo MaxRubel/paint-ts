@@ -15,7 +15,6 @@
     editting_tile_store,
     type PaletteType,
   } from "../../../stores/paletteStore";
-  import { get } from "svelte/store";
 
   let brushSize: Number;
   let eventState: string;
@@ -149,7 +148,7 @@
       Palette has not been saved
     {/if}
     <div><strong>Name: &nbsp;</strong> {activePalette.name}</div>
-    <div><strong>Editting Item: &nbsp;</strong> {edittingTile}</div>
+    <div><strong>Editting Tile: &nbsp;</strong> {edittingTile}</div>
     <div>
       <div><strong>Colors &nbsp;</strong></div>
       {#each activePalette.colors as color}
