@@ -104,7 +104,10 @@
   .view-doodles {
     z-index: 1003;
     min-height: 400px;
+    max-height: 900px;
+    overflow-y: auto;
     width: 700px;
+    top: 70px;
   }
 
   .trash {

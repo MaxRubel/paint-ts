@@ -93,6 +93,11 @@
     }
   }
 
+  function handleOpenPalette() {
+    console.log("hellooooo");
+    event_state_store.set("large_view_palettes");
+  }
+
   function handleAdd() {
     if (activePalette.colors.length < 16) {
       PushColorIntoActivePalette("rgb(255, 255, 255)");
@@ -162,7 +167,7 @@
       <button type="submit" class="clear-button small">
         <SaveIcon />
       </button>
-      <button type="button" class="clear-button small">
+      <button type="button" class="clear-button small" on:click={handleOpenPalette}>
         <Folder />
       </button>
       <button type="button" class="clear-button small" on:click={handleDelete}>
