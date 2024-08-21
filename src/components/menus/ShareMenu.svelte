@@ -95,7 +95,9 @@
     <div class="centered"><button class="submit" type="submit">Share</button></div>
   </form>
   <div class="collabs-container">
-    <div class="centered second-row"><h3>Collaborators</h3></div>
+    <div class="centered second-row">
+      <h3>Collaborators</h3>
+    </div>
     <div class="sub-container">
       {#if collaborators.length === 0}
         You haven't shared this project with anyone yet...
@@ -190,7 +192,6 @@
 
   .second-row {
     border-bottom: 1px solid white;
-    margin-top: 15px;
     width: 100%;
   }
 
