@@ -6,6 +6,7 @@
   import SaveConfirmForm from "./SaveConfirmForm.svelte";
   import ColorPaletteForm from "./ColorPaletteForm.svelte";
   import LargeViewPalettes from "../menus/LargeViewPalettes.svelte";
+  import ShareMenu from "../menus/ShareMenu.svelte";
 
   let eventState: string;
 
@@ -30,4 +31,7 @@
 {/if}
 {#if eventState.includes("large_view_palettes")}
   <LargeViewPalettes />
+{/if}
+{#if eventState.includes("share_menu_form")}
+  <ShareMenu />
 {/if}

@@ -1,5 +1,15 @@
 const endpoint = (import.meta as any).env.VITE_DJANGO_DB_URL
 
+interface ShareDoodleType{
+  doodle_id: number
+  email: string
+}
+
+interface RemoveDoodleType{
+  user_id: number
+  doodle_id: number
+}
+
 export const CreateNewDoodle = (payload: any) => new Promise((resolve, reject) => {
   fetch(`${endpoint}/doodles`, {
     method: 'POST',
@@ -64,5 +74,31 @@ export const DeleteDoodle = (id: number) => new Promise((resolve, reject) => {
     .then((data) => {
       resolve(data);
     })
+    .catch(reject);
+});
+
+export const ShareDoodle = (payload: ShareDoodleType) => new Promise((resolve, reject) => {
+  fetch(`${endpoint}/doodle_collabs/add_doodle_collab`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  })
+    .then((resp) => resolve(resp.json()))
+    .catch(reject);
+});
+
+export const RemoveCollabFromDoodle = (payload: RemoveDoodleType) => new Promise((resolve, reject) => {
+  fetch(`${endpoint}/doodle_collabs/remove_doodle_collab`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+  })
+    .then((resp) => resolve(resp))
     .catch(reject);
 });

@@ -5,7 +5,11 @@
   import { signIn, signOut } from "../../../utils/auth/firebase";
   import { authStore } from "../../../utils/auth/auth_store";
   import { get } from "svelte/store";
-  import { CompileAndSaveDoodle, EmptyFetch } from "../../../stores/fetchDataStore";
+  import {
+    CompileAndSaveDoodle,
+    EmptyFetch,
+    type ProjectType,
+  } from "../../../stores/fetchDataStore";
   import { fetched_single } from "../../../stores/fetchDataStore";
   import { undo_store } from "../../../stores/undoStore";
   import { alert_store } from "../../../stores/alertStore";
@@ -15,6 +19,7 @@
   let menuOpen = false;
   let eventState: String;
   let authState: any;
+  let loadedDrawing: ProjectType;
 
   const unsubscribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -22,9 +27,14 @@
 
   const unsubscribe2 = authStore.subscribe((value) => (authState = value.user));
 
+  const unsubscribe3 = fetched_single.subscribe((value) => {
+    loadedDrawing = value;
+  });
+
   onDestroy(() => {
     unsubscribe();
     unsubscribe2();
+    unsubscribe3();
   });
 
   function handleNew() {
@@ -44,8 +54,6 @@
   }
 
   function toggleNavMenu() {
-    console.log("clicked");
-    console.log(menuOpen);
     if (eventState.includes("form")) {
       return;
     }
@@ -97,6 +105,11 @@
     menuOpen = false;
   }
 
+  function openShareMenu() {
+    event_state_store.set("share_menu_form");
+    menuOpen = false;
+  }
+
   function handleSignIn() {
     signIn();
     menuOpen = false;
@@ -131,12 +144,12 @@
     >About Us</button
   >
   {#if !authState}
-    <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}
-      >Clear drawing</button
-    >
-    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleSignIn}
-      >Sign in</button
-    >
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}>
+      Clear drawing
+    </button>
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleSignIn}>
+      Sign in
+    </button>
   {:else}
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleNew}>
       New
@@ -155,9 +168,15 @@
     >
       Save
     </button>
-    <button class="clear-button nav-button-btn divide-bottom" id="dd-menu">
-      Share
-    </button>
+    {#if loadedDrawing.id}
+      <button
+        class="clear-button nav-button-btn divide-bottom"
+        id="dd-menu"
+        on:click={openShareMenu}
+      >
+        Share
+      </button>
+    {/if}
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}>
       Clear Drawing
     </button>
