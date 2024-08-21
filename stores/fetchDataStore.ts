@@ -11,6 +11,7 @@ import { alert_store } from "./alertStore";
 export interface ProjectType {
     name: string
     id: number
+    owner: any
     date_created: string
     data: any
     collaborators: any[]
@@ -24,6 +25,7 @@ interface AllProjects {
 export const EmptyFetch: ProjectType = {
     name: "",
     id: 0,
+    owner: {},
     date_created: "",
     data: null,
     collaborators: []
@@ -67,7 +69,6 @@ export async function CompileAndSaveDoodle(name: string, update: boolean) {
 }
 
 export function FetchAndLoadDoodle(id: number) {
-
     const canvas: HTMLCanvasElement = document.getElementById('main-canvas') as HTMLCanvasElement;
     const ctx = GetCanvasContext()
     GetSingleDoodle(id).then((resp: any) => {
@@ -75,11 +76,18 @@ export function FetchAndLoadDoodle(id: number) {
         clearAllTextBoxes();
         ClearOldPathData();
         ClearUndoStore();
-        const { id, name, date_created, collaborators, data } = resp
-        fetched_single.set({ id, name, date_created, collaborators, data })
+        const { id, name, date_created, collaborators, data, owner } = resp
+        fetched_single.set({ id, name, date_created, collaborators, data, owner })
         textBoxesStore.set(data.rectangles)
         DrawImage();
         event_state_store.set("arrow")
         selected_store.set([])
+    })
+}
+
+export function SyncDoodle(){
+    const doodleId = get(fetched_single).id
+    GetSingleDoodle(doodleId).then((data: any)=>{
+        fetched_single.set(data)
     })
 }
