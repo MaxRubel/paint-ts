@@ -36,7 +36,7 @@
   <div class="centered fullwidth top-row">
     <div />
     <div class="centered">
-      <h3>Your Palettes</h3>
+      <h3 style="margin-top: 0px; margin-bottom: 15px">Your Palettes</h3>
     </div>
     <div class="top-right">
       <button class="clear-button close-button" on:click={handleClose}>

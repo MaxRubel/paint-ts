@@ -106,7 +106,7 @@
   }
 
   function openPaletteWindow() {
-    event_state_store.set("color_palette_edit&drawing");
+    event_state_store.set("color_palette_edit_form&drawing");
   }
 
   let dropArrow = false;

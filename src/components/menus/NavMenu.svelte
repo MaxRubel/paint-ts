@@ -54,7 +54,7 @@
   }
 
   function toggleNavMenu() {
-    if (eventState.includes("form")) {
+    if (eventState.includes("form") && !eventState.includes("color_palette_edit")) {
       return;
     }
     if (!menuOpen) {
@@ -141,8 +141,8 @@
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
   <button class="clear-button nav-button-btn divide-bottom" id="dd-menu"
-    >About Us</button
-  >
+    >About Us
+  </button>
   {#if !authState}
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}>
       Clear drawing

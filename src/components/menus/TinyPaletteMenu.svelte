@@ -15,7 +15,7 @@
 
   function handleEditPalette() {
     SetPaletteById(paletteId);
-    event_state_store.set("color_palette_edit&drawing");
+    event_state_store.set("color_palette_edit_form&drawing");
   }
 
   function handleDeletePalette() {
