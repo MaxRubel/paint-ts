@@ -98,7 +98,7 @@
     <div class="centered second-row"><h3>Collaborators</h3></div>
     <div class="sub-container">
       {#if collaborators.length === 0}
-        "You haven't shared this project with anyone yet..."
+        You haven't shared this project with anyone yet...
       {:else}
         <table class="collaborator-table">
           <thead>
