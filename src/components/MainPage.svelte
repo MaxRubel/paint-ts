@@ -19,7 +19,6 @@
     SaveOriginalRaster,
     EndBrushStroke,
     InitCtx,
-    ReDrawBrushStrokes,
   } from "../../utils/drawBrushStroke";
   import {
     ClearSelectionRect,
@@ -158,10 +157,7 @@
 
   function redrawCanvas(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
-    ReDrawBrushStrokes();
-    if (get(fetched_single).data?.canvasImage) {
-      DrawImage();
-    }
+    DrawImage();
   }
 
   export function handleClear(): void {
@@ -199,6 +195,10 @@
         SaveOriginalRaster();
         DrawBrushStroke(ctx, e);
         break;
+      case "erasing":
+        SaveOriginalRaster();
+        DrawBrushStroke(ctx, e);
+        break;
       case "rectangle-draw":
         xStart = e.clientX;
         yStart = e.clientY;
@@ -216,6 +216,9 @@
       case "drawing":
         DrawBrushStroke(ctx, e);
         break;
+      case "erasing":
+        DrawBrushStroke(ctx, e);
+        break;
       case "rectangle-draw":
         DrawRectangle(ctx, canvas, e, xStart, yStart);
         break;
@@ -230,6 +233,9 @@
       case "drawing":
         EndBrushStroke();
         AddUndoItem;
+        break;
+      case "erasing":
+        EndBrushStroke();
         break;
       case "selecting":
         ClearSelectionRect();
@@ -335,4 +341,9 @@
     top: 0px;
     left: 0px;
   }
+  /* 
+  #main-canvas {
+    height: 1000px;
+    width: 1400px;
+  } */
 </style>

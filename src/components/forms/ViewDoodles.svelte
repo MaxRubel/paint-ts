@@ -104,7 +104,7 @@
   .view-doodles {
     z-index: 1003;
     min-height: 400px;
-    max-height: 800px;
+    max-height: 400px;
     overflow-y: auto;
     width: 700px;
     top: 70px;

@@ -1,7 +1,7 @@
 import getStroke from "perfect-freehand";
 import { getSvgPathFromStroke } from "./getSvgPathFromStroke";
 import { get } from "svelte/store";
-import { theme_store } from "../stores/eventState";
+import { event_state_store, theme_store } from "../stores/eventState";
 import { AddUndoItem } from "../stores/undoStore";
 import { brush_size_store } from "../stores/brushStore";
 import { fetched_single } from "../stores/fetchDataStore";
@@ -15,7 +15,12 @@ let start = 0;
 let end = 0;
 let isDrawing = false;
 let color = ""
+
+//Temporary store of canvas as DataURL on mouse down of eraser/drawing
 let oldRaster: string | null = null
+
+//Store of canvas as DataURL on mouse up
+let currentCanvas: string = ""
 
 export function InitCtx(context: CanvasRenderingContext2D) {
   ctx = context;
@@ -30,30 +35,51 @@ export function GetCanvasContext() {
 }
 
 export function DrawImageFromDataURL(ctx, dataURL) {
-  console.log(dataURL)
+
   return new Promise((resolve: any, reject) => {
     const img = new Image();
+
     img.onload = function () {
       requestAnimationFrame(() => {
-        const canvas = document.getElementById('main-canvas')
+        const canvas = document.getElementById('main-canvas');
+        if (!canvas) {
+          reject(new Error('Canvas element not found'));
+          return;
+        }
+
         //@ts-ignore
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        console.log('drawing')
+        canvas.width = img.width;
+        //@ts-ignore
+        canvas.height = img.height;
+
         ctx.drawImage(img, 0, 0);
         resolve();
-      })
+      });
     };
-    img.onerror = reject;
+
+    img.onerror = (error) => {
+      console.error('Error loading image:', error);
+      reject(error);
+    };
+
     img.src = dataURL;
   });
 }
 
 export function SaveOriginalRaster() {
-  const canvas = document.getElementById('main-canvas')
-  if (canvas) {
-    //@ts-ignore
-    oldRaster = canvas.toDataURL()
+  if (!ctx) {
+    console.error("Canvas context not initialized");
+    return;
   }
+
+  const canvas = document.getElementById('main-canvas')
+  if (!canvas) {
+    console.error("no canvas found")
+    return
+  }
+
+  //@ts-ignore
+  oldRaster = canvas.toDataURL('image/png');
 }
 
 export function DrawBrushStroke(
@@ -64,8 +90,15 @@ export function DrawBrushStroke(
   if (!isDrawing) {
     start = paths.length;
   }
-  isDrawing = true;
 
+  isDrawing = true;
+  const eventState = get(event_state_store)
+
+  if (eventState === "drawing") {
+    ctx.globalCompositeOperation = 'source-over';
+  } else if (eventState === "erasing") {
+    ctx.globalCompositeOperation = 'destination-out';
+  }
   const stroke = getStroke(points, {
     size: get(brush_size_store),
     thinning: 0.5,
@@ -87,42 +120,38 @@ export function EndBrushStroke() {
   points = [];
   end = paths.length;
   isDrawing = false;
-  AddUndoItem({
-    action: 'drewBrush',
-    data: { start, end, color, oldRaster }
-  });
+  const canvas = document.getElementById('main-canvas')
+  const eventState = get(event_state_store)
+  if (canvas) {
+    //@ts-ignore
+    currentCanvas = canvas.toDataURL()
+  }
+  // openImageInNewWindow(oldRaster)
+  if (eventState === "drawing") {
+    AddUndoItem({
+      action: 'drewBrush',
+      data: { start, end, color, oldRaster }
+    });
+  } else if (eventState === "erasing") {
+    AddUndoItem({
+      action: 'erased',
+      data: { oldRaster }
+    });
+  }
+  oldRaster = null;
   paths = []
 }
 
-export function InsertOldBrushStrokes(oldStrokes: any) {
-  const length = oldStrokes.data.pathArray.length
-  paths.splice(oldStrokes.data.start, length, ...oldStrokes.data.pathArray)
-  ReDrawBrushStrokes()
+export function GetCurrentCanvas() {
+  return currentCanvas
 }
 
-export function ReDrawBrushStrokes() {
-  if (ctx) {
-    if (get(fetched_single).id) {
-      DrawImage()
-    }
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    paths.forEach((path: any) => {
-      const canvasPath = new Path2D(path.pathData);
-      ctx.fillStyle = path.color
-      ctx.fill(canvasPath);
-    });
-  } else {
-    console.error("Canvas context is not initialized");
-  }
+export function ClearCurrentCanvas() {
+  currentCanvas = ""
 }
 
 export function ClearOldPathData() {
   paths = [];
-}
-
-export function SplicePaths(start: number, amount: number) {
-  paths.splice(start, amount);
-  ReDrawBrushStrokes();
 }
 
 export function GetVectorPaths() {
