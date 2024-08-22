@@ -129,10 +129,11 @@
   onMount(() => {
     ctx = canvas.getContext("2d");
     InitCtx(ctx);
-    window.addEventListener("resize", resizeCanvas);
     window.addEventListener("keyup", handleKeyup);
     canvas?.addEventListener("click", handleClick);
-    resizeCanvas();
+    canvas.width = 3000;
+    canvas.height = 2000;
+    // resizeCanvas();
   });
 
   onDestroy(() => {
@@ -144,21 +145,9 @@
     unsubcribe2();
     unsubscribe3();
 
-    window.removeEventListener("resize", resizeCanvas);
     window.removeEventListener("keyup", handleKeyup);
     canvas?.removeEventListener("click", handleClick);
   });
-
-  function resizeCanvas(): void {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    redrawCanvas();
-  }
-
-  function redrawCanvas(): void {
-    ctx.clearRect(0, 0, canvas?.width, canvas?.height);
-    DrawImage();
-  }
 
   export function handleClear(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
@@ -331,19 +320,12 @@
 <style>
   .canvas-container {
     position: relative;
-    width: 100vw;
+    width: 100%;
+    height: 100vh;
   }
 
-  .full-size {
-    position: absolute;
-    height: 100vh;
-    width: 100vw;
-    top: 0px;
-    left: 0px;
-  }
-  /* 
   #main-canvas {
-    height: 1000px;
-    width: 1400px;
-  } */
+    width: 3000px;
+    height: 2000px;
+  }
 </style>

@@ -35,6 +35,9 @@ export default function handleCursor(event_state: string, cursor: string): strin
     case "rectangle-draw":
       cursor = "crosshair";
       break;
+    case "erasing":
+    cursor = "crosshair"
+    break
   }
   return cursor
 }
