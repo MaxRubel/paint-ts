@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { InsertOldBrushStrokes } from "../utils/drawBrushStroke";
+import { DrawImageFromDataURL, GetCanvasContext, InsertOldBrushStrokes } from "../utils/drawBrushStroke";
 import { AddUndoItem } from "./undoStore";
 import { deleteTextBox, textBoxesStore } from "./textBoxStore";
 import type { TextBoxType, UndoType } from "../utils/types/app_types";
@@ -30,7 +30,8 @@ export function HandleRedo() {
 
     switch (redoItem.action) {
         case "drawBushStroke":
-            InsertOldBrushStrokes(redoItem)
+            // InsertOldBrushStrokes(redoItem)
+            redoDrawBrushStrokes(redoItem)
             break;
         case "createTextBox":
             createOldTextBox(redoItem)
@@ -71,7 +72,10 @@ export function HandleRedo() {
     AddUndoItem(redoItem.undoItem);
     popLastItem();
 }
-
+function redoDrawBrushStrokes(lastAction) {
+    const ctx = GetCanvasContext()
+    DrawImageFromDataURL(ctx, lastAction.data.currentRaster)
+}
 function createOldTextBox(undoItem: any) {
     textBoxesStore.update((prevVal) => ({
         ...prevVal,
