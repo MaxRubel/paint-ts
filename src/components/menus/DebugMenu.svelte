@@ -12,6 +12,7 @@
   import {
     active_color_store,
     active_palette_store,
+    border_index_store,
     editting_tile_store,
     type PaletteType,
   } from "../../../stores/paletteStore";
@@ -28,7 +29,7 @@
   let activePalette: PaletteType;
   let edittingTile: number | null;
   let activeColor: string;
-
+  let borderIndex: number | null;
   const unsubscribe = brush_size_store.subscribe((value) => {
     brushSize = value;
   });
@@ -80,6 +81,10 @@
     activeColor = value;
   });
 
+  const unsubscribe12 = border_index_store.subscribe((value) => {
+    borderIndex = value;
+  });
+
   onDestroy(() => {
     unsubscribe();
     unsubscribe2();
@@ -92,6 +97,7 @@
     unsubscribe9();
     unsubscribe10();
     unsubscribe11();
+    unsubscribe12();
   });
 </script>
 
@@ -149,6 +155,7 @@
     {/if}
     <div><strong>Name: &nbsp;</strong> {activePalette.name}</div>
     <div><strong>Editting Tile: &nbsp;</strong> {edittingTile}</div>
+    <div><strong>Border Index: &nbsp;</strong> {borderIndex}</div>
     <div>
       <div><strong>Colors &nbsp;</strong></div>
       {#each activePalette.colors as color}

@@ -67,8 +67,6 @@
     if (!target.id || !target.id.includes("color-button-palette-form")) {
       clearBorders();
       editting_tile_store.set(null);
-      // console.log("unfocus");
-      console.log("tag name: ", target.tagName);
     }
   }
 

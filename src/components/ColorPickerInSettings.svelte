@@ -16,6 +16,7 @@
   import { authStore } from "../../utils/auth/auth_store";
   import type { TextBoxType } from "../../utils/types/app_types";
   import iro from "@jaames/iro";
+  import Alert from "./alerts/Alert.svelte";
 
   export let location;
   export let width;
@@ -25,7 +26,7 @@
   let activePalette: PaletteType;
   let edittingTile: number | null;
   let activeColor: string;
-  let draggingColor: Boolean;
+  let draggingColor = false;
   let creatingNew = false;
   let mouseHasLeftWhileDragging = false;
   let eventState: string;
@@ -81,23 +82,42 @@
     });
   });
 
-  function handleChangeColor(origin: string) {
+  function handleChangeColor() {
+    //format the color
     const newColor = colorPicker.color.rgb;
     const newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
+
+    // if active palette has this color, no need to do anything
+    if (activePalette.colors.includes(newColorF) && edittingTile !== null) {
+      return;
+    }
+
+    //make this color active
     active_color_store.set(newColorF);
+
+    //just change the color that is selected
     if (edittingTile !== null) {
-      if (edittingTile >= 16) {
+      if (edittingTile > 15) {
+        //last one
         UpdateColorTile(newColorF, 15);
         return;
+      } else {
+        UpdateColorTile(newColorF, edittingTile);
+        return;
       }
-      UpdateColorTile(newColorF, edittingTile);
-      return;
     } else {
-      editting_tile_store.set(activePalette.colors.length);
+      //fires on first mouse down
+      if (activePalette.colors.length > 15) {
+        //last one
+        editting_tile_store.set(activePalette.colors.length - 1);
+      } else {
+        editting_tile_store.set(activePalette.colors.length);
+      }
     }
-    border_index_store.set(get(active_palette_store).colors.length - 1);
+
     const eventState = get(event_state_store);
 
+    //change color of selected items
     if (eventState === "selected") {
       const selectedArray = get(selected_store);
       const undoArray: any[] = [];
@@ -118,8 +138,7 @@
         });
       }
     }
-    if (draggingColor) return;
-    if (activePalette.colors.includes(newColorF)) return;
+
     if (activePalette.id) return;
     PushColorIntoActivePalette(newColorF);
   }
@@ -138,40 +157,44 @@
       draggingColor = true;
       if (edittingTile === null) {
         creatingNew = true;
-        editting_tile_store.set(activePalette.colors.length);
-        border_index_store.set(activePalette.colors.length);
       }
-      handleChangeColor("box");
+      if (edittingTile === null && eventState.includes("color_palette_edit_form")) {
+        editting_tile_store.set(activePalette.colors.length);
+      }
+      border_index_store.set(edittingTile);
+      handleChangeColor();
     }}
     on:mousemove={() => {
       if (draggingColor) {
-        handleChangeColor("box");
+        handleChangeColor();
       }
     }}
     on:mouseleave={() => {
-      if (creatingNew) {
+      if (draggingColor) {
         mouseHasLeftWhileDragging = true;
       }
     }}
     on:mouseenter={() => {
-      if (creatingNew && mouseHasLeftWhileDragging) {
+      if (draggingColor && mouseHasLeftWhileDragging) {
         mouseHasLeftWhileDragging = false;
       }
     }}
     on:pointerup={() => {
-      handleChangeColor("box");
-      draggingColor = false;
+      handleChangeColor();
       //@ts-ignore
-      // active_color_store.set(activePalette.colors[edittingTile]);
-      if (creatingNew && eventState.includes("color_palette_edit_form")) {
-        console.log("hi");
+      border_index_store.set(edittingTile);
+      if (edittingTile) {
+        active_color_store.set(activePalette.colors[edittingTile]);
       }
-      if (creatingNew || mouseHasLeftWhileDragging) {
-        border_index_store.set(edittingTile);
-        // editting_tile_store.set(null);
-        creatingNew = false;
+      if (draggingColor || mouseHasLeftWhileDragging) {
+        draggingColor = false;
         mouseHasLeftWhileDragging = false;
       }
+      if (!eventState.includes("color_palette_edit_form")) {
+        editting_tile_store.set(null);
+      }
+      draggingColor = false;
+      creatingNew = false;
     }}
   />
 </div>

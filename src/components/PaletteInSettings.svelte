@@ -21,6 +21,7 @@
   let activeColor: string;
   let edittingTile: number | null;
   let borderIndex: number | null;
+  let selected: number | null;
 
   const unsubscribe = active_palette_store.subscribe((value) => {
     activePalette = value;
@@ -46,6 +47,10 @@
     edittingTile = value;
   });
 
+  const unsubcribe7 = border_index_store.subscribe((value) => {
+    borderIndex = value;
+  });
+
   onDestroy(() => {
     unsubscribe();
     unsubcribe2();
@@ -53,6 +58,7 @@
     unsubscribe4();
     unsubscribe5();
     unsubscribe6();
+    unsubcribe7();
   });
 
   let dropArrow = false;
@@ -141,13 +147,10 @@
     }
   }
 
-  $: if (eventState.includes("color_palette_edit_form")) {
-    borderIndex = edittingTile;
+  $: if (edittingTile !== null) {
+    selected = edittingTile;
   } else {
-    const index = activePalette.colors.findIndex(
-      (item: string) => item === activeColor,
-    );
-    borderIndex = index;
+    selected = borderIndex;
   }
 </script>
 
@@ -170,10 +173,10 @@
           on:mousedown={() => {
             handleClickSmall(color, index);
           }}
-          style="background-color: {color}; outline: {borderIndex === index
+          style="background-color: {color}; outline: {selected === index
             ? '2px solid white'
             : 'none'};
-            border: {borderIndex === index ? '1px solid lightgrey' : 'none'}
+            border: {selected === index ? '1px solid lightgrey' : 'none'}
             "
         ></button>
       </div>
