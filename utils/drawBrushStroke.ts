@@ -34,7 +34,7 @@ export function GetCanvasContext() {
   }
 }
 
-export function DrawImageFromDataURL(ctx, dataURL) {
+export function DrawImageFromDataURL(ctx:CanvasRenderingContext2D , dataURL: string) {
 
   return new Promise((resolve: any, reject) => {
     const img = new Image();
@@ -86,7 +86,19 @@ export function DrawBrushStroke(
   context: CanvasRenderingContext2D,
   e: PointerEvent,
 ): void {
-  points.push([e.clientX - 6, e.clientY - 6, e.pressure]);
+  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement;
+  const rect = canvas.getBoundingClientRect();
+
+  // Calculate the scaling factors
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  // Adjust the coordinates based on the scaling factors
+  const x = (e.clientX - rect.left) * scaleX;
+  const y = (e.clientY - rect.top) * scaleY;
+
+  points.push([x, y, e.pressure]);
+  
   if (!isDrawing) {
     start = paths.length;
   }

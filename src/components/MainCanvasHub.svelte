@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import TextBox from "./Text_Box.svelte";
+  import TextBox from "./canvas elements/Text_Box.svelte";
   import {
     createNewTextBox,
     textBoxesStore,
@@ -30,16 +30,15 @@
   import { get } from "svelte/store";
   import type { TextBoxMap } from "../../stores/textBoxStore";
   import { AddUndoItem, ClearUndoStore } from "../../stores/undoStore";
-  import ToolBar2 from "./menus/ToolBar2.svelte";
-  import PageTurn from "./PageTurn.svelte";
-  import BrushSettings from "./BrushSettings.svelte";
-  import TextSettings from "./TextSettings.svelte";
+  import BrushSettings from "./toolbars/BrushSettings.svelte";
+  import TextSettings from "./toolbars/TextSettings.svelte";
   import NavMenu from "./menus/NavMenu.svelte";
-  import { fetched_single } from "../../stores/fetchDataStore";
-  import { DrawImage } from "../../stores/canvasStore";
   import { ClearRedoItems } from "../../stores/redoStore";
   import DebugMenu from "./menus/DebugMenu.svelte";
   import MultiplayerDebug from "./menus/MultiplayerDebug.svelte";
+  import UndoRedoBottom from "./toolbars/UndoRedoBottom.svelte";
+  import TopToolBar from "./toolbars/TopToolBar.svelte";
+  import EraserSettings from "./toolbars/EraserSettings.svelte";
 
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
@@ -129,10 +128,11 @@
   onMount(() => {
     ctx = canvas.getContext("2d");
     InitCtx(ctx);
-    window.addEventListener("resize", resizeCanvas);
     window.addEventListener("keyup", handleKeyup);
     canvas?.addEventListener("click", handleClick);
-    resizeCanvas();
+    canvas.width = 3000;
+    canvas.height = 2000;
+    // resizeCanvas();
   });
 
   onDestroy(() => {
@@ -144,21 +144,9 @@
     unsubcribe2();
     unsubscribe3();
 
-    window.removeEventListener("resize", resizeCanvas);
     window.removeEventListener("keyup", handleKeyup);
     canvas?.removeEventListener("click", handleClick);
   });
-
-  function resizeCanvas(): void {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    redrawCanvas();
-  }
-
-  function redrawCanvas(): void {
-    ctx.clearRect(0, 0, canvas?.width, canvas?.height);
-    DrawImage();
-  }
 
   export function handleClear(): void {
     ctx.clearRect(0, 0, canvas?.width, canvas?.height);
@@ -302,7 +290,7 @@
   <NavMenu {handleClear} />
   <MultiplayerDebug />
   <DebugMenu />
-  <ToolBar2
+  <TopToolBar
     {handle_arrow_mode}
     {handle_drawing_mode}
     {handle_textbox_mode}
@@ -323,27 +311,21 @@
     >
     </canvas>
     <BrushSettings />
+    <EraserSettings />
     <TextSettings />
-    <PageTurn />
+    <UndoRedoBottom />
   </div>
 </main>
 
 <style>
   .canvas-container {
     position: relative;
-    width: 100vw;
+    width: 100%;
+    height: 100vh;
   }
 
-  .full-size {
-    position: absolute;
-    height: 100vh;
-    width: 100vw;
-    top: 0px;
-    left: 0px;
-  }
-  /* 
   #main-canvas {
-    height: 1000px;
-    width: 1400px;
-  } */
+    width: 3000px;
+    height: 2000px;
+  }
 </style>

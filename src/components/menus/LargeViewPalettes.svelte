@@ -6,7 +6,7 @@
     type PaletteType,
   } from "../../../stores/paletteStore";
   import { get } from "svelte/store";
-  import SmallPalette from "../SmallPalette.svelte";
+  import SmallPalette from "./SmallPalette.svelte";
   import Close from "../../graphics/Close.svelte";
   import { event_state_store } from "../../../stores/eventState";
 

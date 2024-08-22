@@ -2,7 +2,7 @@
   import { onDestroy } from "svelte";
   import { event_state_store } from "../../../stores/eventState";
   import SavingNewProjectForm from "./SavingNewProjectForm.svelte";
-  import ViewDoodles from "./ViewDoodles.svelte";
+  import ViewDoodles from "../menus/OpenDoodleMenu.svelte";
   import SaveConfirmForm from "./SaveConfirmForm.svelte";
   import ColorPaletteForm from "./ColorPaletteForm.svelte";
   import LargeViewPalettes from "../menus/LargeViewPalettes.svelte";
