@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { get } from "svelte/store";
   import {
     CompileAndSaveDoodle,
@@ -9,6 +9,7 @@
   import { event_state_store } from "../../../stores/eventState";
   import { ClearEverything } from "../../../stores/canvasStore";
   import { alert_store } from "../../../stores/alertStore";
+  import type { MouseEventHandler } from "svelte/elements";
 
   let oldEventState;
   function handleYes() {
@@ -42,7 +43,7 @@
 </script>
 
 <div class="overlay" />
-<form class="save-confirm-form fixed-center cool">
+<div class="save-confirm-form fixed-center cool">
   <div class="grid">
     <div><h4>Do you want to save this doodle first?</h4></div>
     <div class="right">
@@ -50,10 +51,10 @@
     </div>
   </div>
   <div class="row">
-    <button class="orange" on:click={handleYes}>Yes</button>
-    <button on:click={handleNo}>No</button>
+    <button type="button" class="orange" on:click={handleYes}>Yes</button>
+    <button type="button" on:click={handleNo}>No</button>
   </div>
-</form>
+</div>
 
 <style>
   button {

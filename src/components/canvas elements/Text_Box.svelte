@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
     event_state_store,
     locked_store,
@@ -20,7 +20,7 @@
   import { active_color_store } from "../../../stores/paletteStore";
   export let data: TextBoxType;
 
-  let { id } = data;
+  const { id } = data;
   $: x = data.x;
   $: y = data.y;
   $: height = data.height;
@@ -45,6 +45,10 @@
   let selected: HTMLTextAreaElement[] = [];
   let iAmSelected = false;
   let typeStart = "";
+
+  onMount(() => {
+    hidden = false;
+  });
 
   const unsubcribe = theme_store.subscribe((value: string) => {
     theme = value;
@@ -194,10 +198,6 @@
   }
 
   function handleBlur() {
-    // textareaElement?.setSelectionRange(
-    //   textareaElement.selectionStart,
-    //   textareaElement.selectionStart,
-    // );
     if (eventState.includes("typing")) {
       if (oldValue !== textareaElement.value) {
         AddUndoItem({
@@ -209,23 +209,6 @@
         });
       }
     }
-    // if (eventState === "selecting") {
-    //   hidden = true;
-    // }
-    // if (
-    //   eventState !== "creating_text" &&
-    //   eventState !== "selecting" &&
-    //   eventState !== "selected"
-    // ) {
-    //   if (!eventState.includes("expanding")) {
-    //     selected_store.set([textareaElement]);
-    //   }
-    // }
-    // if (textareaElement?.value === "") {
-    //   //auto remove empty text boxes
-    //   deleteTextBox(id);
-    // }
-    // checkOverflow();
     updateTextBox(id, { x, y, height, width });
   }
 
@@ -250,7 +233,6 @@
 
   let oldValue = "";
   function handleFocus() {
-    dispatch("select", `textbox&${id}`);
     hidden = false;
     oldValue = textareaElement?.value;
   }
@@ -532,11 +514,9 @@
   class:no-pointer={eventState === "selecting" ||
     eventState === "drawing" ||
     eventState === "creating_text" ||
+    eventState === "erasing" ||
     eventState.includes("expanding")}
   class:iAmSelected
-  on:focus={() => {
-    hidden = false;
-  }}
   on:blur={() => {
     hidden = true;
   }}
