@@ -191,8 +191,7 @@
     background-color: rgb(25, 29, 31);
     left: 15px;
     padding: 20px;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 100px;
     display: none;
     flex-direction: column;
     border: 2px solid rgba(255, 255, 255, 0.198);

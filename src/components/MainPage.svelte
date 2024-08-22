@@ -38,6 +38,7 @@
   import MultiplayerDebug from "./menus/MultiplayerDebug.svelte";
   import UndoRedoBottom from "./toolbars/UndoRedoBottom.svelte";
   import TopToolBar from "./toolbars/TopToolBar.svelte";
+  import EraserSettings from "./toolbars/EraserSettings.svelte";
 
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
@@ -310,6 +311,7 @@
     >
     </canvas>
     <BrushSettings />
+    <EraserSettings />
     <TextSettings />
     <UndoRedoBottom />
   </div>

@@ -10,13 +10,12 @@
   // Props
   let min = 1;
   let max = 45;
-  let initialValue = get(brush_size_store);
+  let initialValue = 10;
   let id = null;
-  let value =
-    typeof initialValue === "string" ? parseInt(initialValue) : initialValue;
+  let value = initialValue;
   let eventState;
+  let brushSize;
 
-  $: brush_size_store.set(value);
   // Node Bindings
   let container = null;
   let thumb = null;
@@ -33,6 +32,10 @@
 
   const unsubscribe = event_state_store.subscribe((value) => {
     eventState = value;
+  });
+
+  const unsubcribe2 = brush_size_store.subscribe((value) => {
+    initialValue = value;
   });
 
   // Dispatch 'change' events
@@ -52,8 +55,9 @@
   }
 
   // Allows both bind:value and on:change for parent value retrieval
-  function setValue(val) {
-    value = val;
+  function setValue(input) {
+    value = input;
+    brush_size_store.set(input);
     dispatch("change", { value });
   }
 
@@ -159,7 +163,13 @@
   $: holding = Boolean(currentThumb);
 
   // Update progressbar and thumb styles to represent value
-  $: if (progressBar && thumb && eventState === "drawing") {
+  $: if (
+    progressBar &&
+    thumb &&
+    (eventState === "drawing" ||
+      eventState === "erasing" ||
+      eventState.includes("color_palette_edit_form"))
+  ) {
     resizeWindow();
     // Limit value min -> max
     value = value > min ? value : min;

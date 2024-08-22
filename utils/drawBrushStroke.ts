@@ -89,9 +89,6 @@ export function DrawBrushStroke(
   const canvas = document.getElementById('main-canvas') as HTMLCanvasElement;
   const rect = canvas.getBoundingClientRect();
 
-  console.log('Canvas intrinsic dimensions:', canvas.width, canvas.height);
-  console.log('Canvas displayed dimensions:', rect.width, rect.height);
-
   // Calculate the scaling factors
   const scaleX = canvas.width / rect.width;
   const scaleY = canvas.height / rect.height;
@@ -100,9 +97,8 @@ export function DrawBrushStroke(
   const x = (e.clientX - rect.left) * scaleX;
   const y = (e.clientY - rect.top) * scaleY;
 
-  console.log('Pointer coordinates:', x, y);
-
   points.push([x, y, e.pressure]);
+  
   if (!isDrawing) {
     start = paths.length;
   }
