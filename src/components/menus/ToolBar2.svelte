@@ -16,6 +16,7 @@
     theme_store,
   } from "../../../stores/eventState";
   import { onDestroy } from "svelte";
+  import Eraser from "../../graphics/Eraser.svelte";
 
   let mode = "";
   let locked = true;
@@ -38,6 +39,10 @@
   const unsubscribe4 = selected_store.subscribe((value) => {
     selected = value;
   });
+
+  function handle_eraser_mode() {
+    event_state_store.set("erasing");
+  }
 
   $: {
     if (
@@ -74,6 +79,12 @@
     style="background-color: {event_state === 'drawing' ? '#535bf2' : ''}"
   >
     <Marker />
+  </button>
+  <button
+    on:click={handle_eraser_mode}
+    style="background-color: {event_state === 'erasing' ? '#535bf2' : ''}"
+  >
+    <Eraser />
   </button>
   {#if event_state === "creating_text" || event_state.includes("typing")}
     <button

@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { DrawImageFromDataURL, GetCanvasContext, GetVectorPaths, SplicePaths } from "../utils/drawBrushStroke";
+import { DrawImageFromDataURL, GetCanvasContext } from "../utils/drawBrushStroke";
 import type { UndoBrushStroke, UndoDragSingle, UndoExpand, UndoTyping } from "../utils/types/undo_types";
 import type { TextBoxType, UndoType } from "../utils/types/app_types";
 import { deleteTextBox, font_size_store, textBoxesStore, updateTextBox } from "./textBoxStore";
@@ -33,6 +33,9 @@ export function HandleUndo() {
   switch (lastAction.action) {
     case "drewBrush": //
       undoBrushStroke(lastAction);
+      break;
+    case "erased":
+      undoEraser(lastAction)
       break;
     case "created_text_box": //
       undoCreatedTextBox(lastAction);
@@ -94,6 +97,29 @@ function undoBrushStroke(lastAction: UndoBrushStroke) {
       currentRaster,
       start,
       end
+    },
+    undoItem: lastAction
+  })
+}
+
+export function undoEraser(lastAction: any) {
+  const ctx = GetCanvasContext();
+  if (!ctx) {
+    console.error("Canvas context not available");
+    return;
+  }
+  const { oldRaster } = lastAction.data;
+  DrawImageFromDataURL(ctx, oldRaster);
+  let currentRaster;
+  const canvas = document.getElementById('main-canvas')
+  if (canvas) {
+    //@ts-ignore
+    currentRaster = canvas.toDataURL()
+  }
+  AddRedoItem({
+    action: "drawBushStroke",
+    data: {
+      currentRaster,
     },
     undoItem: lastAction
   })

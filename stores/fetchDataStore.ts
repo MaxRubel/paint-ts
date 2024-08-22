@@ -3,7 +3,7 @@ import { clearAllTextBoxes, textBoxesStore } from "./textBoxStore";
 import { authStore } from "../utils/auth/auth_store";
 import { CreateNewDoodle, GetDoodlesOfUser, GetSingleDoodle, UpdateDoodle } from "../api/doodles"
 import { event_state_store, selected_store } from "./eventState";
-import { ClearOldPathData, GetCanvasContext } from "../utils/drawBrushStroke";
+import { ClearCurrentCanvas, ClearOldPathData, GetCanvasContext } from "../utils/drawBrushStroke";
 import { ClearUndoStore, undo_store } from "./undoStore";
 import { DrawImage } from "./canvasStore";
 import { alert_store } from "./alertStore";
@@ -76,6 +76,7 @@ export function FetchAndLoadDoodle(id: number) {
         clearAllTextBoxes();
         ClearOldPathData();
         ClearUndoStore();
+        ClearCurrentCanvas();
         const { id, name, date_created, collaborators, data, owner } = resp
         fetched_single.set({ id, name, date_created, collaborators, data, owner })
         textBoxesStore.set(data.rectangles)
@@ -85,9 +86,9 @@ export function FetchAndLoadDoodle(id: number) {
     })
 }
 
-export function SyncDoodle(){
+export function SyncDoodle() {
     const doodleId = get(fetched_single).id
-    GetSingleDoodle(doodleId).then((data: any)=>{
+    GetSingleDoodle(doodleId).then((data: any) => {
         fetched_single.set(data)
     })
 }

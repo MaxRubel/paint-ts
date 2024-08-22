@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { DrawImageFromDataURL, GetCanvasContext, InsertOldBrushStrokes } from "../utils/drawBrushStroke";
+import { DrawImageFromDataURL, GetCanvasContext } from "../utils/drawBrushStroke";
 import { AddUndoItem } from "./undoStore";
 import { deleteTextBox, textBoxesStore } from "./textBoxStore";
 import type { TextBoxType, UndoType } from "../utils/types/app_types";
