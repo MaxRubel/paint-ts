@@ -1,17 +1,21 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { brush_size_store } from "../../../stores/brushStore";
-  import { event_state_store, locked_store, selected_store } from "../../../stores/eventState";
+  import {
+    event_state_store,
+    locked_store,
+    selected_store,
+  } from "../../../stores/eventState";
   import { fetched_all, fetched_single } from "../../../stores/fetchDataStore";
   import { undo_store } from "../../../stores/undoStore";
   import { redo_store } from "../../../stores/redoStore";
   import {
+    active_color_store,
     active_palette_store,
+    border_index_store,
     editting_tile_store,
     type PaletteType,
   } from "../../../stores/paletteStore";
-  import { get } from "svelte/store";
-  import { color_store } from "../../../stores/colorStore";
 
   let brushSize: Number;
   let eventState: string;
@@ -25,7 +29,7 @@
   let activePalette: PaletteType;
   let edittingTile: number | null;
   let activeColor: string;
-
+  let borderIndex: number | null;
   const unsubscribe = brush_size_store.subscribe((value) => {
     brushSize = value;
   });
@@ -73,8 +77,12 @@
     edittingTile = value;
   });
 
-  const unsubscribe11 = color_store.subscribe((value) => {
+  const unsubscribe11 = active_color_store.subscribe((value) => {
     activeColor = value;
+  });
+
+  const unsubscribe12 = border_index_store.subscribe((value) => {
+    borderIndex = value;
   });
 
   onDestroy(() => {
@@ -89,6 +97,7 @@
     unsubscribe9();
     unsubscribe10();
     unsubscribe11();
+    unsubscribe12();
   });
 </script>
 
@@ -107,7 +116,9 @@
     <div class="drawing">
       <div class="pre-wrap centered">---------Drawing---------</div>
       <div class="extend"><strong>id: </strong>&nbsp;&nbsp;{fetchedDrawing.id}</div>
-      <div class="extend"><strong>name: </strong>&nbsp;&nbsp;{fetchedDrawing.name}</div>
+      <div class="extend">
+        <strong>name: </strong>&nbsp;&nbsp;{fetchedDrawing.name}
+      </div>
       <div class="extend">
         <strong>date created: </strong>&nbsp;&nbsp;{fetchedDrawing.date_created}
       </div>
@@ -135,12 +146,16 @@
   </div>
   <div class="palette">
     <div class="top centered">--------Palette--------</div>
-    <div style="font-size: 14px;"><strong>Active Color: &nbsp;</strong> {activeColor}</div>
+    <div style="font-size: 14px;">
+      <strong>Active Color: &nbsp;</strong>
+      {activeColor}
+    </div>
     {#if !activePalette.id}
       Palette has not been saved
     {/if}
     <div><strong>Name: &nbsp;</strong> {activePalette.name}</div>
-    <div><strong>Editting Item: &nbsp;</strong> {edittingTile}</div>
+    <div><strong>Editting Tile: &nbsp;</strong> {edittingTile}</div>
+    <div><strong>Border Index: &nbsp;</strong> {borderIndex}</div>
     <div>
       <div><strong>Colors &nbsp;</strong></div>
       {#each activePalette.colors as color}
@@ -156,7 +171,7 @@
     z-index: 1003;
     top: 50px;
     right: 0;
-    width: 200px;
+    width: 215px;
     background-color: rgb(192, 189, 189);
     overflow-y: auto;
     padding: 15px;

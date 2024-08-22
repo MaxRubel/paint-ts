@@ -2,6 +2,8 @@
   import { DeletePalette, GetPalletesOfUser } from "../../../api/palette";
   import {
     active_palette_store,
+    border_index_store,
+    editting_tile_store,
     initialPalette,
     SetPaletteById,
     SyncLocalPalettes,
@@ -15,6 +17,8 @@
 
   function handleEditPalette() {
     SetPaletteById(paletteId);
+    border_index_store.set(null);
+    editting_tile_store.set(null);
     event_state_store.set("color_palette_edit_form&drawing");
   }
 
@@ -33,7 +37,11 @@
   <button class="clear-button border" on:click={handleEditPalette}>
     <EditIcon />
   </button>
-  <button class="clear-button border" on:click={handleDeletePalette}>
+  <button
+    class="clear-button border"
+    on:click={handleDeletePalette}
+    id="delete-palette-button-small"
+  >
     <TrashCan />
   </button>
 </div>

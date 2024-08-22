@@ -2,7 +2,9 @@
   import { onDestroy, onMount } from "svelte";
   import type { PaletteType } from "../../../stores/paletteStore";
   import {
+    active_color_store,
     active_palette_store,
+    border_index_store,
     DeleteColorPalette,
     editting_tile_store,
     initialPalette,
@@ -17,7 +19,6 @@
   import TrashCanBig from "../../graphics/TrashCanBig.svelte";
   import { event_state_store } from "../../../stores/eventState";
   import { get } from "svelte/store";
-  import { color_store } from "../../../stores/colorStore";
 
   let activePalette: PaletteType;
   let nameInput: string;
@@ -55,7 +56,12 @@
     if (target.classList.contains("IroBox")) return;
     if (target.classList.contains("IroSliderGradient")) return;
     if (target.classList.contains("IroSliderGradient")) return;
-    if (target.closest("#picker2")) {
+    if (
+      target.closest("#text-color-picker") ||
+      target.closest("brush-color-picker") ||
+      target.tagName.toLowerCase() === "circle" ||
+      target.tagName.toLowerCase() === "svg"
+    ) {
       return;
     }
     if (!target.id || !target.id.includes("color-button-palette-form")) {
@@ -66,7 +72,7 @@
 
   function handleClick(index: number) {
     editting_tile_store.set(index);
-    color_store.set(activePalette.colors[index]);
+    active_color_store.set(activePalette.colors[index]);
   }
 
   function handleDelete() {
@@ -94,7 +100,6 @@
   }
 
   function handleOpenPalette() {
-    console.log("hellooooo");
     event_state_store.set("large_view_palettes");
   }
 
@@ -128,6 +133,17 @@
 
   onMount(() => {
     document.addEventListener("pointerdown", handleContinueDrawing);
+    //select the item from the active color
+    const borderIndex = get(border_index_store);
+    if (borderIndex) {
+      const element = document.getElementById(
+        `color-button-palette-form&${borderIndex}`,
+      );
+      if (element) {
+        element.style.border = "2px solid lightgray";
+        element.style.outline = "2px solid white";
+      }
+    }
   });
 
   onDestroy(() => {

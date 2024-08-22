@@ -39,6 +39,7 @@
   import { DrawImage } from "../../stores/canvasStore";
   import { ClearRedoItems } from "../../stores/redoStore";
   import DebugMenu from "./menus/DebugMenu.svelte";
+  import MultiplayerDebug from "./menus/MultiplayerDebug.svelte";
 
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
@@ -291,7 +292,8 @@
 
 <main>
   <NavMenu {handleClear} />
-  <!-- <DebugMenu /> -->
+  <MultiplayerDebug />
+  <DebugMenu />
   <ToolBar2
     {handle_arrow_mode}
     {handle_drawing_mode}

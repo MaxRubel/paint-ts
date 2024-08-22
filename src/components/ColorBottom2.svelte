@@ -6,7 +6,6 @@
   import TextLeft from "../graphics/TextLeft.svelte";
   import TextRight from "../graphics/TextRight.svelte";
   import iro from "@jaames/iro";
-  import { color_store } from "../../stores/colorStore";
   import {
     ChangeTextFont,
     font_family_store,
@@ -23,13 +22,11 @@
   } from "../../stores/eventState";
   import { AddUndoItem } from "../../stores/undoStore";
   import DownArrow from "../graphics/Arrow.svelte";
-  import {
-    UpdateUserPrefs,
-    user_prefs_store,
-  } from "../../stores/userPrefsStore";
+  import { UpdateUserPrefs, user_prefs_store } from "../../stores/userPrefsStore";
   import Arrow from "../graphics/Arrow.svelte";
   import { brush_size_store } from "../../stores/brushStore";
   import Slider from "./Slider.svelte";
+  import { active_color_store } from "../../stores/paletteStore";
 
   let colorPicker;
   let arrayOfColors = [];
@@ -64,7 +61,7 @@
     return "#" + toHex(r) + toHex(g) + toHex(b);
   }
 
-  const unsubcribe = color_store.subscribe((value) => {
+  const unsubcribe = active_color_store.subscribe((value) => {
     if (!value) {
       const mode = get(theme_store);
       mode === "dark"
@@ -137,7 +134,7 @@
       newColorF = origin;
     }
 
-    color_store.set(newColorF);
+    active_color_store.set(newColorF);
     const eventState = get(event_state_store);
 
     if (eventState === "selected") {
@@ -301,9 +298,7 @@
           >
             <option class="font-box" value="Arial">Arial</option>
             <option class="font-box" value="Patrick Hand">Patrick Hand</option>
-            <option class="font-box" value="Times New Roman"
-              >Times New Roman</option
-            >
+            <option class="font-box" value="Times New Roman">Times New Roman</option>
           </select>
           <div class="size-container">
             <div>Size</div>

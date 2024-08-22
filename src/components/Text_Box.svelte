@@ -16,8 +16,8 @@
   import { StartDragMany, DragMany, EndDragMany } from "../../utils/dragMultiple";
   import { AddUndoItem } from "../../stores/undoStore";
   import { updateTextBox } from "../../stores/textBoxStore";
-  import { color_store } from "../../stores/colorStore";
   import { get } from "svelte/store";
+  import { active_color_store } from "../../stores/paletteStore";
   export let data: TextBoxType;
 
   let { id } = data;
@@ -74,7 +74,7 @@
     }
   });
 
-  const unsubscribe5 = color_store.subscribe((value) => {
+  const unsubscribe5 = active_color_store.subscribe((value) => {
     if (!value) return;
     if (eventState.includes("typing")) {
       const [, boxId] = eventState.split("&");

@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from "uuid";
 import { event_state_store, locked_store, selected_store } from "./eventState";
 import { get } from "svelte/store";
 import type { TextBoxType } from "../utils/types/app_types";
-import { color_store } from "./colorStore";
 import { AddUndoItem } from "./undoStore";
+import { active_color_store } from "./paletteStore";
 
 export interface TextBoxMap {
   [key: string]: TextBoxType;
@@ -35,7 +35,7 @@ export function createNewTextBox(
     x = e.clientX - 133;
     y = e.clientY - 40;
   }
-  const fontColor = get(color_store)
+  const fontColor = get(active_color_store)
   const align = get(text_alignment)
   const newBox: TextBoxType = {
     id: newKey,

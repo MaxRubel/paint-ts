@@ -14,16 +14,15 @@
   import TextRight from "../graphics/TextRight.svelte";
   import { get } from "svelte/store";
   import { AddUndoItem } from "../../stores/undoStore";
-  import iro from "@jaames/iro";
-  import { color_store } from "../../stores/colorStore";
+  import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
+  import PaletteInSettings from "./PaletteInSettings.svelte";
 
   let isVisible = false;
   let eventState: string;
   let fontSize: number;
   let textAlignment: string;
-  let colorPicker: any;
   let fontFamily = "";
-  let arrayOfColors: any[] = [];
+  let colorPicker: any;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -84,7 +83,9 @@
   }
 
   let oldFontSize = 24;
-  function handleSizeChange(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+  function handleSizeChange(
+    e: Event & { currentTarget: EventTarget & HTMLInputElement },
+  ) {
     const target = e.currentTarget;
     const value = Number(target.value);
 
@@ -112,79 +113,13 @@
     oldFontSize = value;
   }
 
-  function handleChangeColor(origin: string) {
-    let newColorF;
-    if (origin === "box") {
-      const newColor = colorPicker.color.rgb;
-      newColorF = `rgb(${newColor.r}, ${newColor.g}, ${newColor.b})`;
-    } else {
-      newColorF = origin;
-    }
-
-    color_store.set(newColorF);
-    const eventState = get(event_state_store);
-
-    if (eventState === "selected") {
-      const selectedArray = get(selected_store);
-      const undoArray: any[] = [];
-      selectedArray.forEach((item) => {
-        const [, id] = item.id.split("&");
-        if (item.id.includes("textbox")) {
-          const ogTextbox = get(textBoxesStore)[id];
-          if (ogTextbox.fontColor !== newColorF) {
-            undoArray.push({
-              id,
-              fontColor: ogTextbox.fontColor,
-            });
-            updateTextBox(id, { fontColor: newColorF });
-          }
-        }
-      });
-      if (undoArray.length > 0) {
-        AddUndoItem({
-          action: "changedManyFontColors",
-          data: undoArray,
-        });
-      }
-    }
-
-    if (arrayOfColors.includes(newColorF)) return;
-
-    if (arrayOfColors.length === 16) {
-      arrayOfColors.shift();
-      arrayOfColors = arrayOfColors;
-    }
-    arrayOfColors.push(newColorF);
-    arrayOfColors = arrayOfColors;
-  }
-
   onMount(() => {
     // @ts-ignore
-    colorPicker = new iro.ColorPicker("#picker-text", {
-      width: 150,
-      layout: [
-        {
-          component: iro.ui.Box,
-          options: {
-            width: 100,
-            height: 100,
-          },
-        },
-        {
-          component: iro.ui.Slider,
-          options: {
-            sliderType: "hue",
-            width: 100,
-          },
-        },
-      ],
-      layoutDirection: "horizontal",
-    });
   });
 
   $: {
     if (
-      eventState === "creating_text" ||
+      eventState.includes("creating_text") ||
       eventState.includes("typing") ||
       eventState === "selected"
     ) {
@@ -243,33 +178,8 @@
         >
       </div>
     </div>
-    <div class="color-container centered">
-      Color
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div
-        class="color-picker"
-        id="picker-text"
-        on:mouseup={() => {
-          handleChangeColor("box");
-        }}
-      />
-    </div>
-    <div class="palette centered">
-      Palette
-      <div class="recent-choices">
-        <!-- {#each arrayOfColors as color}
-          <div class="color-box">
-            <button
-              class="color-button"
-              on:click={() => {
-                handleChangeColor(color);
-              }}
-              style="background-color: {color};"
-            ></button>
-          </div>
-        {/each} -->
-      </div>
-    </div>
+    <ColorPickerInSettings location={"text-color-picker"} width={100} />
+    <PaletteInSettings />
   </div>
 </div>
 
@@ -278,7 +188,7 @@
     position: fixed;
     color: white;
     border-radius: 20px;
-    height: 548px;
+    height: 610px;
     background-color: rgba(0, 0, 0, 0.266);
     left: 15px;
     padding: 20px;
@@ -287,6 +197,7 @@
     display: none;
     flex-direction: column;
     border: 2px solid rgba(255, 255, 255, 0.198);
+    width: 208px;
   }
 
   .font-container {
@@ -329,7 +240,7 @@
     padding: 0px;
     background-color: transparent;
     color: rgb(255, 255, 255);
-    border: 1px solid;
+    border: 1px solid white;
   }
 
   .text-position {
@@ -345,41 +256,5 @@
     justify-content: space-between;
     border-bottom: 2px solid rgba(255, 255, 255, 0.198);
     padding-bottom: 15px;
-  }
-
-  .color-container {
-    padding-bottom: 10px;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.198);
-  }
-
-  .color-picker {
-    margin-top: 5px;
-  }
-
-  .recent-choices {
-    margin-top: 10px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: min-content;
-    padding: 10px;
-    /* border: 1px solid rgba(255, 255, 255); */
-    border-radius: 10pt;
-    /* flex-grow: 1; */
-    /* height: 80%; */
-    width: 180px;
-    gap: 5px;
-    align-content: start;
-    height: 135px;
-  }
-
-  .color-container {
-    flex-direction: column;
-    margin-top: 10px;
-  }
-
-  .palette {
-    flex-direction: column;
-    margin-top: 10px;
-    width: 208px;
   }
 </style>
