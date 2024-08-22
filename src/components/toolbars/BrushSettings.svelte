@@ -9,7 +9,6 @@
     editting_tile_store,
   } from "../../../stores/paletteStore";
   import type { PaletteType } from "../../../stores/paletteStore";
-  import SmallViewPalettes from "../menus/SmallViewPalettes.svelte";
   import PaletteInSettings from "./PaletteInSettings.svelte";
   import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
 
@@ -41,14 +40,6 @@
   });
 
   let smallPaletteMenu = false;
-
-  function closeSmallMenu() {
-    smallPaletteMenu = false;
-  }
-
-  function openSmallMenu() {
-    smallPaletteMenu = true;
-  }
 
   $: onDestroy(() => {
     unsubcribe();
@@ -95,7 +86,7 @@
   }
 
   .isVisible {
-    display: flex !important;
+    display: flex;
   }
 
   .content-wrapper {

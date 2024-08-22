@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { authStore } from "../utils/auth/auth_store";
-  import MainPage from "./components/MainPage.svelte";
+  import MainPage from "./components/MainCanvasHub.svelte";
   import { CheckUser } from "../api/user";
   import { event_state_store } from "../stores/eventState";
   import UserRegistrationForm from "./components/forms/UserRegistrationForm.svelte";

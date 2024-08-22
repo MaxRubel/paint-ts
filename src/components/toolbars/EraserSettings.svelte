@@ -33,7 +33,7 @@
 
 <div class="cool eraser-menu" class:isVisible>
   <div class="eraser-header">Eraser Size</div>
-  <Slider />
+  <div class="slider-container"><Slider /></div>
   <div class="stroke-container centered">
     <EraserStroke size={brushStroke + 3} />
   </div>
@@ -52,7 +52,7 @@
     flex-direction: column;
     border: 2px solid rgba(255, 255, 255, 0.198);
     width: 208px;
-    z-index: 1000;
+    z-index: 800;
   }
 
   .isVisible {
@@ -61,7 +61,7 @@
 
   .eraser-header {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
 
   .stroke-container {
