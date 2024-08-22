@@ -12,6 +12,7 @@
   import { get } from "svelte/store";
   import { textBoxesStore, updateTextBox } from "../../stores/textBoxStore";
   import { AddUndoItem } from "../../stores/undoStore";
+  import SmallViewPalettes from "./menus/SmallViewPalettes.svelte";
 
   let activePalette: any = {
     colors: [],
@@ -82,6 +83,9 @@
     } else {
       smallPaletteMenu = true;
     }
+  }
+  function closeSmallMenu() {
+    smallPaletteMenu = false;
   }
 
   function openPaletteWindow() {
@@ -154,6 +158,9 @@
   }
 </script>
 
+{#if smallPaletteMenu}
+  <SmallViewPalettes {closeSmallMenu} />
+{/if}
 <div class="palette">
   <button
     id="small-palette-menu-opener"

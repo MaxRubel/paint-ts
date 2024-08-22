@@ -22,7 +22,6 @@
   let fontSize: number;
   let textAlignment: string;
   let fontFamily = "";
-  let colorPicker: any;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -188,8 +187,8 @@
     position: fixed;
     color: white;
     border-radius: 20px;
-    height: 610px;
-    background-color: rgba(0, 0, 0, 0.266);
+    height: 620px;
+    background-color: rgb(25, 29, 31);
     left: 15px;
     padding: 20px;
     top: 50%;

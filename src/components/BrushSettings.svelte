@@ -19,7 +19,6 @@
   let activePalette: PaletteType;
   let edittingTile: number | null;
   let activeColor: string;
-  let colorPicker: any;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -47,6 +46,10 @@
     smallPaletteMenu = false;
   }
 
+  function openSmallMenu() {
+    smallPaletteMenu = true;
+  }
+
   $: onDestroy(() => {
     unsubcribe();
     unsubcribe2();
@@ -62,17 +65,9 @@
       isVisible = false;
     }
   }
-
-  function initColorPicker(value: any) {
-    colorPicker = value;
-    console.log("color picked init");
-  }
 </script>
 
 <div class="color-bar-3" class:isVisible>
-  {#if smallPaletteMenu}
-    <SmallViewPalettes {closeSmallMenu} />
-  {/if}
   <div class="content-wrapper">
     <div class="slider centered" style="flex-direction: column">
       Stroke
@@ -88,7 +83,7 @@
     position: fixed;
     color: white;
     border-radius: 20px;
-    height: 610px;
+    height: 620px;
     background-color: rgb(25, 29, 31);
     left: 15px;
     padding: 20px;

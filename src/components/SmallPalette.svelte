@@ -5,6 +5,7 @@
   import {
     active_color_store,
     active_palette_store,
+    border_index_store,
     SetPaletteById,
   } from "../../stores/paletteStore";
   import TinyPaletteMenu from "./menus/TinyPaletteMenu.svelte";
@@ -19,8 +20,10 @@
       active_color_store.set(palette.colors[0]);
     }
     SetPaletteById(palette.id);
-    if (!e.target.id.includes("delete-palette-button-small"))
+    if (!e.target.id.includes("delete-palette-button-small")) {
       event_state_store.set("drawing");
+      border_index_store.set(0);
+    }
   }
 </script>
 
