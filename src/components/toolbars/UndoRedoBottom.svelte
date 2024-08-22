@@ -1,8 +1,8 @@
 <script>
-  import { HandleRedo } from "../../stores/redoStore";
-  import { HandleUndo } from "../../stores/undoStore";
-  import Redo from "../graphics/Redo.svelte";
-  import Undo from "../graphics/Undo.svelte";
+  import { HandleRedo } from "../../../stores/redoStore";
+  import { HandleUndo } from "../../../stores/undoStore";
+  import Redo from "../../graphics/Redo.svelte";
+  import Undo from "../../graphics/Undo.svelte";
 </script>
 
 <div class="page-turn">

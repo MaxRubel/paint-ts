@@ -8,15 +8,15 @@
     PushColorIntoActivePalette,
     UpdateColorTile,
     type PaletteType,
-  } from "../../stores/paletteStore";
+  } from "../../../stores/paletteStore";
   import { get } from "svelte/store";
-  import { event_state_store, selected_store } from "../../stores/eventState";
-  import { textBoxesStore, updateTextBox } from "../../stores/textBoxStore";
-  import { AddUndoItem } from "../../stores/undoStore";
-  import { authStore } from "../../utils/auth/auth_store";
-  import type { TextBoxType } from "../../utils/types/app_types";
+  import { event_state_store, selected_store } from "../../../stores/eventState";
+  import { textBoxesStore, updateTextBox } from "../../../stores/textBoxStore";
+  import { AddUndoItem } from "../../../stores/undoStore";
+  import { authStore } from "../../../utils/auth/auth_store";
+  import type { TextBoxType } from "../../../utils/types/app_types";
   import iro from "@jaames/iro";
-  import Alert from "./alerts/Alert.svelte";
+  import Alert from "../alerts/Alert.svelte";
 
   export let location;
   export let width;

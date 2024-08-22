@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { event_state_store, selected_store } from "../../stores/eventState";
+  import { event_state_store, selected_store } from "../../../stores/eventState";
   import {
     ChangeTextFont,
     font_family_store,
@@ -8,12 +8,12 @@
     text_alignment,
     textBoxesStore,
     updateTextBox,
-  } from "../../stores/textBoxStore";
-  import TextLeft from "../graphics/TextLeft.svelte";
-  import TextCenter from "../graphics/TextCenter.svelte";
-  import TextRight from "../graphics/TextRight.svelte";
+  } from "../../../stores/textBoxStore";
+  import TextLeft from "../../graphics/TextLeft.svelte";
+  import TextCenter from "../../graphics/TextCenter.svelte";
+  import TextRight from "../../graphics/TextRight.svelte";
   import { get } from "svelte/store";
-  import { AddUndoItem } from "../../stores/undoStore";
+  import { AddUndoItem } from "../../../stores/undoStore";
   import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
   import PaletteInSettings from "./PaletteInSettings.svelte";
 

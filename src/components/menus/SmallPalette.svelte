@@ -1,14 +1,14 @@
 <script lang="ts">
   import { get } from "svelte/store";
-  import { event_state_store } from "../../stores/eventState";
-  import type { PaletteType } from "../../stores/paletteStore";
+  import { event_state_store } from "../../../stores/eventState";
+  import type { PaletteType } from "../../../stores/paletteStore";
   import {
     active_color_store,
     active_palette_store,
     border_index_store,
     SetPaletteById,
-  } from "../../stores/paletteStore";
-  import TinyPaletteMenu from "./menus/TinyPaletteMenu.svelte";
+  } from "../../../stores/paletteStore";
+  import TinyPaletteMenu from "./TinyPaletteMenu.svelte";
 
   export let palette: PaletteType;
 

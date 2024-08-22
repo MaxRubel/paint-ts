@@ -6,13 +6,13 @@
     border_index_store,
     ClearPalette,
     editting_tile_store,
-  } from "../../stores/paletteStore";
-  import { event_state_store, selected_store } from "../../stores/eventState";
-  import { authStore } from "../../utils/auth/auth_store";
+  } from "../../../stores/paletteStore";
+  import { event_state_store, selected_store } from "../../../stores/eventState";
+  import { authStore } from "../../../utils/auth/auth_store";
   import { get } from "svelte/store";
-  import { textBoxesStore, updateTextBox } from "../../stores/textBoxStore";
-  import { AddUndoItem } from "../../stores/undoStore";
-  import SmallViewPalettes from "./menus/SmallViewPalettes.svelte";
+  import { textBoxesStore, updateTextBox } from "../../../stores/textBoxStore";
+  import { AddUndoItem } from "../../../stores/undoStore";
+  import SmallViewPalettes from "../menus/SmallViewPalettes.svelte";
 
   let activePalette: any = {
     colors: [],

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import TextBox from "./Text_Box.svelte";
+  import TextBox from "./canvas elements/Text_Box.svelte";
   import {
     createNewTextBox,
     textBoxesStore,
@@ -30,16 +30,14 @@
   import { get } from "svelte/store";
   import type { TextBoxMap } from "../../stores/textBoxStore";
   import { AddUndoItem, ClearUndoStore } from "../../stores/undoStore";
-  import ToolBar2 from "./menus/ToolBar2.svelte";
-  import PageTurn from "./PageTurn.svelte";
-  import BrushSettings from "./BrushSettings.svelte";
-  import TextSettings from "./TextSettings.svelte";
+  import BrushSettings from "./toolbars/BrushSettings.svelte";
+  import TextSettings from "./toolbars/TextSettings.svelte";
   import NavMenu from "./menus/NavMenu.svelte";
-  import { fetched_single } from "../../stores/fetchDataStore";
-  import { DrawImage } from "../../stores/canvasStore";
   import { ClearRedoItems } from "../../stores/redoStore";
   import DebugMenu from "./menus/DebugMenu.svelte";
   import MultiplayerDebug from "./menus/MultiplayerDebug.svelte";
+  import UndoRedoBottom from "./toolbars/UndoRedoBottom.svelte";
+  import TopToolBar from "./toolbars/TopToolBar.svelte";
 
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
@@ -291,7 +289,7 @@
   <NavMenu {handleClear} />
   <MultiplayerDebug />
   <DebugMenu />
-  <ToolBar2
+  <TopToolBar
     {handle_arrow_mode}
     {handle_drawing_mode}
     {handle_textbox_mode}
@@ -313,7 +311,7 @@
     </canvas>
     <BrushSettings />
     <TextSettings />
-    <PageTurn />
+    <UndoRedoBottom />
   </div>
 </main>
 

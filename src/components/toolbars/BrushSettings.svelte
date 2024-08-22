@@ -1,15 +1,15 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { event_state_store } from "../../stores/eventState";
+  import { event_state_store } from "../../../stores/eventState";
   import Slider from "./Slider.svelte";
-  import { authStore } from "../../utils/auth/auth_store";
+  import { authStore } from "../../../utils/auth/auth_store";
   import {
     active_color_store,
     active_palette_store,
     editting_tile_store,
-  } from "../../stores/paletteStore";
-  import type { PaletteType } from "../../stores/paletteStore";
-  import SmallViewPalettes from "./menus/SmallViewPalettes.svelte";
+  } from "../../../stores/paletteStore";
+  import type { PaletteType } from "../../../stores/paletteStore";
+  import SmallViewPalettes from "../menus/SmallViewPalettes.svelte";
   import PaletteInSettings from "./PaletteInSettings.svelte";
   import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
 

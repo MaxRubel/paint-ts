@@ -1,23 +1,23 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import {
     event_state_store,
     locked_store,
     selected_store,
     theme_store,
-  } from "../../stores/eventState";
+  } from "../../../stores/eventState";
   import { createEventDispatcher } from "svelte";
   import {
     font_family_store,
     font_size_store,
     text_alignment,
-  } from "../../stores/textBoxStore";
-  import type { TextBoxType } from "../../utils/types/app_types";
-  import { StartDragMany, DragMany, EndDragMany } from "../../utils/dragMultiple";
-  import { AddUndoItem } from "../../stores/undoStore";
-  import { updateTextBox } from "../../stores/textBoxStore";
+  } from "../../../stores/textBoxStore";
+  import type { TextBoxType } from "../../../utils/types/app_types";
+  import { StartDragMany, DragMany, EndDragMany } from "../../../utils/dragMultiple";
+  import { AddUndoItem } from "../../../stores/undoStore";
+  import { updateTextBox } from "../../../stores/textBoxStore";
   import { get } from "svelte/store";
-  import { active_color_store } from "../../stores/paletteStore";
+  import { active_color_store } from "../../../stores/paletteStore";
   export let data: TextBoxType;
 
   let { id } = data;

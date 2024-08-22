@@ -3,16 +3,17 @@
 
   import { createEventDispatcher, onMount } from "svelte";
   import { fly, fade } from "svelte/transition";
-  import { brush_size_store } from "../../stores/brushStore";
+  import { brush_size_store } from "../../../stores/brushStore";
   import { get } from "svelte/store";
-  import { event_state_store } from "../../stores/eventState";
+  import { event_state_store } from "../../../stores/eventState";
 
   // Props
   let min = 1;
   let max = 45;
   let initialValue = get(brush_size_store);
   let id = null;
-  let value = typeof initialValue === "string" ? parseInt(initialValue) : initialValue;
+  let value =
+    typeof initialValue === "string" ? parseInt(initialValue) : initialValue;
   let eventState;
 
   $: brush_size_store.set(value);
@@ -75,7 +76,8 @@
   function onDragEnd(e) {
     // If using mouse - remove pointer event shield
     if (e.type === "mouseup") {
-      if (document.body.contains(mouseEventShield)) document.body.removeChild(mouseEventShield);
+      if (document.body.contains(mouseEventShield))
+        document.body.removeChild(mouseEventShield);
       // Needed to check whether thumb and mouse overlap after shield removed
       if (isMouseInElement(e, thumb)) thumbHover = true;
     }
@@ -135,14 +137,17 @@
   // Handles both dragging of touch/mouse as well as simple one-off click/touches
   function updateValueOnEvent(e) {
     // touchstart && mousedown are one-off updates, otherwise expect a currentPointer node
-    if (!currentThumb && e.type !== "touchstart" && e.type !== "mousedown") return false;
+    if (!currentThumb && e.type !== "touchstart" && e.type !== "mousedown")
+      return false;
 
     if (e.stopPropagation) e.stopPropagation();
     if (e.preventDefault) e.preventDefault();
 
     // Get client's x cord either touch or mouse
     const clientX =
-      e.type === "touchmove" || e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+      e.type === "touchmove" || e.type === "touchstart"
+        ? e.touches[0].clientX
+        : e.clientX;
 
     calculateNewValue(clientX);
   }
@@ -205,7 +210,11 @@
         on:mouseout={() => (thumbHover = false)}
       >
         {#if holding || thumbHover}
-          <div class="range__tooltip" in:fly={{ y: 7, duration: 200 }} out:fade={{ duration: 100 }}>
+          <div
+            class="range__tooltip"
+            in:fly={{ y: 7, duration: 200 }}
+            out:fade={{ duration: 100 }}
+          >
             {value}
           </div>
         {/if}
