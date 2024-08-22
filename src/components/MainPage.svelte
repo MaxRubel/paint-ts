@@ -16,6 +16,7 @@
   import {
     ClearOldPathData,
     DrawBrushStroke,
+    SaveOriginalRaster,
     EndBrushStroke,
     InitCtx,
     ReDrawBrushStrokes,
@@ -195,6 +196,7 @@
         }
         break;
       case "drawing":
+        SaveOriginalRaster();
         DrawBrushStroke(ctx, e);
         break;
       case "rectangle-draw":

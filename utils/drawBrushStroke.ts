@@ -15,16 +15,44 @@ let start = 0;
 let end = 0;
 let isDrawing = false;
 let color = ""
+let oldRaster: string | null = null
 
 export function InitCtx(context: CanvasRenderingContext2D) {
   ctx = context;
 }
 
-export function GetCanvasContext(){
-  if(ctx){
+export function GetCanvasContext() {
+  if (ctx) {
     return ctx
   } else {
     console.error("Canvas was not initialized properly")
+  }
+}
+
+export function DrawImageFromDataURL(ctx, dataURL) {
+  console.log(dataURL)
+  return new Promise((resolve: any, reject) => {
+    const img = new Image();
+    img.onload = function () {
+      requestAnimationFrame(() => {
+        const canvas = document.getElementById('main-canvas')
+        //@ts-ignore
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        console.log('drawing')
+        ctx.drawImage(img, 0, 0);
+        resolve();
+      })
+    };
+    img.onerror = reject;
+    img.src = dataURL;
+  });
+}
+
+export function SaveOriginalRaster() {
+  const canvas = document.getElementById('main-canvas')
+  if (canvas) {
+    //@ts-ignore
+    oldRaster = canvas.toDataURL()
   }
 }
 
@@ -61,19 +89,20 @@ export function EndBrushStroke() {
   isDrawing = false;
   AddUndoItem({
     action: 'drewBrush',
-    data: { start, end, color }
+    data: { start, end, color, oldRaster }
   });
+  paths = []
 }
 
-export function InsertOldBrushStrokes(oldStrokes: any){
+export function InsertOldBrushStrokes(oldStrokes: any) {
   const length = oldStrokes.data.pathArray.length
-  paths.splice(oldStrokes.data.start, length, ...oldStrokes.data.pathArray )
+  paths.splice(oldStrokes.data.start, length, ...oldStrokes.data.pathArray)
   ReDrawBrushStrokes()
 }
 
 export function ReDrawBrushStrokes() {
   if (ctx) {
-    if(get(fetched_single).id){
+    if (get(fetched_single).id) {
       DrawImage()
     }
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -96,6 +125,6 @@ export function SplicePaths(start: number, amount: number) {
   ReDrawBrushStrokes();
 }
 
-export function GetVectorPaths(){
+export function GetVectorPaths() {
   return paths
 }
