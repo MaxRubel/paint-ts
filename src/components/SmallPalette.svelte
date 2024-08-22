@@ -13,13 +13,14 @@
 
   let mouseIsOver = false;
 
-  function handleClick() {
+  function handleClick(e: any) {
     //set the active color of the first of the new palette if changing palette
     if (palette.id !== get(active_palette_store).id) {
       active_color_store.set(palette.colors[0]);
     }
     SetPaletteById(palette.id);
-    event_state_store.set("drawing");
+    if (!e.target.id.includes("delete-palette-button-small"))
+      event_state_store.set("drawing");
   }
 </script>
 
