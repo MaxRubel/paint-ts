@@ -13,6 +13,7 @@
   import { fetched_single } from "../../../stores/fetchDataStore";
   import { undo_store } from "../../../stores/undoStore";
   import { alert_store } from "../../../stores/alertStore";
+  import { drawing_room_store } from "../../../stores/drawingRoomStore";
 
   export let handleClear: Function;
 
@@ -105,6 +106,10 @@
     menuOpen = false;
   }
 
+  function handleCreateDrawingRoom() {
+    drawing_room_store.set(true);
+  }
+
   function openShareMenu() {
     event_state_store.set("share_menu_form");
     menuOpen = false;
@@ -188,6 +193,13 @@
       View Color Palettes
     </button>
     <button
+      class="clear-button nav-button-btn"
+      id="dd-menu"
+      on:click={handleCreateDrawingRoom}
+    >
+      Create Drawing Room
+    </button>
+    <button
       class="clear-button nav-button-btn signout"
       id="dd-menu"
       on:click={handleSignOut}>Sign Out</button
@@ -198,6 +210,7 @@
 <style>
   button {
     cursor: pointer;
+    width: 100%;
   }
 
   .nav-button {
