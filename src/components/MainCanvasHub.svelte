@@ -34,7 +34,6 @@
   import TextSettings from "./toolbars/TextSettings.svelte";
   import NavMenu from "./menus/NavMenu.svelte";
   import { ClearRedoItems } from "../../stores/redoStore";
-  import DebugMenu from "./menus/DebugMenu.svelte";
   import MultiplayerDebug from "./menus/MultiplayerDebug.svelte";
   import UndoRedoBottom from "./toolbars/UndoRedoBottom.svelte";
   import TopToolBar from "./toolbars/TopToolBar.svelte";
@@ -258,11 +257,6 @@
   function handle_drawing_mode(): void {
     ClearSelection();
     event_state_store.set("drawing");
-  }
-
-  function handle_new_rectangle(): void {
-    ClearSelection();
-    event_state_store.set("rectangle-draw");
   }
 
   function handle_arrow_mode(): void {
