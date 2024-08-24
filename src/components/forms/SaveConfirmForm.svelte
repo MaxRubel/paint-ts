@@ -9,7 +9,6 @@
   import { event_state_store } from "../../../stores/eventState";
   import { ClearEverything } from "../../../stores/canvasStore";
   import { alert_store } from "../../../stores/alertStore";
-  import type { MouseEventHandler } from "svelte/elements";
 
   let oldEventState;
   function handleYes() {

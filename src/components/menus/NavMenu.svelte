@@ -13,8 +13,12 @@
   import { fetched_single } from "../../../stores/fetchDataStore";
   import { undo_store } from "../../../stores/undoStore";
   import { alert_store } from "../../../stores/alertStore";
-  import { drawing_room_id } from "../../../stores/drawingRoomStore";
+  import {
+    drawing_room_id,
+    drawing_room_store,
+  } from "../../../stores/drawingRoomStore";
   import { v4 as uuidv4 } from "uuid";
+  import { navigate } from "svelte-routing";
 
   export let handleClear: Function;
 
@@ -22,6 +26,7 @@
   let eventState: String;
   let authState: any;
   let loadedDrawing: ProjectType;
+  let userInDrawingRoom: boolean;
 
   const unsubscribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -33,10 +38,15 @@
     loadedDrawing = value;
   });
 
+  const unsubscribe4 = drawing_room_store.subscribe((value) => {
+    userInDrawingRoom = value;
+  });
+
   onDestroy(() => {
     unsubscribe();
     unsubscribe2();
     unsubscribe3();
+    unsubscribe4();
   });
 
   function handleNew() {
@@ -118,6 +128,10 @@
     menuOpen = false;
   }
 
+  function handleExitDrawingRoom() {
+    navigate("/");
+  }
+
   function handleSignIn() {
     signIn();
     menuOpen = false;
@@ -195,13 +209,23 @@
     >
       View Color Palettes
     </button>
-    <button
-      class="clear-button nav-button-btn"
-      id="dd-menu"
-      on:click={handleCreateDrawingRoom}
-    >
-      Create Drawing Room
-    </button>
+    {#if !userInDrawingRoom}
+      <button
+        class="clear-button nav-button-btn"
+        id="dd-menu"
+        on:click={handleCreateDrawingRoom}
+      >
+        Create Drawing Room
+      </button>
+    {:else}
+      <button
+        class="clear-button nav-button-btn"
+        id="dd-menu"
+        on:click={handleExitDrawingRoom}
+      >
+        Exit Drawing Room
+      </button>
+    {/if}
     <button
       class="clear-button nav-button-btn signout"
       id="dd-menu"

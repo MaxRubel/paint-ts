@@ -2,6 +2,8 @@
   import { onDestroy } from "svelte";
   import {
     drawing_room_id,
+    drawing_room_store,
+    i_am_hosting,
     TransitionToDrawingRoom,
     UnpackTransition,
   } from "../../../stores/drawingRoomStore";
@@ -29,6 +31,8 @@
 
   function handleMakeDrawingRoom() {
     TransitionToDrawingRoom();
+    drawing_room_store.set(true);
+    i_am_hosting.set(true);
     navigate(`/${drawingRoomId}`, { replace: true });
     UnpackTransition();
     event_state_store.set("arrow");
@@ -41,7 +45,7 @@
 
 <div class="overlay" />
 <div class="cool confirm-drawing-room-form">
-  <div class="top-row"><h3>Create Drawing Room?</h3></div>
+  <div class="top-row"><h3>Create Drawing Room</h3></div>
   <div class="paragraph">
     <p style="margin-bottom: 3rem;">
       Are you sure you want to create a public drawing room?
@@ -68,9 +72,9 @@
     Do you wish to proceed?
   </div>
   <div class="buttons">
-    <button class="heh" style="width: auto;" on:click={handleMakeDrawingRoom}
-      >Confirm</button
-    >
+    <button class="heh" style="width: auto;" on:click={handleMakeDrawingRoom}>
+      Confirm
+    </button>
     <button style="width: auto;" on:click={handleCancel}>Cancel</button>
   </div>
 </div>

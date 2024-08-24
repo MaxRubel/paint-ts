@@ -17,10 +17,9 @@ export interface DataTransitionType {
 }
 
 export const drawing_room_store = writable(false)
-
 export const drawing_room_id = writable("")
-
 export const data_transition = writable(<DataTransitionType>{})
+export const i_am_hosting = writable(false)
 
 export function TransitionToDrawingRoom(){
     const canvas: HTMLCanvasElement = document.getElementById('main-canvas') as HTMLCanvasElement;
