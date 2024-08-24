@@ -13,7 +13,8 @@
   import { fetched_single } from "../../../stores/fetchDataStore";
   import { undo_store } from "../../../stores/undoStore";
   import { alert_store } from "../../../stores/alertStore";
-  import { drawing_room_store } from "../../../stores/drawingRoomStore";
+  import { drawing_room_id } from "../../../stores/drawingRoomStore";
+  import { v4 as uuidv4 } from "uuid";
 
   export let handleClear: Function;
 
@@ -107,7 +108,9 @@
   }
 
   function handleCreateDrawingRoom() {
-    drawing_room_store.set(true);
+    event_state_store.set("confirm_draw_room_form");
+    drawing_room_id.set(uuidv4());
+    menuOpen = false;
   }
 
   function openShareMenu() {

@@ -40,6 +40,8 @@
   import TopToolBar from "./toolbars/TopToolBar.svelte";
   import EraserSettings from "./toolbars/EraserSettings.svelte";
 
+  export let drawingRoomId = null;
+
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
   let textBoxes: TextBoxMap;
@@ -133,6 +135,10 @@
     canvas.width = 3000;
     canvas.height = 2000;
     // resizeCanvas();
+
+    if (drawingRoomId) {
+      console.log("you are in a drawing room!");
+    }
   });
 
   onDestroy(() => {

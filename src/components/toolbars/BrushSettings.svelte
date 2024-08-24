@@ -39,8 +39,6 @@
     activeColor = value;
   });
 
-  let smallPaletteMenu = false;
-
   $: onDestroy(() => {
     unsubcribe();
     unsubcribe2();
