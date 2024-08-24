@@ -297,7 +297,6 @@
 <main>
   <NavMenu {handleClear} />
   <MultiplayerDebug />
-  <DebugMenu />
   <TopToolBar
     {handle_arrow_mode}
     {handle_drawing_mode}

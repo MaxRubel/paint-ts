@@ -47,7 +47,7 @@
     background-color: rgb(25, 29, 31);
     left: 15px;
     padding: 20px;
-    top: 100px;
+    top: 70px;
     display: none;
     flex-direction: column;
     border: 2px solid rgba(255, 255, 255, 0.198);

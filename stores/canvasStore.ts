@@ -38,7 +38,9 @@ export function DrawImage() {
       ctx?.drawImage(img, 0, 0);
     })
   };
+  //@ts-ignore
   img.src = dataURL;
+
 }
 
 export function ClearEverything() {
