@@ -16,6 +16,10 @@
     editting_tile_store,
     type PaletteType,
   } from "../../../stores/paletteStore";
+  import {
+    drawing_room_id,
+    drawing_room_store,
+  } from "../../../stores/drawingRoomStore";
 
   let brushSize: Number;
   let eventState: string;
@@ -30,6 +34,9 @@
   let edittingTile: number | null;
   let activeColor: string;
   let borderIndex: number | null;
+  let drawingRoomStore: boolean;
+  let drawingRoomId: string;
+
   const unsubscribe = brush_size_store.subscribe((value) => {
     brushSize = value;
   });
@@ -85,6 +92,14 @@
     borderIndex = value;
   });
 
+  const unsubcribe13 = drawing_room_store.subscribe((value) => {
+    drawingRoomStore = value;
+  });
+
+  const unsubcribe14 = drawing_room_id.subscribe((value) => {
+    drawingRoomId = value;
+  });
+
   onDestroy(() => {
     unsubscribe();
     unsubscribe2();
@@ -98,6 +113,8 @@
     unsubscribe10();
     unsubscribe11();
     unsubscribe12();
+    unsubcribe13();
+    unsubcribe14();
   });
 </script>
 
@@ -111,6 +128,14 @@
   <div class="extend"><strong>Brush Size:</strong>&nbsp;&nbsp;{brushSize}</div>
   <div class="extend"><strong>Undo Items</strong>&nbsp;&nbsp;{undoArraySize}</div>
   <div class="extend"><strong>Redo Items</strong>&nbsp;&nbsp;{redoArraySize}</div>
+  <div class="extend">
+    <strong>Drawing Room Active</strong>&nbsp;&nbsp;{drawingRoomStore}
+  </div>
+  <!-- {#if drawingRoomStore} -->
+  <div class="extend">
+    <strong>Drawing Room ID</strong>&nbsp;&nbsp;{drawingRoomId}
+  </div>
+  <!-- {/if} -->
   <h4 class="centered">Data</h4>
   {#if fetchedDrawing.id}
     <div class="drawing">

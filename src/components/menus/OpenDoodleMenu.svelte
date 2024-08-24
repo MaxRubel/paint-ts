@@ -12,6 +12,7 @@
   import TrashCan from "../../graphics/TrashCan.svelte";
   import { get } from "svelte/store";
   import { ClearEverything } from "../../../stores/canvasStore";
+  import { navigate } from "svelte-routing";
 
   let doodlesData: any;
 
@@ -24,6 +25,7 @@
   }
 
   function handleOpenDoodle(id: number) {
+    navigate("/");
     FetchAndLoadDoodle(id);
   }
 

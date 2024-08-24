@@ -34,11 +34,12 @@
   import TextSettings from "./toolbars/TextSettings.svelte";
   import NavMenu from "./menus/NavMenu.svelte";
   import { ClearRedoItems } from "../../stores/redoStore";
-  import DebugMenu from "./menus/DebugMenu.svelte";
   import MultiplayerDebug from "./menus/MultiplayerDebug.svelte";
   import UndoRedoBottom from "./toolbars/UndoRedoBottom.svelte";
   import TopToolBar from "./toolbars/TopToolBar.svelte";
   import EraserSettings from "./toolbars/EraserSettings.svelte";
+
+  export let drawingRoomId = null;
 
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
@@ -133,6 +134,10 @@
     canvas.width = 3000;
     canvas.height = 2000;
     // resizeCanvas();
+
+    if (drawingRoomId) {
+      console.log("you are in a drawing room!");
+    }
   });
 
   onDestroy(() => {
@@ -254,11 +259,6 @@
     event_state_store.set("drawing");
   }
 
-  function handle_new_rectangle(): void {
-    ClearSelection();
-    event_state_store.set("rectangle-draw");
-  }
-
   function handle_arrow_mode(): void {
     ClearSelection();
     event_state_store.set("arrow");
@@ -283,6 +283,14 @@
         }
       });
     }
+  }
+
+  function handleConnectWebsockets() {
+    const ws = new WebSocket("ws://localhost:8000/ws/signalling");
+
+    ws.onmessage = (e) => {
+      console.log(e.data);
+    };
   }
 </script>
 
@@ -313,6 +321,11 @@
     <EraserSettings />
     <TextSettings />
     <UndoRedoBottom />
+    <div class="websockets">
+      <button style="width: auto;" on:click={handleConnectWebsockets}>
+        connect to websockets
+      </button>
+    </div>
   </div>
 </main>
 
@@ -326,5 +339,13 @@
   #main-canvas {
     width: 3000px;
     height: 2000px;
+  }
+
+  .websockets {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
   }
 </style>

@@ -23,6 +23,11 @@ export interface RectangleType {
 }
 
 export interface UndoType {
-  action: string,
+  action: string;
+  data: any
+}
+
+export interface RedoType{
+  action: string
   data: any
 }

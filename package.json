@@ -24,6 +24,7 @@
     "@jaames/iro": "^5.5.2",
     "firebase": "^10.12.5",
     "perfect-freehand": "^1.2.2",
+    "svelte-routing": "^2.13.0",
     "uuidv4": "^6.2.13"
   }
 }

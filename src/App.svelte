@@ -8,6 +8,7 @@
   import FormRouter from "./components/forms/FormRouter.svelte";
   import Alert from "./components/alerts/Alert.svelte";
   import DebugMenu from "./components/menus/DebugMenu.svelte";
+  import { Route, Router } from "svelte-routing";
 
   let user: any;
   let eventState: string;
@@ -34,7 +35,10 @@
 {#if eventState === "needs_registration_form"}
   <UserRegistrationForm />
 {/if}
-<Alert />
-<!-- <DebugMenu /> -->
 <FormRouter />
-<MainPage />
+<Alert />
+<DebugMenu />
+<Router>
+  <Route path="/" component={MainPage} let:params />
+  <Route path="/:drawingRoomId" component={MainPage} let:params />
+</Router>
