@@ -284,6 +284,14 @@
       });
     }
   }
+
+  function handleConnectWebsockets() {
+    const ws = new WebSocket("ws://localhost:8000/ws/signalling");
+
+    ws.onmessage = (e) => {
+      console.log(e.data);
+    };
+  }
 </script>
 
 <main>
@@ -314,6 +322,11 @@
     <EraserSettings />
     <TextSettings />
     <UndoRedoBottom />
+    <div class="websockets">
+      <button style="width: auto;" on:click={handleConnectWebsockets}>
+        connect to websockets
+      </button>
+    </div>
   </div>
 </main>
 
@@ -327,5 +340,13 @@
   #main-canvas {
     width: 3000px;
     height: 2000px;
+  }
+
+  .websockets {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 500;
   }
 </style>
