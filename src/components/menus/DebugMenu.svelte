@@ -19,6 +19,7 @@
   import {
     drawing_room_id,
     drawing_room_store,
+    i_am_hosting,
   } from "../../../stores/drawingRoomStore";
 
   let brushSize: Number;
@@ -36,6 +37,7 @@
   let borderIndex: number | null;
   let drawingRoomStore: boolean;
   let drawingRoomId: string;
+  let iAmHosting: boolean;
 
   const unsubscribe = brush_size_store.subscribe((value) => {
     brushSize = value;
@@ -100,6 +102,10 @@
     drawingRoomId = value;
   });
 
+  const unsubcribe15 = i_am_hosting.subscribe((value) => {
+    iAmHosting = value;
+  });
+
   onDestroy(() => {
     unsubscribe();
     unsubscribe2();
@@ -115,6 +121,7 @@
     unsubscribe12();
     unsubcribe13();
     unsubcribe14();
+    unsubcribe15();
   });
 </script>
 
@@ -128,6 +135,7 @@
   <div class="extend"><strong>Brush Size:</strong>&nbsp;&nbsp;{brushSize}</div>
   <div class="extend"><strong>Undo Items</strong>&nbsp;&nbsp;{undoArraySize}</div>
   <div class="extend"><strong>Redo Items</strong>&nbsp;&nbsp;{redoArraySize}</div>
+  <div class="pre-wrap centered">-------Drawing-Room------</div>
   <div class="extend">
     <strong>Drawing Room Active</strong>&nbsp;&nbsp;{drawingRoomStore}
   </div>
@@ -135,6 +143,7 @@
   <div class="extend">
     <strong>Drawing Room ID</strong>&nbsp;&nbsp;{drawingRoomId}
   </div>
+  <div class="extend"><strong>I am hosting:</strong>&nbsp;&nbsp;{iAmHosting}</div>
   <!-- {/if} -->
   <h4 class="centered">Data</h4>
   {#if fetchedDrawing.id}
