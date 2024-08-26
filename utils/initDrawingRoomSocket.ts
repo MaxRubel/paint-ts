@@ -5,7 +5,7 @@ import { uuidv4 } from "@firebase/util";
 
 const wsEndpoint = (import.meta as any).env.VITE_WEBSOCKET_API;
 
-let fakeUserId;
+let userId = "";
 
 interface websocketData {
   host: boolean;
@@ -21,10 +21,11 @@ export function InitWShandshake() {
   };
 
   if (get(authStore).user.id) {
-    initialData.clientId = get(authStore).user.uid;
+    userId = get(authStore).user.uid;
+    initialData.clientId = userId;
   } else {
-    fakeUserId = uuidv4();
-    initialData.clientId = fakeUserId;
+    userId = uuidv4();
+    initialData.clientId = userId;
   }
 
   const currentUrl = window.location.href;
@@ -40,5 +41,5 @@ export function InitWShandshake() {
   const jsonString = JSON.stringify(initialData);
   const encodedData = encodeURIComponent(jsonString);
   const ws = new WebSocket(`${wsEndpoint}?data=${encodedData}`);
-  return ws;
+  return { ws, userId };
 }
