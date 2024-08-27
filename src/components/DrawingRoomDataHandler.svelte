@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { InitWShandshake } from "../../utils/initDrawingRoomSocket";
   import { drawing_room_id } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
@@ -19,10 +19,11 @@
   }
 
   let peerIds: string[] = [];
+  let peerStates: { [key: string]: boolean } = {};
   let peerConnections: { [key: string]: RTCPeerConnection } = {};
+  let dataChannels: { [key: string]: RTCDataChannel } = {};
   let myPublicId: string;
   let ws: WebSocket;
-  let iceCandidateQueue: RTCIceCandidate[] = [];
 
   function addClientIds(array: string[]) {
     for (let i = 0; i < array.length; i++) {
@@ -36,13 +37,11 @@
   }
   async function handleIceCandidate(incoming: any) {
     const { from, data } = incoming;
-    console.log("Received ICE candidate", data);
     const peerConnection = peerConnections[from];
 
     if (peerConnection) {
       try {
         await peerConnection.addIceCandidate(new RTCIceCandidate(data));
-        console.log("Added ICE candidate successfully");
       } catch (error) {
         console.error("Error adding ICE candidate:", error);
       }
@@ -53,14 +52,24 @@
 
   async function createOffer(id: string) {
     const peerConnection = new RTCPeerConnection({ iceServers });
-    peerConnections[id] = peerConnection;
     const dataChannel = peerConnection.createDataChannel(id);
+
+    peerConnections[id] = peerConnection;
+    peerStates[id] = false;
+    dataChannels[id] = dataChannel;
 
     const offer = await peerConnection.createOffer();
     await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
 
+    peerConnection.ondatachannel = (event) => {
+      const dataChannel = event.channel;
+
+      dataChannel.onmessage = (messageEvent) => {
+        console.log("Received message:", messageEvent.data);
+      };
+    };
+
     peerConnection.onicecandidate = (event) => {
-      console.log("ice candidate");
       if (event.candidate) {
         const dataToSend: outgoingMessage = {
           type: "iceCandidate",
@@ -75,11 +84,11 @@
       }
     };
 
-    console.log("creating offer", offer);
-
-    // peerConnection.addEventListener("iceconnectionstatechange", (e) => {
-    //   console.log(peerConnection.iceConnectionState);
-    // });
+    peerConnection.addEventListener("connectionstatechange", (event) => {
+      if (peerConnection.connectionState === "connected") {
+        peerStates[id] = true;
+      }
+    });
 
     const dataToSend: outgoingMessage = {
       type: "offer",
@@ -93,22 +102,40 @@
   }
 
   async function receiveOffer(incoming: any) {
-    console.log("received offer: ", incoming);
     const { from, data } = incoming;
     if (from === myPublicId) {
       console.warn("receiving my own offer");
     }
 
     const peerConnection = new RTCPeerConnection({ iceServers });
+    const dataChannel = peerConnection.createDataChannel(from);
+
     peerConnections[from] = peerConnection;
-    const dataChannel = peerConnection.createDataChannel(incoming.from);
+    peerStates[from] = false;
+    peerIds.push(from);
+    dataChannels[from] = dataChannel;
 
     await peerConnection.setRemoteDescription(data);
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
 
+    peerConnection.ondatachannel = (event) => {
+      const dataChannel = event.channel;
+
+      dataChannel.onmessage = (messageEvent) => {
+        console.log("Received message:", messageEvent.data);
+      };
+
+      dataChannel.onopen = () => {
+        console.log("Data channel is open and ready to use");
+      };
+
+      dataChannel.onclose = () => {
+        console.log("Data channel has closed");
+      };
+    };
+
     peerConnection.onicecandidate = (event) => {
-      console.log("ice candidate");
       if (event.candidate) {
         const dataToSend: outgoingMessage = {
           type: "iceCandidate",
@@ -123,6 +150,12 @@
       }
     };
 
+    peerConnection.addEventListener("connectionstatechange", (event) => {
+      if (peerConnection.connectionState === "connected") {
+        peerStates[from] = true;
+      }
+    });
+
     const dataToSend: outgoingMessage = {
       type: "answer",
       to: from,
@@ -131,13 +164,10 @@
       data: answer,
     };
 
-    console.log("creating answer", answer);
-
     ws.send(JSON.stringify(dataToSend));
   }
 
   async function receiveAnswer(incoming: any) {
-    console.log("received answer", incoming.data);
     const { from, data } = incoming;
     await peerConnections[from].setRemoteDescription(
       new RTCSessionDescription(data),
@@ -148,18 +178,6 @@
     peerIds.forEach((id) => {
       createOffer(id);
     });
-  }
-
-  function checkIceState() {
-    console.log(Object.values(peerConnections)[0].iceGatheringState);
-  }
-
-  function checkLocalDesc() {
-    console.log(Object.values(peerConnections)[0].localDescription);
-  }
-
-  function checkRemoteDesc() {
-    console.log(Object.values(peerConnections)[0].remoteDescription);
   }
 
   function parseMessage(e: any) {
@@ -185,26 +203,10 @@
     }
   }
 
-  function testIce() {
-    const pc = new RTCPeerConnection({ iceServers });
-    pc.onicecandidate = (event) => {
-      if (event.candidate) {
-        console.log("New ICE candidate:", event.candidate);
-      }
-    };
-    pc.createDataChannel("test"); // This triggers ICE gathering
-    pc.createOffer()
-      .then((offer) => pc.setLocalDescription(offer))
-      .then(() => {
-        console.log("Offer set as local description");
-      })
-      .catch((error) => console.error("Error creating offer:", error));
-    pc.onicegatheringstatechange = () => {
-      console.log("ICE gathering state changed:", pc.iceGatheringState);
-    };
-    pc.oniceconnectionstatechange = () => {
-      console.log("ICE connection state changed:", pc.iceConnectionState);
-    };
+  function checkIceStatuses() {
+    Object.values(peerConnections).forEach((pc) => {
+      console.log(pc.connectionState);
+    });
   }
 
   onMount(() => {
@@ -215,18 +217,43 @@
       parseMessage(e);
     };
   });
+
+  //debug functions
+  function checkIceState() {
+    console.log(Object.values(peerConnections)[0].iceGatheringState);
+  }
+
+  function checkLocalDesc() {
+    console.log(Object.values(peerConnections)[0].localDescription);
+  }
+
+  function checkRemoteDesc() {
+    console.log(Object.values(peerConnections)[0].remoteDescription);
+  }
+
+  function sendDateMessage() {
+    Object.values(dataChannels).forEach((chan) => {
+      chan.send("hello this is a test thank u");
+    });
+  }
 </script>
 
 <div class="debug-webrtc">
   <div>My Id: {myPublicId}</div>
   <div class="peerIds top">
-    <div><strong>Other user's IDs</strong></div>
     <button style="width: auto" on:click={checkIceState}>Check Ice State</button>
     <button style="width: auto" on:click={checkLocalDesc}>Check Local Desc</button>
     <button style="width: auto" on:click={checkRemoteDesc}>Check Remote Desc</button>
-    <button style="width: auto" on:click={testIce}>Test Ice</button>
+    <button style="width: auto" on:click={checkIceStatuses}>Check Ice Status</button>
+    <button style="width: auto" on:click={sendDateMessage}>Send Data Message</button>
+    <!-- <button style="width: auto" on:click={testIce}>Test Ice</button> -->
+    <div><strong>Other user's IDs</strong></div>
     {#each peerIds as id}
-      <div>{id}</div>
+      {#if peerStates[id]}
+        <div style="color: green; width: 100%">{id}</div>
+      {:else}
+        <div style="color: red; width: 100%">{id}</div>
+      {/if}
     {/each}
   </div>
 </div>
@@ -237,9 +264,8 @@
     height: 500px;
     width: 400px;
     position: fixed;
-    right: 200px;
-    top: 50%;
-    transform: translateY(-50%);
+    right: 10px;
+    top: 70px;
     z-index: 1000;
     border-radius: 10%;
     padding: 20px;
