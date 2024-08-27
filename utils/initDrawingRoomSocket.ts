@@ -34,8 +34,6 @@ export function InitWShandshake() {
 
   drawing_room_id.set(parsedRoomId);
 
-  console.log("parsed the room id and it is: ", parsedRoomId);
-
   if (parsedRoomId) {
     initialData.roomId = parsedRoomId;
   } else {
