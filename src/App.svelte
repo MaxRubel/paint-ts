@@ -42,12 +42,9 @@
 {#if eventState === "needs_registration_form"}
   <UserRegistrationForm />
 {/if}
-{#if inDrawingRoom}
-  <DrawingRoomDataHandler />
-{/if}
 <FormRouter />
 <Alert />
-<DebugMenu />
+<!-- <DebugMenu /> -->
 <Router>
   <Route path="/" component={MainPage} let:params />
   <Route path="/:drawingRoomId" component={MainPage} let:params />

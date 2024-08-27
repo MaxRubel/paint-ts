@@ -162,15 +162,19 @@
   <SmallViewPalettes {closeSmallMenu} />
 {/if}
 <div class="palette">
-  <button
-    id="small-palette-menu-opener"
-    class="clear-button"
-    on:mouseenter={toggleOnDrop}
-    on:mouseleave={toggleOffDrop}
-    on:click={handleOpenSmallPaletteMenu}
-  >
+  {#if auth?.id}
+    <button
+      id="small-palette-menu-opener"
+      class="clear-button"
+      on:mouseenter={toggleOnDrop}
+      on:mouseleave={toggleOffDrop}
+      on:click={handleOpenSmallPaletteMenu}
+    >
+      Palette
+    </button>
+  {:else}
     Palette
-  </button>
+  {/if}
   <div class="recent-choices">
     {#each activePalette.colors as color, index}
       <div class="color-box">

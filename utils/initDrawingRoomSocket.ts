@@ -1,5 +1,5 @@
 import { get } from "svelte/store";
-import { i_am_hosting } from "../stores/drawingRoomStore";
+import { drawing_room_id, i_am_hosting } from "../stores/drawingRoomStore";
 import { authStore } from "../utils/auth/auth_store";
 import { uuidv4 } from "@firebase/util";
 
@@ -20,7 +20,7 @@ export function InitWShandshake() {
     clientId: "",
   };
 
-  if (get(authStore).user.id) {
+  if (get(authStore).user?.id) {
     userId = get(authStore).user.uid;
     initialData.clientId = userId;
   } else {
@@ -30,7 +30,11 @@ export function InitWShandshake() {
 
   const currentUrl = window.location.href;
   const url = new URL(currentUrl);
-  const parsedRoomId = url.pathname.split("/").pop();
+  const parsedRoomId = url.pathname.split("/").pop() || "";
+
+  drawing_room_id.set(parsedRoomId);
+
+  console.log("parsed the room id and it is: ", parsedRoomId);
 
   if (parsedRoomId) {
     initialData.roomId = parsedRoomId;
@@ -40,6 +44,6 @@ export function InitWShandshake() {
 
   const jsonString = JSON.stringify(initialData);
   const encodedData = encodeURIComponent(jsonString);
-  const ws = new WebSocket(`${wsEndpoint}?data=${encodedData}`);
-  return { ws, userId };
+  const socket = new WebSocket(`${wsEndpoint}?data=${encodedData}`);
+  return { socket, userId };
 }

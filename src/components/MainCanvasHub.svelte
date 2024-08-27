@@ -38,6 +38,7 @@
   import UndoRedoBottom from "./toolbars/UndoRedoBottom.svelte";
   import TopToolBar from "./toolbars/TopToolBar.svelte";
   import EraserSettings from "./toolbars/EraserSettings.svelte";
+  import DrawingRoomDataHandler from "./DrawingRoomDataHandler.svelte";
 
   export let drawingRoomId = null;
 
@@ -133,11 +134,6 @@
     canvas?.addEventListener("click", handleClick);
     canvas.width = 3000;
     canvas.height = 2000;
-    // resizeCanvas();
-
-    if (drawingRoomId) {
-      console.log("you are in a drawing room!");
-    }
   });
 
   onDestroy(() => {
@@ -287,6 +283,9 @@
 </script>
 
 <main>
+  {#if drawingRoomId}
+    <DrawingRoomDataHandler />
+  {/if}
   <NavMenu {handleClear} />
   <MultiplayerDebug />
   <TopToolBar
