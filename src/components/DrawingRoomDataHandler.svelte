@@ -47,29 +47,29 @@
     }
   }
 
-  // function videoToCanvas(id: string, video: HTMLVideoElement) {
-  //   const canvas = document.getElementById(
-  //     `canvas-element-${id}`,
-  //   ) as HTMLCanvasElement;
-  //   const ctx = canvas.getContext("2d");
+  let interval: any;
+  function startSendingCanvasData(dataChannel: RTCDataChannel) {
+    const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!canvas || !ctx) {
+      console.error("canvas not setup properly");
+      return;
+    }
+    interval = setInterval(() => {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const buffer = imageData.data.buffer;
+      const metadata = {
+        width: canvas.width,
+        height: canvas.height,
+      };
 
-  //   canvas.height = 3000;
-  //   canvas.width = 2000;
+      // Send metadata first
+      dataChannel.send(JSON.stringify(metadata));
 
-  //   console.log("c width", canvas.width);
-  //   console.log("c height", canvas.height);
-
-  //   console.log("v width", video.width);
-  //   console.log("v height", video.height);
-
-  //   function draw() {
-  //     if (video.paused || video.ended) return;
-  //     ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
-  //     requestAnimationFrame(draw);
-  //   }
-
-  //   draw();
-  // }
+      // Then send the actual image data
+      dataChannel.send(buffer);
+    }, 250); // Adjust interval as needed
+  }
 
   async function handleIceCandidate(incoming: any) {
     const { from, data } = incoming;
@@ -116,7 +116,12 @@
       const dataChannel = event.channel;
 
       dataChannel.onmessage = (messageEvent) => {
-        console.log("Received message:", messageEvent.data);
+        console.log("Received data:", messageEvent.data);
+      };
+
+      dataChannel.onopen = () => {
+        console.log("Data channel is open and ready to use");
+        startSendingCanvasData(dataChannel);
       };
     };
 
@@ -204,11 +209,12 @@
       const dataChannel = event.channel;
 
       dataChannel.onmessage = (messageEvent) => {
-        console.log("Received message:", messageEvent.data);
+        console.log("Received data:", messageEvent.data);
       };
 
       dataChannel.onopen = () => {
         console.log("Data channel is open and ready to use");
+        startSendingCanvasData(dataChannel);
       };
 
       dataChannel.onclose = () => {
@@ -339,6 +345,9 @@
   onDestroy(() => {
     unsubscribe();
     i_have_joined.set(false);
+    if (interval) {
+      clearInterval(interval);
+    }
   });
 
   //debug functions
@@ -390,7 +399,6 @@
       id={`video-element-${peerId}`}
       autoplay
       playsinline
-      type="video/webm"
     >
       <track kind="captions" />
     </video>
