@@ -3,12 +3,15 @@
   import { InitWShandshake } from "../../utils/initDrawingRoomSocket";
   import {
     drawing_room_id,
+    drawing_room_store,
     i_am_hosting,
     i_have_joined,
   } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
   import { event_state_store } from "../../stores/eventState";
   import { VideoToCanvas } from "../../utils/videoToCanvas";
+  import { alert_store } from "../../stores/alertStore";
+  import { navigate } from "svelte-routing";
 
   const iceServers = [
     { urls: "stun:stun.l.google.com:19302" },
@@ -16,13 +19,13 @@
     { urls: "stun:stun1.l.google.com:3478" },
   ];
 
-  interface outgoingMessage {
+  type outgoingMessage = {
     type: string;
     to: string;
     from: string;
     room: string;
     data: any;
-  }
+  };
 
   let peerIds: string[] = [];
   let peerStates: { [key: string]: boolean } = {};
@@ -257,6 +260,24 @@
     });
   }
 
+  function handleRemovePeer(incoming: any) {
+    const cliendId = incoming.from;
+    peerConnections[cliendId].close();
+    delete peerConnections[cliendId];
+    delete peerStates[cliendId];
+    peerIds = peerIds.filter((item) => item !== cliendId);
+  }
+
+  function handleBounceBack() {
+    alert_store.set("alert:Ooops! This room doesn't exist");
+    setTimeout(() => {
+      drawing_room_store.set(false);
+      drawing_room_id.set("");
+      i_am_hosting.set(false);
+      navigate("/");
+    }, 1500);
+  }
+
   function parseMessage(e: any) {
     const { data } = e;
     const parsed = JSON.parse(data);
@@ -276,6 +297,12 @@
         break;
       case "iceCandidate":
         handleIceCandidate(parsed);
+        break;
+      case "someoneLeft":
+        handleRemovePeer(parsed);
+        break;
+      case "bounceBack":
+        handleBounceBack();
         break;
     }
   }
@@ -313,6 +340,11 @@
   onDestroy(() => {
     unsubscribe();
     i_have_joined.set(false);
+    drawing_room_id.set("");
+    drawing_room_store.set(false);
+
+    ws.close();
+
     if (interval) {
       clearInterval(interval);
     }

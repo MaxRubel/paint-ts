@@ -120,7 +120,6 @@
 
   function handleCreateDrawingRoom() {
     event_state_store.set("confirm_draw_room_form");
-    console.log("hello");
     drawing_room_id.set(uuidv4());
     menuOpen = false;
   }
