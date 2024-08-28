@@ -8,7 +8,7 @@
   } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
   import { event_state_store } from "../../stores/eventState";
-  import { InitCtx } from "../../utils/drawBrushStroke";
+  import { VideoToCanvas } from "../../utils/videoToCanvas";
 
   const iceServers = [
     { urls: "stun:stun.l.google.com:19302" },
@@ -48,28 +48,6 @@
   }
 
   let interval: any;
-  function startSendingCanvasData(dataChannel: RTCDataChannel) {
-    const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
-    const ctx = canvas.getContext("2d", { willReadFrequently: true });
-    if (!canvas || !ctx) {
-      console.error("canvas not setup properly");
-      return;
-    }
-    interval = setInterval(() => {
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const buffer = imageData.data.buffer;
-      const metadata = {
-        width: canvas.width,
-        height: canvas.height,
-      };
-
-      // Send metadata first
-      dataChannel.send(JSON.stringify(metadata));
-
-      // Then send the actual image data
-      dataChannel.send(buffer);
-    }, 250); // Adjust interval as needed
-  }
 
   async function handleIceCandidate(incoming: any) {
     const { from, data } = incoming;
@@ -118,11 +96,6 @@
       dataChannel.onmessage = (messageEvent) => {
         console.log("Received data:", messageEvent.data);
       };
-
-      dataChannel.onopen = () => {
-        console.log("Data channel is open and ready to use");
-        startSendingCanvasData(dataChannel);
-      };
     };
 
     peerConnection.onicecandidate = (event) => {
@@ -169,9 +142,9 @@
         videoElem.srcObject = e.streams[0];
         videoElem.play().catch((e) => console.error("Error playing video:", e));
         console.log("got stream", e.streams[0]);
-        // videoElem.addEventListener("play", () => {
-        //   videoToCanvas(id, videoElem, { r: 0, g: 0, b: 0 });
-        // });
+        videoElem.addEventListener("play", () => {
+          VideoToCanvas(id, videoElem);
+        });
       }
     };
 
@@ -212,11 +185,6 @@
         console.log("Received data:", messageEvent.data);
       };
 
-      dataChannel.onopen = () => {
-        console.log("Data channel is open and ready to use");
-        startSendingCanvasData(dataChannel);
-      };
-
       dataChannel.onclose = () => {
         console.log("Data channel has closed");
       };
@@ -238,9 +206,9 @@
         videoElem.srcObject = e.streams[0];
         videoElem.play().catch((e) => console.error("Error playing video:", e));
         console.log("got stream", e.streams[0]);
-        // videoElem.addEventListener("play", () => {
-        //   videoToCanvas(from, videoElem, { r: 0, g: 0, b: 0 });
-        // });
+        videoElem.addEventListener("play", () => {
+          VideoToCanvas(from, videoElem);
+        });
       }
     };
 
@@ -402,7 +370,7 @@
     >
       <track kind="captions" />
     </video>
-    <!-- <canvas id={`canvas-element-${peerId}`} class="peer-canvas"> </canvas> -->
+    <canvas id={`canvas-element-${peerId}`} class="peer-canvas"> </canvas>
   {/each}
 </div>
 
@@ -439,6 +407,8 @@
     z-index: 800;
     pointer-events: none;
     background-color: transparent !important;
+    display: hidden;
+    opacity: 0;
   }
 
   .peer-canvas {

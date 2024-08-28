@@ -1,20 +1,12 @@
-function videoToCanvas(
-  id: string,
-  video: HTMLVideoElement,
-  chromaKeyColor: { r: number; g: number; b: number },
-) {
+export function VideoToCanvas(id: string, video: HTMLVideoElement) {
   const canvas = document.getElementById(
     `canvas-element-${id}`,
   ) as HTMLCanvasElement;
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-  canvas.height = 3000;
-  canvas.width = 2000;
-
-  console.log("c width", canvas.width);
-  console.log("c height", canvas.height);
-  console.log("v width", video.width);
-  console.log("v height", video.height);
+  // Create a buffer canvas
+  const bufferCanvas = document.createElement("canvas");
+  const bufferCtx = bufferCanvas.getContext("2d", { willReadFrequently: true });
 
   function applyChromaKey(imageData: ImageData) {
     const data = imageData.data;
@@ -23,31 +15,59 @@ function videoToCanvas(
       const g = data[i + 1];
       const b = data[i + 2];
 
-      // Check if the pixel color matches the chroma key color (with some tolerance)
-      if (
-        Math.abs(r - chromaKeyColor.r) < 30 &&
-        Math.abs(g - chromaKeyColor.g) < 30 &&
-        Math.abs(b - chromaKeyColor.b) < 30
-      ) {
+      if (r < 10 && g < 10 && b < 10) {
         data[i + 3] = 0; // Set alpha to 0 (fully transparent)
       }
     }
     return imageData;
   }
 
+  function updateCanvasSize() {
+    if (video.videoWidth && video.videoHeight) {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      bufferCanvas.width = video.videoWidth;
+      bufferCanvas.height = video.videoHeight;
+    }
+  }
+
   function draw() {
     if (video.paused || video.ended) return;
-    ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Apply chroma key effect
-    if (ctx) {
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const processedImageData = applyChromaKey(imageData);
-      ctx.putImageData(processedImageData, 0, 0);
+    // Check if we need to update canvas size
+    if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+      updateCanvasSize();
+    }
+
+    // Only proceed if the canvas has valid dimensions
+    if (canvas.width && canvas.height) {
+      bufferCtx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // Apply chroma key effect
+      if (bufferCtx) {
+        const imageData = bufferCtx.getImageData(0, 0, canvas.width, canvas.height);
+        const processedImageData = applyChromaKey(imageData);
+        bufferCtx.putImageData(processedImageData, 0, 0);
+
+        // Draw the processed frame to the main canvas
+        ctx?.drawImage(bufferCanvas, 0, 0);
+      }
     }
 
     requestAnimationFrame(draw);
   }
 
-  draw();
+  // Start drawing when the video is ready
+  video.addEventListener("loadedmetadata", () => {
+    updateCanvasSize();
+    draw();
+  });
+
+  // Also listen for the 'canplay' event as a fallback
+  video.addEventListener("canplay", () => {
+    if (!canvas.width || !canvas.height) {
+      updateCanvasSize();
+      draw();
+    }
+  });
 }
