@@ -8,6 +8,7 @@
   } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
   import { event_state_store } from "../../stores/eventState";
+  import { InitCtx } from "../../utils/drawBrushStroke";
 
   const iceServers = [
     { urls: "stun:stun.l.google.com:19302" },
@@ -45,6 +46,31 @@
       }
     }
   }
+
+  // function videoToCanvas(id: string, video: HTMLVideoElement) {
+  //   const canvas = document.getElementById(
+  //     `canvas-element-${id}`,
+  //   ) as HTMLCanvasElement;
+  //   const ctx = canvas.getContext("2d");
+
+  //   canvas.height = 3000;
+  //   canvas.width = 2000;
+
+  //   console.log("c width", canvas.width);
+  //   console.log("c height", canvas.height);
+
+  //   console.log("v width", video.width);
+  //   console.log("v height", video.height);
+
+  //   function draw() {
+  //     if (video.paused || video.ended) return;
+  //     ctx?.drawImage(video, 0, 0, canvas.width, canvas.height);
+  //     requestAnimationFrame(draw);
+  //   }
+
+  //   draw();
+  // }
+
   async function handleIceCandidate(incoming: any) {
     const { from, data } = incoming;
     const peerConnection = peerConnections[from];
@@ -138,6 +164,9 @@
         videoElem.srcObject = e.streams[0];
         videoElem.play().catch((e) => console.error("Error playing video:", e));
         console.log("got stream", e.streams[0]);
+        // videoElem.addEventListener("play", () => {
+        //   videoToCanvas(id, videoElem, { r: 0, g: 0, b: 0 });
+        // });
       }
     };
 
@@ -203,6 +232,9 @@
         videoElem.srcObject = e.streams[0];
         videoElem.play().catch((e) => console.error("Error playing video:", e));
         console.log("got stream", e.streams[0]);
+        // videoElem.addEventListener("play", () => {
+        //   videoToCanvas(from, videoElem, { r: 0, g: 0, b: 0 });
+        // });
       }
     };
 
@@ -358,9 +390,11 @@
       id={`video-element-${peerId}`}
       autoplay
       playsinline
+      type="video/webm"
     >
       <track kind="captions" />
     </video>
+    <!-- <canvas id={`canvas-element-${peerId}`} class="peer-canvas"> </canvas> -->
   {/each}
 </div>
 
@@ -397,7 +431,18 @@
     z-index: 800;
     pointer-events: none;
     background-color: transparent !important;
-    opacity: 1;
+  }
+
+  .peer-canvas {
+    height: 2000px;
+    width: 3000px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 800;
+    pointer-events: none;
+    background-color: transparent !important;
+    object-fit: fit;
   }
 
   .top {
