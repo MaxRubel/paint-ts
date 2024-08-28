@@ -8,6 +8,7 @@
   import LargeViewPalettes from "../menus/LargeViewPalettes.svelte";
   import ShareMenu from "../menus/ShareMenu.svelte";
   import ConfirmDrawingRoomForm from "./ConfirmDrawingRoomForm.svelte";
+  import ConfirmJoinDrawingRoom from "./ConfirmJoinDrawingRoom.svelte";
 
   let eventState: string;
 
@@ -38,4 +39,7 @@
 {/if}
 {#if eventState === "confirm_draw_room_form"}
   <ConfirmDrawingRoomForm />
+{/if}
+{#if eventState === "confirm_join_drawing_room_form"}
+  <ConfirmJoinDrawingRoom />
 {/if}

@@ -16,6 +16,7 @@
   import {
     drawing_room_id,
     drawing_room_store,
+    i_am_hosting,
   } from "../../../stores/drawingRoomStore";
   import { v4 as uuidv4 } from "uuid";
   import { navigate } from "svelte-routing";
@@ -119,6 +120,7 @@
 
   function handleCreateDrawingRoom() {
     event_state_store.set("confirm_draw_room_form");
+    console.log("hello");
     drawing_room_id.set(uuidv4());
     menuOpen = false;
   }
@@ -129,7 +131,10 @@
   }
 
   function handleExitDrawingRoom() {
+    drawing_room_store.set(false);
+    i_am_hosting.set(false);
     navigate("/");
+    menuOpen = false;
   }
 
   function handleSignIn() {

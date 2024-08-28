@@ -1,8 +1,13 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { InitWShandshake } from "../../utils/initDrawingRoomSocket";
-  import { drawing_room_id } from "../../stores/drawingRoomStore";
+  import {
+    drawing_room_id,
+    i_am_hosting,
+    i_have_joined,
+  } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
+  import { event_state_store } from "../../stores/eventState";
 
   const iceServers = [
     { urls: "stun:stun.l.google.com:19302" },
@@ -21,10 +26,14 @@
   let peerIds: string[] = [];
   let peerStates: { [key: string]: boolean } = {};
   let peerConnections: { [key: string]: RTCPeerConnection } = {};
-  let peerVideoStreams: any[] = [];
   let dataChannels: { [key: string]: RTCDataChannel } = {};
   let myPublicId: string;
   let ws: WebSocket;
+  let iHaveJoined: boolean;
+
+  const unsubscribe = i_have_joined.subscribe((value) => {
+    iHaveJoined = value;
+  });
 
   function addClientIds(array: string[]) {
     for (let i = 0; i < array.length; i++) {
@@ -271,13 +280,33 @@
     });
   }
 
-  onMount(() => {
+  function InitWebsockets() {
+    console.log("initing websockets");
     const { socket, userId } = InitWShandshake();
     myPublicId = userId;
     ws = socket;
     ws.onmessage = (e) => {
       parseMessage(e);
     };
+  }
+
+  $: {
+    if (iHaveJoined) {
+      InitWebsockets();
+    }
+  }
+
+  onMount(() => {
+    if (get(i_am_hosting)) {
+      InitWebsockets();
+    } else {
+      event_state_store.set("confirm_join_drawing_room_form");
+    }
+  });
+
+  onDestroy(() => {
+    unsubscribe();
+    i_have_joined.set(false);
   });
 
   //debug functions
