@@ -9,16 +9,23 @@
   import Alert from "./components/alerts/Alert.svelte";
   import DebugMenu from "./components/menus/DebugMenu.svelte";
   import { Route, Router } from "svelte-routing";
+  import { drawing_room_store } from "../stores/drawingRoomStore";
+  import DrawingRoomDataHandler from "./components/DrawingRoomDataHandler.svelte";
 
   let user: any;
   let eventState: string;
+  let inDrawingRoom: boolean;
 
   const unsubscribe = authStore.subscribe((value) => (user = value.user));
   const unsubscribe2 = event_state_store.subscribe((value) => (eventState = value));
+  const unsubscribe3 = drawing_room_store.subscribe(
+    (value) => (inDrawingRoom = value),
+  );
 
   onDestroy(() => {
     unsubscribe();
     unsubscribe2();
+    unsubscribe3();
   });
 
   $: {
@@ -37,7 +44,7 @@
 {/if}
 <FormRouter />
 <Alert />
-<DebugMenu />
+<!-- <DebugMenu /> -->
 <Router>
   <Route path="/" component={MainPage} let:params />
   <Route path="/:drawingRoomId" component={MainPage} let:params />

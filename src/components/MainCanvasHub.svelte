@@ -38,6 +38,7 @@
   import UndoRedoBottom from "./toolbars/UndoRedoBottom.svelte";
   import TopToolBar from "./toolbars/TopToolBar.svelte";
   import EraserSettings from "./toolbars/EraserSettings.svelte";
+  import DrawingRoomDataHandler from "./DrawingRoomDataHandler.svelte";
 
   export let drawingRoomId = null;
 
@@ -127,17 +128,12 @@
   }
 
   onMount(() => {
-    ctx = canvas.getContext("2d");
+    ctx = canvas.getContext("2d", { alpha: true });
     InitCtx(ctx);
     window.addEventListener("keyup", handleKeyup);
     canvas?.addEventListener("click", handleClick);
     canvas.width = 3000;
     canvas.height = 2000;
-    // resizeCanvas();
-
-    if (drawingRoomId) {
-      console.log("you are in a drawing room!");
-    }
   });
 
   onDestroy(() => {
@@ -284,17 +280,12 @@
       });
     }
   }
-
-  function handleConnectWebsockets() {
-    const ws = new WebSocket("ws://localhost:8000/ws/signalling");
-
-    ws.onmessage = (e) => {
-      console.log(e.data);
-    };
-  }
 </script>
 
 <main>
+  {#if drawingRoomId}
+    <DrawingRoomDataHandler />
+  {/if}
   <NavMenu {handleClear} />
   <MultiplayerDebug />
   <TopToolBar
@@ -321,11 +312,6 @@
     <EraserSettings />
     <TextSettings />
     <UndoRedoBottom />
-    <div class="websockets">
-      <button style="width: auto;" on:click={handleConnectWebsockets}>
-        connect to websockets
-      </button>
-    </div>
   </div>
 </main>
 
@@ -339,13 +325,6 @@
   #main-canvas {
     width: 3000px;
     height: 2000px;
-  }
-
-  .websockets {
-    position: absolute;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 500;
+    background-color: transparent;
   }
 </style>

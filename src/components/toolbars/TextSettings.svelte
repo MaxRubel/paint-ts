@@ -16,12 +16,14 @@
   import { AddUndoItem } from "../../../stores/undoStore";
   import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
   import PaletteInSettings from "./PaletteInSettings.svelte";
+  import { authStore } from "../../../utils/auth/auth_store";
 
   let isVisible = false;
   let eventState: string;
   let fontSize: number;
   let textAlignment: string;
   let fontFamily = "";
+  let auth: any;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -39,11 +41,16 @@
     fontFamily = value;
   });
 
+  const unsubscribe5 = authStore.subscribe((value) => {
+    auth = value.user;
+  });
+
   onDestroy(() => {
     unsubcribe();
     unsubcribe2();
     unsubscribe3();
     unsubscribe4();
+    unsubscribe5();
   });
 
   function handleFontChange(e: any) {
@@ -178,7 +185,9 @@
       </div>
     </div>
     <ColorPickerInSettings location={"text-color-picker"} width={100} />
-    <PaletteInSettings />
+    {#if auth?.id}
+      <PaletteInSettings />
+    {/if}
   </div>
 </div>
 
