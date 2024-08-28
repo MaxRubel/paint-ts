@@ -21,6 +21,7 @@ export const drawing_room_id = writable("");
 export const data_transition = writable(<DataTransitionType>{});
 export const i_am_hosting = writable(false);
 export const myPublicId = writable("");
+export const i_have_joined = writable(false)
 
 export function TransitionToDrawingRoom() {
   const canvas: HTMLCanvasElement = document.getElementById(

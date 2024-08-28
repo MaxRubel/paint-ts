@@ -1,8 +1,17 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import { InitWShandshake } from "../../utils/initDrawingRoomSocket";
-  import { drawing_room_id } from "../../stores/drawingRoomStore";
+  import {
+    drawing_room_id,
+    drawing_room_store,
+    i_am_hosting,
+    i_have_joined,
+  } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
+  import { event_state_store } from "../../stores/eventState";
+  import { VideoToCanvas } from "../../utils/videoToCanvas";
+  import { alert_store } from "../../stores/alertStore";
+  import { navigate } from "svelte-routing";
 
   const iceServers = [
     { urls: "stun:stun.l.google.com:19302" },
@@ -10,21 +19,25 @@
     { urls: "stun:stun1.l.google.com:3478" },
   ];
 
-  interface outgoingMessage {
+  type outgoingMessage = {
     type: string;
     to: string;
     from: string;
     room: string;
     data: any;
-  }
+  };
 
   let peerIds: string[] = [];
   let peerStates: { [key: string]: boolean } = {};
   let peerConnections: { [key: string]: RTCPeerConnection } = {};
-  let peerVideoStreams: any[] = [];
   let dataChannels: { [key: string]: RTCDataChannel } = {};
   let myPublicId: string;
   let ws: WebSocket;
+  let iHaveJoined: boolean;
+
+  const unsubscribe = i_have_joined.subscribe((value) => {
+    iHaveJoined = value;
+  });
 
   function addClientIds(array: string[]) {
     for (let i = 0; i < array.length; i++) {
@@ -36,6 +49,9 @@
       }
     }
   }
+
+  let interval: any;
+
   async function handleIceCandidate(incoming: any) {
     const { from, data } = incoming;
     const peerConnection = peerConnections[from];
@@ -81,7 +97,7 @@
       const dataChannel = event.channel;
 
       dataChannel.onmessage = (messageEvent) => {
-        console.log("Received message:", messageEvent.data);
+        console.log("Received data:", messageEvent.data);
       };
     };
 
@@ -129,6 +145,9 @@
         videoElem.srcObject = e.streams[0];
         videoElem.play().catch((e) => console.error("Error playing video:", e));
         console.log("got stream", e.streams[0]);
+        videoElem.addEventListener("play", () => {
+          VideoToCanvas(id, videoElem);
+        });
       }
     };
 
@@ -166,11 +185,7 @@
       const dataChannel = event.channel;
 
       dataChannel.onmessage = (messageEvent) => {
-        console.log("Received message:", messageEvent.data);
-      };
-
-      dataChannel.onopen = () => {
-        console.log("Data channel is open and ready to use");
+        console.log("Received data:", messageEvent.data);
       };
 
       dataChannel.onclose = () => {
@@ -194,6 +209,9 @@
         videoElem.srcObject = e.streams[0];
         videoElem.play().catch((e) => console.error("Error playing video:", e));
         console.log("got stream", e.streams[0]);
+        videoElem.addEventListener("play", () => {
+          VideoToCanvas(from, videoElem);
+        });
       }
     };
 
@@ -242,6 +260,24 @@
     });
   }
 
+  function handleRemovePeer(incoming: any) {
+    const cliendId = incoming.from;
+    peerConnections[cliendId].close();
+    delete peerConnections[cliendId];
+    delete peerStates[cliendId];
+    peerIds = peerIds.filter((item) => item !== cliendId);
+  }
+
+  function handleBounceBack() {
+    alert_store.set("alert:Ooops! This room doesn't exist");
+    setTimeout(() => {
+      drawing_room_store.set(false);
+      drawing_room_id.set("");
+      i_am_hosting.set(false);
+      navigate("/");
+    }, 1500);
+  }
+
   function parseMessage(e: any) {
     const { data } = e;
     const parsed = JSON.parse(data);
@@ -262,6 +298,12 @@
       case "iceCandidate":
         handleIceCandidate(parsed);
         break;
+      case "someoneLeft":
+        handleRemovePeer(parsed);
+        break;
+      case "bounceBack":
+        handleBounceBack();
+        break;
     }
   }
 
@@ -271,13 +313,41 @@
     });
   }
 
-  onMount(() => {
+  function InitWebsockets() {
+    console.log("initing websockets");
     const { socket, userId } = InitWShandshake();
     myPublicId = userId;
     ws = socket;
     ws.onmessage = (e) => {
       parseMessage(e);
     };
+  }
+
+  $: {
+    if (iHaveJoined) {
+      InitWebsockets();
+    }
+  }
+
+  onMount(() => {
+    if (get(i_am_hosting)) {
+      InitWebsockets();
+    } else {
+      event_state_store.set("confirm_join_drawing_room_form");
+    }
+  });
+
+  onDestroy(() => {
+    unsubscribe();
+    i_have_joined.set(false);
+    drawing_room_id.set("");
+    drawing_room_store.set(false);
+
+    ws.close();
+
+    if (interval) {
+      clearInterval(interval);
+    }
   });
 
   //debug functions
@@ -332,6 +402,7 @@
     >
       <track kind="captions" />
     </video>
+    <canvas id={`canvas-element-${peerId}`} class="peer-canvas"> </canvas>
   {/each}
 </div>
 
@@ -368,7 +439,20 @@
     z-index: 800;
     pointer-events: none;
     background-color: transparent !important;
-    opacity: 1;
+    display: hidden;
+    opacity: 0;
+  }
+
+  .peer-canvas {
+    height: 2000px;
+    width: 3000px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 800;
+    pointer-events: none;
+    background-color: transparent !important;
+    object-fit: fit;
   }
 
   .top {
