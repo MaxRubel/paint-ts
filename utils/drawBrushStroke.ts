@@ -9,18 +9,18 @@ import { DrawImage } from "../stores/canvasStore";
 import { active_color_store } from "../stores/paletteStore";
 
 let points: [number, number, number][] = [];
-let paths: { pathData: string, color: string }[] = [];
+let paths: { pathData: string; color: string }[] = [];
 let ctx: CanvasRenderingContext2D;
 let start = 0;
 let end = 0;
 let isDrawing = false;
-let color = ""
+let color = "";
 
 //Temporary store of canvas as DataURL on mouse down of eraser/drawing
-let oldRaster: string | null = null
+let oldRaster: string | null = null;
 
 //Store of canvas as DataURL on mouse up
-let currentCanvas: string = ""
+let currentCanvas: string = "";
 
 export function InitCtx(context: CanvasRenderingContext2D) {
   ctx = context;
@@ -28,22 +28,24 @@ export function InitCtx(context: CanvasRenderingContext2D) {
 
 export function GetCanvasContext() {
   if (ctx) {
-    return ctx
+    return ctx;
   } else {
-    console.error("Canvas was not initialized properly")
+    console.error("Canvas was not initialized properly");
   }
 }
 
-export function DrawImageFromDataURL(ctx:CanvasRenderingContext2D , dataURL: string) {
-
+export function DrawImageFromDataURL(
+  ctx: CanvasRenderingContext2D,
+  dataURL: string,
+) {
   return new Promise((resolve: any, reject) => {
     const img = new Image();
 
     img.onload = function () {
       requestAnimationFrame(() => {
-        const canvas = document.getElementById('main-canvas');
+        const canvas = document.getElementById("main-canvas");
         if (!canvas) {
-          reject(new Error('Canvas element not found'));
+          reject(new Error("Canvas element not found"));
           return;
         }
 
@@ -58,7 +60,7 @@ export function DrawImageFromDataURL(ctx:CanvasRenderingContext2D , dataURL: str
     };
 
     img.onerror = (error) => {
-      console.error('Error loading image:', error);
+      console.error("Error loading image:", error);
       reject(error);
     };
 
@@ -72,21 +74,21 @@ export function SaveOriginalRaster() {
     return;
   }
 
-  const canvas = document.getElementById('main-canvas')
+  const canvas = document.getElementById("main-canvas");
   if (!canvas) {
-    console.error("no canvas found")
-    return
+    console.error("no canvas found");
+    return;
   }
 
   //@ts-ignore
-  oldRaster = canvas.toDataURL('image/png');
+  oldRaster = canvas.toDataURL("image/png");
 }
 
 export function DrawBrushStroke(
   context: CanvasRenderingContext2D,
   e: PointerEvent,
 ): void {
-  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement;
+  const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
   const rect = canvas.getBoundingClientRect();
 
   // Calculate the scaling factors
@@ -98,18 +100,18 @@ export function DrawBrushStroke(
   const y = (e.clientY - rect.top) * scaleY;
 
   points.push([x, y, e.pressure]);
-  
+
   if (!isDrawing) {
     start = paths.length;
   }
 
   isDrawing = true;
-  const eventState = get(event_state_store)
+  const eventState = get(event_state_store);
 
   if (eventState === "drawing") {
-    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalCompositeOperation = "source-over";
   } else if (eventState === "erasing") {
-    ctx.globalCompositeOperation = 'destination-out';
+    ctx.globalCompositeOperation = "destination-out";
   }
   const stroke = getStroke(points, {
     size: get(brush_size_store),
@@ -119,12 +121,12 @@ export function DrawBrushStroke(
   });
   const pathData = getSvgPathFromStroke(stroke);
   const canvasPath = new Path2D(pathData);
-  color = get(active_color_store)
+  color = get(active_color_store);
   if (!color) {
-    color = get(theme_store) === 'dark' ? 'lightgray' : 'black'
+    color = get(theme_store) === "dark" ? "lightgray" : "black";
   }
   paths.push({ color, pathData });
-  context.fillStyle = color
+  context.fillStyle = color;
   context.fill(canvasPath);
 }
 
@@ -132,34 +134,34 @@ export function EndBrushStroke() {
   points = [];
   end = paths.length;
   isDrawing = false;
-  const canvas = document.getElementById('main-canvas')
-  const eventState = get(event_state_store)
+  const canvas = document.getElementById("main-canvas");
+  const eventState = get(event_state_store);
   if (canvas) {
     //@ts-ignore
-    currentCanvas = canvas.toDataURL()
+    currentCanvas = canvas.toDataURL();
   }
   // openImageInNewWindow(oldRaster)
   if (eventState === "drawing") {
     AddUndoItem({
-      action: 'drewBrush',
-      data: { start, end, color, oldRaster }
+      action: "drewBrush",
+      data: { start, end, color, oldRaster },
     });
   } else if (eventState === "erasing") {
     AddUndoItem({
-      action: 'erased',
-      data: { oldRaster }
+      action: "erased",
+      data: { oldRaster },
     });
   }
   oldRaster = null;
-  paths = []
+  paths = [];
 }
 
 export function GetCurrentCanvas() {
-  return currentCanvas
+  return currentCanvas;
 }
 
 export function ClearCurrentCanvas() {
-  currentCanvas = ""
+  currentCanvas = "";
 }
 
 export function ClearOldPathData() {
@@ -167,5 +169,5 @@ export function ClearOldPathData() {
 }
 
 export function GetVectorPaths() {
-  return paths
+  return paths;
 }

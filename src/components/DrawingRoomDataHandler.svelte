@@ -21,6 +21,7 @@
   let peerIds: string[] = [];
   let peerStates: { [key: string]: boolean } = {};
   let peerConnections: { [key: string]: RTCPeerConnection } = {};
+  let peerVideoStreams: any[] = [];
   let dataChannels: { [key: string]: RTCDataChannel } = {};
   let myPublicId: string;
   let ws: WebSocket;
@@ -58,7 +59,22 @@
     peerStates[id] = false;
     dataChannels[id] = dataChannel;
 
-    const offer = await peerConnection.createOffer();
+    const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
+    if (!canvas) {
+      console.error("error setting up canvas for WebRTC");
+      return;
+    }
+    const stream = canvas.captureStream(30);
+    peerConnection.addTrack(stream.getTracks()[0], stream);
+
+    const offerOptions = {
+      offerToReceiveAudio: false,
+      offerToReceiveVideo: true,
+      videoCodecPreference: "VP8",
+    };
+
+    const offer = await peerConnection.createOffer(offerOptions);
+
     await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
 
     peerConnection.ondatachannel = (event) => {
@@ -97,6 +113,24 @@
       room: get(drawing_room_id),
       data: offer,
     };
+    //herehere
+    peerConnection.ontrack = (e) => {
+      if (e.track.kind === "video") {
+        const videoElem = document.getElementById(
+          `video-element-${id}`,
+        ) as HTMLVideoElement;
+        if (!videoElem) {
+          console.warn("video not found");
+          return;
+        }
+        videoElem.style.backgroundColor = "transparent";
+        videoElem.style.objectFit = "contain";
+        videoElem.playsInline = true;
+        videoElem.srcObject = e.streams[0];
+        videoElem.play().catch((e) => console.error("Error playing video:", e));
+        console.log("got stream", e.streams[0]);
+      }
+    };
 
     ws.send(JSON.stringify(dataToSend));
   }
@@ -110,12 +144,21 @@
     const peerConnection = new RTCPeerConnection({ iceServers });
     const dataChannel = peerConnection.createDataChannel(from);
 
+    const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
+    if (!canvas) {
+      console.error("error setting up canvas for WebRTC");
+      return;
+    }
+    const stream = canvas.captureStream(30);
+    peerConnection.addTrack(stream.getTracks()[0], stream);
+
     peerConnections[from] = peerConnection;
     peerStates[from] = false;
     peerIds.push(from);
     dataChannels[from] = dataChannel;
 
     await peerConnection.setRemoteDescription(data);
+
     const answer = await peerConnection.createAnswer();
     await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
 
@@ -133,6 +176,25 @@
       dataChannel.onclose = () => {
         console.log("Data channel has closed");
       };
+    };
+    //herehere
+    peerConnection.ontrack = (e) => {
+      if (e.track.kind === "video") {
+        const videoElem = document.getElementById(
+          `video-element-${from}`,
+        ) as HTMLVideoElement;
+        if (!videoElem) {
+          console.warn("video not found");
+          return;
+        }
+        videoElem.style.backgroundColor = "transparent";
+        videoElem.style.mixBlendMode = "source-over";
+        videoElem.style.objectFit = "contain";
+        videoElem.playsInline = true;
+        videoElem.srcObject = e.streams[0];
+        videoElem.play().catch((e) => console.error("Error playing video:", e));
+        console.log("got stream", e.streams[0]);
+      }
     };
 
     peerConnection.onicecandidate = (event) => {
@@ -258,6 +320,21 @@
   </div>
 </div>
 
+<div class="peer-video-stream-container">
+  {#each peerIds as peerId}
+    <video
+      class="peer-video"
+      height="2000px"
+      width="3000px"
+      id={`video-element-${peerId}`}
+      autoplay
+      playsinline
+    >
+      <track kind="captions" />
+    </video>
+  {/each}
+</div>
+
 <style>
   .debug-webrtc {
     background-color: white;
@@ -269,6 +346,29 @@
     z-index: 1000;
     border-radius: 10%;
     padding: 20px;
+  }
+
+  .peer-video-stream-container {
+    height: 2000px;
+    width: 3000px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 800;
+    pointer-events: none;
+    background-color: transparent;
+  }
+
+  .peer-video {
+    height: 2000px;
+    width: 3000px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 800;
+    pointer-events: none;
+    background-color: transparent !important;
+    opacity: 1;
   }
 
   .top {

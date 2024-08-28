@@ -128,7 +128,7 @@
   }
 
   onMount(() => {
-    ctx = canvas.getContext("2d");
+    ctx = canvas.getContext("2d", { alpha: true });
     InitCtx(ctx);
     window.addEventListener("keyup", handleKeyup);
     canvas?.addEventListener("click", handleClick);
@@ -325,5 +325,6 @@
   #main-canvas {
     width: 3000px;
     height: 2000px;
+    background-color: transparent;
   }
 </style>
