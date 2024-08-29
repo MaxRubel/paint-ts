@@ -1,10 +1,22 @@
 import { get } from "svelte/store";
-import { drawing_room_id, drawing_room_store, i_am_hosting, myPublicId } from "../stores/drawingRoomStore";
+import {
+  drawing_room_id,
+  drawing_room_store,
+  i_am_hosting,
+  myPublicId,
+} from "../stores/drawingRoomStore";
 import { authStore } from "../utils/auth/auth_store";
 import { uuidv4 } from "@firebase/util";
 import { alert_store } from "../stores/alertStore";
 import { navigate } from "svelte-routing";
-import { CreateOffer, HandleIceCandidate, HandleRemovePeer, peerIds, ReceiveAnswer, ReceiveOffer } from "./webRTCHub";
+import {
+  CreateOffer,
+  HandleIceCandidate,
+  HandleRemovePeer,
+  peerIds,
+  ReceiveAnswer,
+  ReceiveOffer,
+} from "./webRTCNegotiate";
 
 type outgoingMessage = {
   type: string;
@@ -17,7 +29,7 @@ type outgoingMessage = {
 const wsEndpoint = (import.meta as any).env.VITE_WEBSOCKET_API;
 
 let userId = "";
-let ws: WebSocket | null
+let ws: WebSocket | null;
 
 interface websocketData {
   host: boolean;
@@ -73,13 +85,13 @@ function addClientIds(array: string[]) {
     if (array[i] === get(myPublicId)) {
       continue;
     } else {
-      peerIds.update((item) => ([...item, array[i]]))
+      peerIds.update((item) => [...item, array[i]]);
     }
   }
 }
 
 function startNegotiations() {
-  const array = get(peerIds)
+  const array = get(peerIds);
   array.forEach((id) => {
     CreateOffer(id);
   });
@@ -116,7 +128,7 @@ function parseMessage(e: any) {
 
 export function InitWebsockets() {
   const { socket, userId } = InitWShandshake();
-  myPublicId.set(userId)
+  myPublicId.set(userId);
   ws = socket;
   ws.onmessage = (e) => {
     parseMessage(e);
@@ -125,10 +137,10 @@ export function InitWebsockets() {
 
 export function CloseWebsocket() {
   if (ws) {
-    ws.close()
+    ws.close();
   }
 }
 
 export function SendWSMessage(message: outgoingMessage) {
-  ws?.send(JSON.stringify(message))
+  ws?.send(JSON.stringify(message));
 }

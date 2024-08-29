@@ -17,10 +17,13 @@
     peerIds,
     peerStates,
     SendToAll,
-  } from "../../utils/webRTCHub";
+  } from "../../utils/webRTCNegotiate";
   import { textBoxesStore } from "../../stores/textBoxStore";
   import type { TextBoxType } from "../../utils/types/app_types";
   import TextBox from "./canvas elements/Text_Box.svelte";
+  import { mousePositions } from "../../utils/webRTCNegotiate";
+  import type { mousePos } from "../../utils/webRTCDataMessages";
+  import PeerMouse from "./canvas elements/PeerMouse.svelte";
 
   let iHaveJoined: boolean;
   let myId: string;
@@ -28,6 +31,10 @@
   let peerStateMap: { [key: string]: boolean };
   let textboxes: { [key: string]: TextBoxType };
   let otherTextboxes: { [key: string]: TextBoxType };
+  let mouseX: number = 0;
+  let mouseY: number = 0;
+  let peerMice: { [key: string]: mousePos };
+  let interval: NodeJS.Timeout | null = null;
 
   const unsubscribe = i_have_joined.subscribe((value) => {
     iHaveJoined = value;
@@ -54,9 +61,45 @@
     otherTextboxes = value;
   });
 
+  const unsubscribe7 = mousePositions.subscribe((value) => {
+    peerMice = value;
+  });
+
   $: {
     if (iHaveJoined) {
       InitWebsockets();
+    }
+  }
+
+  function updateMousePosition(e: MouseEvent) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  }
+
+  let oldMousepos: mousePos = { id: "", x: 0, y: 0 };
+
+  function startMouseTracker() {
+    document.addEventListener("mousemove", updateMousePosition);
+
+    interval = setInterval(() => {
+      if (oldMousepos.x === mouseX && oldMousepos.y === mouseY) {
+        //nothing changed
+        return;
+      }
+
+      if (mouseX !== undefined && mouseY !== undefined) {
+        const data = { id: myId, x: mouseX, y: mouseY };
+        oldMousepos = data;
+        SendToAll(`mousepos&*^${JSON.stringify(data)}`);
+      }
+    }, 150);
+  }
+
+  function stopMouseTracker() {
+    document.removeEventListener("mousemove", updateMousePosition);
+    if (interval !== null) {
+      clearInterval(interval);
+      interval = null;
     }
   }
 
@@ -66,6 +109,7 @@
     } else {
       event_state_store.set("confirm_join_drawing_room_form");
     }
+    startMouseTracker();
   });
 
   onDestroy(() => {
@@ -79,7 +123,9 @@
     unsubscribe4();
     unsubscribe5();
     unsubscribe6();
+    unsubscribe7();
     CloseWebsocket();
+    stopMouseTracker();
   });
 
   //debug functions
@@ -140,6 +186,9 @@
     </video>
     <canvas id={`canvas-element-${peerId}`} class="peer-canvas"> </canvas>
   {/each} -->
+  {#each Object.values(peerMice) as mouseData}
+    <PeerMouse {mouseData} />
+  {/each}
 </div>
 
 <style>
