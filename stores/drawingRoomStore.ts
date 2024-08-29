@@ -1,6 +1,6 @@
 import { get, writable } from "svelte/store";
 import { fetched_single, type ProjectType } from "./fetchDataStore";
-import type { RedoType, UndoType } from "../utils/types/app_types";
+import type { RedoType, TextBoxType, UndoType } from "../utils/types/app_types";
 import { textBoxesStore } from "./textBoxStore";
 import { undo_store } from "./undoStore";
 import { redo_store } from "./redoStore";
@@ -22,6 +22,7 @@ export const data_transition = writable(<DataTransitionType>{});
 export const i_am_hosting = writable(false);
 export const myPublicId = writable("");
 export const i_have_joined = writable(false)
+export const other_peoples_textboxes = writable(<{ [key: string]: TextBoxType }>{})
 
 export function TransitionToDrawingRoom() {
   const canvas: HTMLCanvasElement = document.getElementById(

@@ -1,327 +1,58 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
-  import { InitWShandshake } from "../../utils/initDrawingRoomSocket";
   import {
     drawing_room_id,
     drawing_room_store,
     i_am_hosting,
     i_have_joined,
+    myPublicId,
+    other_peoples_textboxes,
   } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
   import { event_state_store } from "../../stores/eventState";
-  import { VideoToCanvas } from "../../utils/videoToCanvas";
-  import { alert_store } from "../../stores/alertStore";
-  import { navigate } from "svelte-routing";
+  import { CloseWebsocket, InitWebsockets } from "../../utils/websocketHub";
+  import {
+    dataChannels,
+    peerConnections,
+    peerIds,
+    peerStates,
+    SendToAll,
+  } from "../../utils/webRTCHub";
+  import { textBoxesStore } from "../../stores/textBoxStore";
+  import type { TextBoxType } from "../../utils/types/app_types";
+  import TextBox from "./canvas elements/Text_Box.svelte";
 
-  const iceServers = [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun.l.google.com:5349" },
-    { urls: "stun:stun1.l.google.com:3478" },
-  ];
-
-  type outgoingMessage = {
-    type: string;
-    to: string;
-    from: string;
-    room: string;
-    data: any;
-  };
-
-  let peerIds: string[] = [];
-  let peerStates: { [key: string]: boolean } = {};
-  let peerConnections: { [key: string]: RTCPeerConnection } = {};
-  let dataChannels: { [key: string]: RTCDataChannel } = {};
-  let myPublicId: string;
-  let ws: WebSocket;
   let iHaveJoined: boolean;
+  let myId: string;
+  let peerIdArray: string[];
+  let peerStateMap: { [key: string]: boolean };
+  let textboxes: { [key: string]: TextBoxType };
+  let otherTextboxes: { [key: string]: TextBoxType };
 
   const unsubscribe = i_have_joined.subscribe((value) => {
     iHaveJoined = value;
   });
 
-  function addClientIds(array: string[]) {
-    for (let i = 0; i < array.length; i++) {
-      if (array[i] === myPublicId) {
-        continue;
-      } else {
-        peerIds.push(array[i]);
-        peerIds = peerIds;
-      }
-    }
-  }
+  const unsubscribe2 = myPublicId.subscribe((value) => {
+    myId = value;
+  });
 
-  let interval: any;
+  const unsubscribe3 = peerIds.subscribe((value) => {
+    peerIdArray = value;
+  });
 
-  async function handleIceCandidate(incoming: any) {
-    const { from, data } = incoming;
-    const peerConnection = peerConnections[from];
+  const unsubscribe4 = peerStates.subscribe((value) => {
+    peerStateMap = value;
+  });
 
-    if (peerConnection) {
-      try {
-        await peerConnection.addIceCandidate(new RTCIceCandidate(data));
-      } catch (error) {
-        console.error("Error adding ICE candidate:", error);
-      }
-    } else {
-      console.warn("Received ICE candidate for unknown peer", from);
-    }
-  }
+  const unsubscribe5 = textBoxesStore.subscribe((value) => {
+    textboxes = value;
+    SendToAll(`changingTextbox&*^${JSON.stringify(value)}`);
+  });
 
-  async function createOffer(id: string) {
-    const peerConnection = new RTCPeerConnection({ iceServers });
-    const dataChannel = peerConnection.createDataChannel(id);
-
-    peerConnections[id] = peerConnection;
-    peerStates[id] = false;
-    dataChannels[id] = dataChannel;
-
-    const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
-    if (!canvas) {
-      console.error("error setting up canvas for WebRTC");
-      return;
-    }
-    const stream = canvas.captureStream(30);
-    peerConnection.addTrack(stream.getTracks()[0], stream);
-
-    const offerOptions = {
-      offerToReceiveAudio: false,
-      offerToReceiveVideo: true,
-      videoCodecPreference: "VP8",
-    };
-
-    const offer = await peerConnection.createOffer(offerOptions);
-
-    await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
-
-    peerConnection.ondatachannel = (event) => {
-      const dataChannel = event.channel;
-
-      dataChannel.onmessage = (messageEvent) => {
-        console.log("Received data:", messageEvent.data);
-      };
-    };
-
-    peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        const dataToSend: outgoingMessage = {
-          type: "iceCandidate",
-          from: myPublicId,
-          to: id,
-          room: get(drawing_room_id),
-          data: event.candidate,
-        };
-        if (peerConnection.localDescription) {
-          ws.send(JSON.stringify(dataToSend));
-        }
-      }
-    };
-
-    peerConnection.addEventListener("connectionstatechange", (event) => {
-      if (peerConnection.connectionState === "connected") {
-        peerStates[id] = true;
-      }
-    });
-
-    const dataToSend: outgoingMessage = {
-      type: "offer",
-      to: id,
-      from: myPublicId,
-      room: get(drawing_room_id),
-      data: offer,
-    };
-    //herehere
-    peerConnection.ontrack = (e) => {
-      if (e.track.kind === "video") {
-        const videoElem = document.getElementById(
-          `video-element-${id}`,
-        ) as HTMLVideoElement;
-        if (!videoElem) {
-          console.warn("video not found");
-          return;
-        }
-        videoElem.style.backgroundColor = "transparent";
-        videoElem.style.objectFit = "contain";
-        videoElem.playsInline = true;
-        videoElem.srcObject = e.streams[0];
-        videoElem.play().catch((e) => console.error("Error playing video:", e));
-        console.log("got stream", e.streams[0]);
-        videoElem.addEventListener("play", () => {
-          VideoToCanvas(id, videoElem);
-        });
-      }
-    };
-
-    ws.send(JSON.stringify(dataToSend));
-  }
-
-  async function receiveOffer(incoming: any) {
-    const { from, data } = incoming;
-    if (from === myPublicId) {
-      console.warn("receiving my own offer");
-    }
-
-    const peerConnection = new RTCPeerConnection({ iceServers });
-    const dataChannel = peerConnection.createDataChannel(from);
-
-    const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
-    if (!canvas) {
-      console.error("error setting up canvas for WebRTC");
-      return;
-    }
-    const stream = canvas.captureStream(30);
-    peerConnection.addTrack(stream.getTracks()[0], stream);
-
-    peerConnections[from] = peerConnection;
-    peerStates[from] = false;
-    peerIds.push(from);
-    dataChannels[from] = dataChannel;
-
-    await peerConnection.setRemoteDescription(data);
-
-    const answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
-
-    peerConnection.ondatachannel = (event) => {
-      const dataChannel = event.channel;
-
-      dataChannel.onmessage = (messageEvent) => {
-        console.log("Received data:", messageEvent.data);
-      };
-
-      dataChannel.onclose = () => {
-        console.log("Data channel has closed");
-      };
-    };
-    //herehere
-    peerConnection.ontrack = (e) => {
-      if (e.track.kind === "video") {
-        const videoElem = document.getElementById(
-          `video-element-${from}`,
-        ) as HTMLVideoElement;
-        if (!videoElem) {
-          console.warn("video not found");
-          return;
-        }
-        videoElem.style.backgroundColor = "transparent";
-        videoElem.style.mixBlendMode = "source-over";
-        videoElem.style.objectFit = "contain";
-        videoElem.playsInline = true;
-        videoElem.srcObject = e.streams[0];
-        videoElem.play().catch((e) => console.error("Error playing video:", e));
-        console.log("got stream", e.streams[0]);
-        videoElem.addEventListener("play", () => {
-          VideoToCanvas(from, videoElem);
-        });
-      }
-    };
-
-    peerConnection.onicecandidate = (event) => {
-      if (event.candidate) {
-        const dataToSend: outgoingMessage = {
-          type: "iceCandidate",
-          from: myPublicId,
-          to: incoming.from,
-          room: get(drawing_room_id),
-          data: event.candidate,
-        };
-        if (peerConnection.localDescription) {
-          ws.send(JSON.stringify(dataToSend));
-        }
-      }
-    };
-
-    peerConnection.addEventListener("connectionstatechange", (event) => {
-      if (peerConnection.connectionState === "connected") {
-        peerStates[from] = true;
-      }
-    });
-
-    const dataToSend: outgoingMessage = {
-      type: "answer",
-      to: from,
-      from: myPublicId,
-      room: get(drawing_room_id),
-      data: answer,
-    };
-
-    ws.send(JSON.stringify(dataToSend));
-  }
-
-  async function receiveAnswer(incoming: any) {
-    const { from, data } = incoming;
-    await peerConnections[from].setRemoteDescription(
-      new RTCSessionDescription(data),
-    );
-  }
-
-  function startNegotiations() {
-    peerIds.forEach((id) => {
-      createOffer(id);
-    });
-  }
-
-  function handleRemovePeer(incoming: any) {
-    const cliendId = incoming.from;
-    peerConnections[cliendId].close();
-    delete peerConnections[cliendId];
-    delete peerStates[cliendId];
-    peerIds = peerIds.filter((item) => item !== cliendId);
-  }
-
-  function handleBounceBack() {
-    alert_store.set("alert:Ooops! This room doesn't exist");
-    setTimeout(() => {
-      drawing_room_store.set(false);
-      drawing_room_id.set("");
-      i_am_hosting.set(false);
-      navigate("/");
-    }, 1500);
-  }
-
-  function parseMessage(e: any) {
-    const { data } = e;
-    const parsed = JSON.parse(data);
-    if (data.from === myPublicId) {
-      console.warn("receiving my own message");
-    }
-    switch (parsed.type) {
-      case "new_client_ids":
-        addClientIds(parsed.data.clientIds);
-        startNegotiations();
-        break;
-      case "offer":
-        receiveOffer(parsed);
-        break;
-      case "answer":
-        receiveAnswer(parsed);
-        break;
-      case "iceCandidate":
-        handleIceCandidate(parsed);
-        break;
-      case "someoneLeft":
-        handleRemovePeer(parsed);
-        break;
-      case "bounceBack":
-        handleBounceBack();
-        break;
-    }
-  }
-
-  function checkIceStatuses() {
-    Object.values(peerConnections).forEach((pc) => {
-      console.log(pc.connectionState);
-    });
-  }
-
-  function InitWebsockets() {
-    console.log("initing websockets");
-    const { socket, userId } = InitWShandshake();
-    myPublicId = userId;
-    ws = socket;
-    ws.onmessage = (e) => {
-      parseMessage(e);
-    };
-  }
+  const unsubscribe6 = other_peoples_textboxes.subscribe((value) => {
+    otherTextboxes = value;
+  });
 
   $: {
     if (iHaveJoined) {
@@ -338,16 +69,17 @@
   });
 
   onDestroy(() => {
-    unsubscribe();
     i_have_joined.set(false);
     drawing_room_id.set("");
     drawing_room_store.set(false);
 
-    ws.close();
-
-    if (interval) {
-      clearInterval(interval);
-    }
+    unsubscribe();
+    unsubscribe2();
+    unsubscribe3();
+    unsubscribe4();
+    unsubscribe5();
+    unsubscribe6();
+    CloseWebsocket();
   });
 
   //debug functions
@@ -364,24 +96,24 @@
   }
 
   function sendDateMessage() {
-    Object.values(dataChannels).forEach((chan) => {
+    Object.values(get(dataChannels)).forEach((chan) => {
       chan.send("hello this is a test thank u");
     });
   }
 </script>
 
 <div class="debug-webrtc">
-  <div>My Id: {myPublicId}</div>
+  <div>My Id: {$myPublicId}</div>
   <div class="peerIds top">
-    <button style="width: auto" on:click={checkIceState}>Check Ice State</button>
+    <!-- <button style="width: auto" on:click={checkIceState}>Check Ice State</button>
     <button style="width: auto" on:click={checkLocalDesc}>Check Local Desc</button>
     <button style="width: auto" on:click={checkRemoteDesc}>Check Remote Desc</button>
     <button style="width: auto" on:click={checkIceStatuses}>Check Ice Status</button>
-    <button style="width: auto" on:click={sendDateMessage}>Send Data Message</button>
+    <button style="width: auto" on:click={sendDateMessage}>Send Data Message</button> -->
     <!-- <button style="width: auto" on:click={testIce}>Test Ice</button> -->
     <div><strong>Other user's IDs</strong></div>
-    {#each peerIds as id}
-      {#if peerStates[id]}
+    {#each peerIdArray as id}
+      {#if peerStateMap[id]}
         <div style="color: green; width: 100%">{id}</div>
       {:else}
         <div style="color: red; width: 100%">{id}</div>
@@ -389,9 +121,13 @@
     {/each}
   </div>
 </div>
-
+{#if otherTextboxes}
+  {#each Object.values(otherTextboxes) as textbox}
+    <TextBox data={textbox} />
+  {/each}
+{/if}
 <div class="peer-video-stream-container">
-  {#each peerIds as peerId}
+  <!-- {#each $peerIds as peerId}
     <video
       class="peer-video"
       height="2000px"
@@ -403,14 +139,14 @@
       <track kind="captions" />
     </video>
     <canvas id={`canvas-element-${peerId}`} class="peer-canvas"> </canvas>
-  {/each}
+  {/each} -->
 </div>
 
 <style>
   .debug-webrtc {
     background-color: white;
     height: 500px;
-    width: 400px;
+    width: 100px;
     position: fixed;
     right: 10px;
     top: 70px;
