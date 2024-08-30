@@ -54,6 +54,7 @@
 
   const unsubcribe = textBoxesStore.subscribe((value) => {
     textBoxes = value;
+    console.log("text box store in component", value);
   });
 
   const unsubcribe2 = event_state_store.subscribe((value: string) => {
@@ -295,8 +296,10 @@
     {handleLock}
   />
   <div class="canvas-container">
-    {#each Object.values(textBoxes) as textBox (textBox.id)}
-      <TextBox data={textBox} />
+    {#each Object.entries(textBoxes) as [id, textBox] (id)}
+      {#if textBox}
+        <TextBox data={textBox} />
+      {/if}
     {/each}
     <canvas
       id="main-canvas"

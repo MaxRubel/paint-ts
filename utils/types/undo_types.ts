@@ -1,37 +1,37 @@
 //UNDO TYPES-------------
 export interface UndoExpand {
-  action: string,
+  action: string;
   data: {
-    id: string,
-    x: number,
-    y: number,
-    height: number,
-    width: number
-  }
+    id: string;
+    x: number;
+    y: number;
+    height: number;
+    width: number;
+  };
 }
 
 export interface UndoDragSingle {
-  action: string,
+  action: string;
   data: {
-    id: string,
-    x: number,
-    y: number
-  }
+    id: string;
+    x: number;
+    y: number;
+  };
 }
 
 export interface UndoTyping {
-  action: string,
+  action: string;
   data: {
-    id: string,
-    start: string
-  }
+    id: string;
+    start: string;
+  };
 }
 
 export interface UndoBrushStroke {
-  action: string,
+  action: string;
   data: {
-    start: number,
-    end: number
-    oldRaster: CanvasImageSource
-  }
+    start: number;
+    end: number;
+    oldRaster: string;
+  };
 }

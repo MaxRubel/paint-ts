@@ -6,6 +6,8 @@ import { get } from "svelte/store";
 import type { TextBoxType } from "../utils/types/app_types";
 import { AddUndoItem } from "./undoStore";
 import { active_color_store } from "./paletteStore";
+import { SendToAll } from "../utils/webRTCNegotiate";
+import { drawing_room_id } from "./drawingRoomStore";
 
 export interface TextBoxMap {
   [key: string]: TextBoxType;
@@ -13,17 +15,17 @@ export interface TextBoxMap {
 
 export const textBoxesStore = writable<TextBoxMap>({});
 
-export const text_alignment = writable("center")
+export const text_alignment = writable("center");
 
-export const font_family_store = writable("Arial")
+export const font_family_store = writable("Arial");
 
-export const font_size_store = writable(24)
+export const font_size_store = writable(24);
 
 export function createNewTextBox(
   e: MouseEvent,
   boxHeight: number,
   boxWidth: number,
-):string {
+): string {
   const newKey: string = uuidv4();
   let x = 0;
   let y = 0;
@@ -35,17 +37,20 @@ export function createNewTextBox(
     x = e.clientX - 133;
     y = e.clientY - 40;
   }
-  const fontColor = get(active_color_store)
-  const align = get(text_alignment)
+  const fontColor = get(active_color_store);
+  const align = get(text_alignment);
   const newBox: TextBoxType = {
     id: newKey,
-    type: 'textbox',
+    type: "textbox",
     text: "",
-    x, y, fontColor, align,
+    x,
+    y,
+    fontColor,
+    align,
     height: 80,
     width: 240,
     fontFamily: get(font_family_store),
-    fontSize: get(font_size_store)
+    fontSize: get(font_size_store),
   };
 
   textBoxesStore.update((boxes) => ({
@@ -53,17 +58,27 @@ export function createNewTextBox(
     [newKey]: newBox,
   }));
 
-  event_state_store.set(`typing&${newKey}`)
-  return newKey
+  event_state_store.set(`typing&${newKey}`);
+
+  if (get(drawing_room_id)) {
+    SendToAll(`newtextbox&*^${JSON.stringify(newBox)}`);
+  }
+
+  return newKey;
 }
 
 export function updateTextBox(id: string, updates: any) {
+  console.log("updating text box!", id, updates);
   textBoxesStore.update((boxes) => {
     if (boxes[id]) {
       boxes = { ...boxes, [id]: { ...boxes[id], ...updates } };
     }
     return boxes;
   });
+  const dataToSend = { id, updates };
+  if (get(drawing_room_id)) {
+    SendToAll(`updatetextbox&*^${JSON.stringify(dataToSend)}`);
+  }
 }
 
 export function clearAllTextBoxes(): void {
@@ -77,44 +92,48 @@ export function deleteTextBox(id: string) {
     const { [id]: deletedBox, ...remainingBoxes } = boxes;
     return remainingBoxes;
   });
+
+  if (get(drawing_room_id)) {
+    SendToAll(`deletetextbox&*^${JSON.stringify({ id })}`);
+  }
 }
 
 export function UndoDeletedTextBoxes(array) {
   array.forEach((item) => {
     textBoxesStore.update((boxes) => ({
       ...boxes,
-      [item.id]: item
-    }))
-  })
+      [item.id]: item,
+    }));
+  });
 }
 
 export function ChangeTextFont(value: string) {
-  const eventState = get(event_state_store)
-  const oldFont = get(font_family_store)
-  font_family_store.set(value)
+  const eventState = get(event_state_store);
+  const oldFont = get(font_family_store);
+  font_family_store.set(value);
 
   if (eventState.includes("typing")) {
-    const [, id] = eventState.split("&")
-    updateTextBox(id, { fontFamily: value })
-    font_family_store.set(value)
+    const [, id] = eventState.split("&");
+    updateTextBox(id, { fontFamily: value });
+    font_family_store.set(value);
     AddUndoItem({
       action: "changedFontSingle",
-      data: { id, oldFont }
-    })
+      data: { id, oldFont },
+    });
   }
   if (eventState === "selected") {
-    const selected = get(selected_store)
-    const undoArray = []
-    const textBoxes = get(textBoxesStore)
+    const selected = get(selected_store);
+    const undoArray = [];
+    const textBoxes = get(textBoxesStore);
     selected.forEach((item) => {
-      const [, id] = item.id.split('&')
-      undoArray.push({ id, fontFamily: textBoxes[id].fontFamily })
-      updateTextBox(id, { fontFamily: value })
-      font_family_store.set(value)
-    })
+      const [, id] = item.id.split("&");
+      undoArray.push({ id, fontFamily: textBoxes[id].fontFamily });
+      updateTextBox(id, { fontFamily: value });
+      font_family_store.set(value);
+    });
     AddUndoItem({
-      action: 'changedManyFonts',
-      data: undoArray
-    })
+      action: "changedManyFonts",
+      data: undoArray,
+    });
   }
 }
