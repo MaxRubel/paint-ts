@@ -207,31 +207,6 @@
     background-color: transparent;
   }
 
-  .peer-video {
-    height: 2000px;
-    width: 3000px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 800;
-    pointer-events: none;
-    background-color: transparent !important;
-    display: hidden;
-    opacity: 0;
-  }
-
-  .peer-canvas {
-    height: 2000px;
-    width: 3000px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 800;
-    pointer-events: none;
-    background-color: transparent !important;
-    object-fit: fit;
-  }
-
   .top {
     margin-top: 20px;
   }

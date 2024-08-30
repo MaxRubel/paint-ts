@@ -49,14 +49,6 @@ export async function CreateOffer(id: string) {
     [id]: { id, x: 0, y: 0 },
   }));
 
-  const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
-  if (!canvas) {
-    console.error("error setting up canvas for WebRTC");
-    return;
-  }
-  const stream = canvas.captureStream(30);
-  peerConnection.addTrack(stream.getTracks()[0], stream);
-
   const offerOptions = {
     offerToReceiveAudio: false,
     offerToReceiveVideo: true,
