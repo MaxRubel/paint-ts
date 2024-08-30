@@ -18,7 +18,7 @@ let isDrawing = false;
 let color = "";
 
 type sendArray = [number, number, number][]
-
+export type DrawSendData = { brush: { size: number, color: string, type: string }, array: sendArray }
 let sendInterval: NodeJS.Timeout | null
 
 let watchingForMouseout = false
@@ -99,8 +99,12 @@ function startTransmitting() {
   if (Object.values(get(peerConnections)).length) {
     sendInterval = setInterval(() => {
       const array = points.slice(oldArrystart)
-      oldArrystart = points.length - 3
-      SendToAll(`points&*^${JSON.stringify(array)}`)
+      oldArrystart = points.length - 2
+      const sendData: DrawSendData = {
+        brush: { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) },
+        array
+      }
+      SendToAll(`points&*^${JSON.stringify(sendData)}`)
     }, BRUSH_DATA_SEND_INTERVAL)
   }
 }
@@ -110,10 +114,13 @@ function stopTransmitting() {
     clearInterval(sendInterval)
     transmitting = false
     const array = points.slice(oldArrystart)
-    oldArrystart = points.length
-    SendToAll(`points&*^${JSON.stringify(array)}`)
-    oldArrystart = 0
+    const sendData: DrawSendData = {
+      brush: { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) },
+      array
+    }
+    SendToAll(`points&*^${JSON.stringify(sendData)}`)
   }
+  oldArrystart = 0
 }
 
 function handleMouseLeave() {
@@ -181,7 +188,6 @@ export function DrawBrushStroke(
 }
 
 export function EndBrushStroke() {
-  console.log("ending brush stroke")
   end = paths.length;
   isDrawing = false;
   const canvas = document.getElementById("main-canvas");
@@ -206,7 +212,6 @@ export function EndBrushStroke() {
     stopTransmitting();
   }
   if (watchingForMouseout) {
-    console.log('removing listener');
     canvas?.removeEventListener("mouseleave", handleMouseLeave);
     watchingForMouseout = false;
   }
@@ -216,20 +221,26 @@ export function EndBrushStroke() {
   points = [];
 }
 
-export function DrawOtherPersonsPoints(points: sendArray) {
-  const stroke = getStroke(points, {
-    size: get(brush_size_store),
+export function DrawOtherPersonsPoints(msg: DrawSendData) {
+  const stroke = getStroke(msg.array, {
+    size: msg.brush.size,
     thinning: 0.5,
     smoothing: 0.5,
     streamline: 0.5,
   });
   const pathData = getSvgPathFromStroke(stroke);
   const canvasPath = new Path2D(pathData);
-  color = get(active_color_store);
+  color = msg.brush.color
   if (!color) {
-    color = get(theme_store) === "dark" ? "lightgray" : "black";
+    color = "rgb(255, 255, 255)"
   }
   paths.push({ color, pathData });
+
+  if (msg.brush.type === "drawing") {
+    ctx.globalCompositeOperation = "source-over";
+  } else if (msg.brush.type === "erasing") {
+    ctx.globalCompositeOperation = "destination-out";
+  }
   ctx.fillStyle = color;
   ctx.fill(canvasPath);
 }

@@ -2,6 +2,7 @@ import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
 import { DrawOtherPersonsPoints } from "./drawBrushStroke";
+import type { DrawSendData } from "./drawBrushStroke";
 
 export type mousePos = {
   id: string;
@@ -46,7 +47,7 @@ function handleDeleteTextBoxes(msgJson: deleteTextbox) {
   });
 }
 
-function handleDrawPointsOnCanvas(msgData: pointsArray) {
+function handleDrawPointsOnCanvas(msgData: DrawSendData) {
   console.log("received brush strokes", msgData)
   DrawOtherPersonsPoints(msgData)
 }
