@@ -38,27 +38,13 @@
 <div class="cool confirm-drawing-room-form">
   <div class="top-row"><h3>Join Drawing Room</h3></div>
   <div class="paragraph">
-    <p style="margin-bottom: 3rem;">
-      Hello and welcome to Groupdoodles! Would you like to join this drawing room?
+    <p style="margin-bottom: 1.5rem;">
+      You are about to join a public drawing room!
     </p>
 
-    <p>By joining this room, you agree to the following:</p>
-
-    <p>1. The drawing canvas will be accessible to anyone with the URL.</p>
-    <p>2. Any user with the link can view and contribute to the drawing.</p>
     <p style="margin-bottom: 3rem;">
-      3. The content of the drawing will be visible to the public.
+      Everyone will be able to view and edit this drawing.
     </p>
-
-    <h3>Share this link:</h3>
-    <div class="url-container" style="margin-bottom: 3rem">
-      <input
-        type="text"
-        class="url"
-        value={`http://localhost:5173/${drawingRoomId}`}
-      />
-      <button style="width: auto;" on:click={handleCopy}>Copy</button>
-    </div>
 
     Do you wish to proceed?
   </div>
@@ -75,29 +61,12 @@
     margin-top: 0px;
   }
 
-  input {
-    margin-top: 0px;
-  }
-
   .confirm-drawing-room-form {
     position: fixed;
     left: 50%;
     top: 100px;
     transform: translateX(-50%);
     z-index: 1004;
-  }
-
-  .url-container {
-    margin-top: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 37rem;
-    gap: 1rem;
-  }
-
-  .url {
-    width: 100%;
   }
 
   .buttons {

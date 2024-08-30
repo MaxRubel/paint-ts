@@ -54,7 +54,6 @@
 
   const unsubcribe = textBoxesStore.subscribe((value) => {
     textBoxes = value;
-    console.log("text box store in component", value);
   });
 
   const unsubcribe2 = event_state_store.subscribe((value: string) => {
