@@ -80,7 +80,6 @@
       layoutDirection: location === "text-color-picker" ? "horizontal" : "vertical",
     });
   });
-
   function handleChangeColor() {
     //format the color
     const newColor = colorPicker.color.rgb;
@@ -93,26 +92,6 @@
 
     //make this color active
     active_color_store.set(newColorF);
-
-    //just change the color that is selected
-    if (edittingTile !== null) {
-      if (edittingTile > 15) {
-        //last one
-        UpdateColorTile(newColorF, 15);
-        return;
-      } else {
-        UpdateColorTile(newColorF, edittingTile);
-        return;
-      }
-    } else {
-      //fires on first mouse down
-      if (activePalette.colors.length > 15) {
-        //last one
-        editting_tile_store.set(activePalette.colors.length - 1);
-      } else {
-        editting_tile_store.set(activePalette.colors.length);
-      }
-    }
 
     const eventState = get(event_state_store);
 
@@ -135,6 +114,26 @@
           action: "changedManyFontColors",
           data: undoArray,
         });
+      }
+    }
+
+    //just change the color that is selected
+    if (edittingTile !== null) {
+      if (edittingTile > 15) {
+        //last one
+        UpdateColorTile(newColorF, 15);
+        return;
+      } else {
+        UpdateColorTile(newColorF, edittingTile);
+        return;
+      }
+    } else {
+      //fires on first mouse down
+      if (activePalette.colors.length > 15) {
+        //last one
+        editting_tile_store.set(activePalette.colors.length - 1);
+      } else {
+        editting_tile_store.set(activePalette.colors.length);
       }
     }
 

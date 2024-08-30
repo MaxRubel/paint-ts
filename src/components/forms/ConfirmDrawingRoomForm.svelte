@@ -47,19 +47,13 @@
 <div class="cool confirm-drawing-room-form">
   <div class="top-row"><h3>Create Drawing Room</h3></div>
   <div class="paragraph">
-    <p style="margin-bottom: 3rem;">
-      Are you sure you want to create a public drawing room?
+    <p style="margin-bottom: 2rem;">You are about to host a public drawing room!</p>
+
+    <p style="margin-bottom: 2rem;">
+      Everyone will be able to see and edit this drawing.
     </p>
 
-    <p>By creating this room, you agree to the following:</p>
-
-    <p>1. The drawing canvas will be accessible to anyone with the URL.</p>
-    <p>2. Any user with the link can view and contribute to the drawing.</p>
-    <p style="margin-bottom: 3rem;">
-      3. The content of the drawing will be visible to the public.
-    </p>
-
-    <h3>Share this link:</h3>
+    <h3>Share the link to this room:</h3>
     <div class="url-container" style="margin-bottom: 3rem">
       <input
         type="text"

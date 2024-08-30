@@ -99,11 +99,10 @@ function startTransmitting() {
   if (Object.values(get(peerConnections)).length) {
     sendInterval = setInterval(() => {
       const array = points.slice(oldArrystart)
-      oldArrystart = points.length
+      oldArrystart = points.length - 3
       SendToAll(`points&*^${JSON.stringify(array)}`)
     }, BRUSH_DATA_SEND_INTERVAL)
   }
-  console.log("start peers")
 }
 
 function stopTransmitting() {

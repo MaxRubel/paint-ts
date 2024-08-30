@@ -1,0 +1,163 @@
+Date : 2024-08-30 00:53:12
+Directory : /Users/suzrubel/Documents/Workspace/svelte/paint-ts
+Total : 110 files,  10110 codes, 198 comments, 1024 blanks, all 11332 lines
+
+Languages
++--------------------+------------+------------+------------+------------+------------+
+| language           | files      | code       | comment    | blank      | total      |
++--------------------+------------+------------+------------+------------+------------+
+| Svelte             |         63 |      4,914 |        122 |        606 |      5,642 |
+| JSON               |          4 |      2,804 |          0 |          3 |      2,807 |
+| TypeScript         |         33 |      2,165 |         57 |        358 |      2,580 |
+| CSS                |          1 |        137 |          5 |         24 |        166 |
+| JavaScript         |          4 |         33 |          8 |          8 |         49 |
+| Markdown           |          1 |         27 |          0 |         21 |         48 |
+| HTML               |          1 |         14 |          0 |          3 |         17 |
+| JSON with Comments |          1 |         14 |          6 |          1 |         21 |
+| XML                |          2 |          2 |          0 |          0 |          2 |
++--------------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                         | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                            |        110 |     10,110 |        198 |      1,024 |     11,332 |
+| . (Files)                                                                                                    |         11 |      2,883 |         11 |         34 |      2,928 |
+| api                                                                                                          |          3 |        170 |          1 |         16 |        187 |
+| public                                                                                                       |          1 |          1 |          0 |          0 |          1 |
+| src                                                                                                          |         66 |      5,006 |        128 |        621 |      5,755 |
+| src (Files)                                                                                                  |          4 |        188 |          8 |         34 |        230 |
+| src/assets                                                                                                   |          1 |          1 |          0 |          0 |          1 |
+| src/components                                                                                               |         29 |      4,375 |        120 |        546 |      5,041 |
+| src/components (Files)                                                                                       |          2 |        492 |         24 |         57 |        573 |
+| src/components/alerts                                                                                        |          1 |         47 |          0 |          7 |         54 |
+| src/components/canvas elements                                                                               |          2 |        686 |          9 |         68 |        763 |
+| src/components/forms                                                                                         |          7 |        756 |          0 |        111 |        867 |
+| src/components/menus                                                                                         |          9 |      1,125 |         84 |        139 |      1,348 |
+| src/components/toolbars                                                                                      |          8 |      1,269 |          3 |        164 |      1,436 |
+| src/graphics                                                                                                 |         31 |        433 |          0 |         39 |        472 |
+| src/lib                                                                                                      |          1 |          9 |          0 |          2 |         11 |
+| stores                                                                                                       |         11 |        875 |         13 |        129 |      1,017 |
+| utils                                                                                                        |         18 |      1,175 |         45 |        224 |      1,444 |
+| utils (Files)                                                                                                |         13 |      1,033 |         39 |        202 |      1,274 |
+| utils/auth                                                                                                   |          2 |         65 |          1 |         10 |         76 |
+| utils/color                                                                                                  |          1 |         14 |          4 |          4 |         22 |
+| utils/types                                                                                                  |          2 |         63 |          1 |          8 |         72 |
++--------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| filename                                                                                                     | language           | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/.prettierrc                                              | JSON               |          6 |          0 |          0 |          6 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/README.md                                                | Markdown           |         27 |          0 |         21 |         48 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/api/doodles.ts                                           | TypeScript         |         95 |          0 |          9 |        104 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/api/palette.ts                                           | TypeScript         |         48 |          1 |          5 |         54 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/api/user.ts                                              | TypeScript         |         27 |          0 |          2 |         29 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/index.html                                               | HTML               |         14 |          0 |          3 |         17 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/package-lock.json                                        | JSON               |      2,758 |          0 |          1 |      2,759 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/package.json                                             | JSON               |         30 |          0 |          1 |         31 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/public/vite.svg                                          | XML                |          1 |          0 |          0 |          1 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/App.svelte                                           | Svelte             |         45 |          1 |          6 |         52 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/app.css                                              | CSS                |        137 |          5 |         24 |        166 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/assets/svelte.svg                                    | XML                |          1 |          0 |          0 |          1 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/DrawingRoomDataHandler.svelte             | Svelte             |        187 |         24 |         28 |        239 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/MainCanvasHub.svelte                      | Svelte             |        305 |          0 |         29 |        334 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/alerts/Alert.svelte                       | Svelte             |         47 |          0 |          7 |         54 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/canvas elements/PeerMouse.svelte          | Svelte             |         16 |          0 |          4 |         20 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/canvas elements/Text_Box.svelte           | Svelte             |        670 |          9 |         64 |        743 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/forms/ColorPaletteForm.svelte             | Svelte             |        309 |          0 |         33 |        342 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/forms/ConfirmDrawingRoomForm.svelte       | Svelte             |        100 |          0 |         18 |        118 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/forms/ConfirmJoinDrawingRoom.svelte       | Svelte             |         91 |          0 |         18 |        109 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/forms/FormRouter.svelte                   | Svelte             |         41 |          0 |          5 |         46 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/forms/SaveConfirmForm.svelte              | Svelte             |         84 |          0 |         10 |         94 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/forms/SavingNewProjectForm.svelte         | Svelte             |         81 |          0 |         15 |         96 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/forms/UserRegistrationForm.svelte         | Svelte             |         50 |          0 |         12 |         62 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/menus/DebugMenu.svelte                    | Svelte             |        211 |          2 |         25 |        238 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/menus/LargeViewPalettes.svelte            | Svelte             |         78 |          0 |         11 |         89 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/menus/MultiplayerDebug.svelte             | Svelte             |          0 |         80 |          1 |         81 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/menus/NavMenu.svelte                      | Svelte             |        262 |          0 |         31 |        293 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/menus/OpenDoodleMenu.svelte               | Svelte             |        157 |          0 |         19 |        176 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/menus/ShareMenu.svelte                    | Svelte             |        218 |          0 |         24 |        242 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/menus/SmallPalette.svelte                 | Svelte             |         73 |          2 |         10 |         85 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/menus/SmallViewPalettes.svelte            | Svelte             |         64 |          0 |         11 |         75 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/menus/TinyPaletteMenu.svelte              | Svelte             |         62 |          0 |          7 |         69 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/toolbars/BrushSettings.svelte             | Svelte             |        127 |          0 |         19 |        146 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/toolbars/ColorPickerInSettings.svelte     | Svelte             |        193 |          1 |         20 |        214 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/toolbars/EraserSettings.svelte            | Svelte             |         61 |          0 |         11 |         72 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/toolbars/PaletteInSettings.svelte         | Svelte             |        219 |          0 |         27 |        246 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/toolbars/Slider.svelte                    | Svelte             |        292 |          2 |         42 |        336 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/toolbars/TextSettings.svelte              | Svelte             |        240 |          0 |         28 |        268 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/toolbars/TopToolBar.svelte                | Svelte             |        111 |          0 |         14 |        125 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/components/toolbars/UndoRedoBottom.svelte            | Svelte             |         26 |          0 |          3 |         29 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Arrow.svelte                                | Svelte             |         26 |          0 |          4 |         30 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/ArrowLeft.svelte                            | Svelte             |         30 |          0 |          5 |         35 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Close.svelte                                | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/CursorPointer.svelte                        | Svelte             |         13 |          0 |          1 |         14 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/DownArrow.svelte                            | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/EditIcon.svelte                             | Svelte             |         16 |          0 |          1 |         17 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Eraser.svelte                               | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/EraserStroke.svelte                         | Svelte             |         13 |          0 |          2 |         15 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Folder.svelte                               | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/GearIcon.svelte                             | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Kiss.svelte                                 | Svelte             |         13 |          0 |          1 |         14 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Lock.svelte                                 | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Marker.svelte                               | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Moon.svelte                                 | Svelte             |         15 |          0 |          1 |         16 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/MouseCursor.svelte                          | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/NavButton.svelte                            | Svelte             |         13 |          0 |          1 |         14 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Navbar.svelte                               | Svelte             |         13 |          0 |          1 |         14 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Rectangle.svelte                            | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Redo.svelte                                 | Svelte             |         16 |          0 |          1 |         17 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/SaveIcon.svelte                             | Svelte             |         13 |          0 |          1 |         14 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/SideArrow.svelte                            | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/SmallCheck.svelte                           | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Sun.svelte                                  | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/TextCenter.svelte                           | Svelte             |         14 |          0 |          1 |         15 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/TextIcon.svelte                             | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/TextLeft.svelte                             | Svelte             |         14 |          0 |          1 |         15 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/TextRight.svelte                            | Svelte             |         14 |          0 |          1 |         15 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/TrashCan.svelte                             | Svelte             |         13 |          0 |          1 |         14 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/TrashCanBig.svelte                          | Svelte             |         13 |          0 |          1 |         14 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Undo.svelte                                 | Svelte             |         16 |          0 |          1 |         17 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/graphics/Unlock.svelte                               | Svelte             |         12 |          0 |          1 |         13 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/lib/Counter.svelte                                   | Svelte             |          9 |          0 |          2 |         11 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/main.ts                                              | TypeScript         |          6 |          0 |          3 |          9 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/src/vite-env.d.ts                                        | TypeScript         |          0 |          2 |          1 |          3 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/alertStore.ts                                     | TypeScript         |          2 |          0 |          1 |          3 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/brushStore.ts                                     | TypeScript         |          2 |          0 |          1 |          3 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/canvasStore.ts                                    | TypeScript         |         44 |          4 |          8 |         56 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/drawingRoomStore.ts                               | TypeScript         |         93 |          3 |         16 |        112 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/eventState.ts                                     | TypeScript         |          5 |          0 |          6 |         11 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/fetchDataStore.ts                                 | TypeScript         |         83 |          0 |         11 |         94 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/paletteStore.ts                                   | TypeScript         |        118 |          1 |         21 |        140 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/redoStore.ts                                      | TypeScript         |        128 |          1 |         19 |        148 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/textBoxStore.ts                                   | TypeScript         |        120 |          1 |         19 |        140 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/undoStore.ts                                      | TypeScript         |        272 |          3 |         24 |        299 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/stores/userPrefsStore.ts                                 | TypeScript         |          8 |          0 |          3 |         11 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/svelte.config.js                                         | JavaScript         |          4 |          2 |          2 |          8 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/testing.js                                               | JavaScript         |          7 |          0 |          1 |          8 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/tsconfig.json                                            | JSON with Comments |         14 |          6 |          1 |         21 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/tsconfig.node.json                                       | JSON               |         10 |          0 |          1 |         11 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/auth/auth_store.ts                                 | TypeScript         |         23 |          0 |          5 |         28 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/auth/firebase.ts                                   | TypeScript         |         42 |          1 |          5 |         48 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/clearSelection.ts                                  | TypeScript         |          4 |          0 |          1 |          5 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/color/rgbStringToHex.js                            | JavaScript         |         14 |          4 |          4 |         22 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/demoDrag.svelte                                    | Svelte             |         52 |          1 |         13 |         66 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/dragMultiple.ts                                    | TypeScript         |         55 |          9 |         17 |         81 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/drawBrushStroke.ts                                 | TypeScript         |        203 |         10 |         40 |        253 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/drawRectangle.ts                                   | TypeScript         |         30 |          1 |          6 |         37 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/drawSelectBox.ts                                   | TypeScript         |        105 |          0 |         19 |        124 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/getSvgPathFromStroke.ts                            | TypeScript         |         27 |          0 |          7 |         34 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/handleCursor.ts                                    | TypeScript         |         41 |          0 |          2 |         43 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/initDrawingRoomSocket.ts                           | TypeScript         |         38 |          0 |         10 |         48 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/types/app_types.ts                                 | TypeScript         |         30 |          0 |          4 |         34 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/types/undo_types.ts                                | TypeScript         |         33 |          1 |          4 |         38 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/videoToCanvas.ts                                   | TypeScript         |         54 |          7 |         13 |         74 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/webRTCDataMessages.ts                              | TypeScript         |         64 |          1 |         13 |         78 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/webRTCNegotiate.ts                                 | TypeScript         |        231 |         10 |         43 |        284 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/utils/websocketHub.ts                                    | TypeScript         |        129 |          0 |         18 |        147 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/vite.config.ts                                           | TypeScript         |          5 |          1 |          2 |          8 |
+| /Users/suzrubel/Documents/Workspace/svelte/paint-ts/vite.config.ts.timestamp-1723150046245-0c46481991363.mjs | JavaScript         |          8 |          2 |          1 |         11 |
+| Total                                                                                                        |                    |     10,110 |        198 |      1,024 |     11,332 |
++--------------------------------------------------------------------------------------------------------------+--------------------+------------+------------+------------+------------+
