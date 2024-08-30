@@ -11,6 +11,8 @@
   import type { PaletteType } from "../../../stores/paletteStore";
   import PaletteInSettings from "./PaletteInSettings.svelte";
   import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
+  import ArrowLeft from "../../graphics/ArrowLeft.svelte";
+  import { side_bar_hidden_store } from "../../../stores/userPrefsStore";
 
   let eventState: string = "";
   let isVisible: boolean = false;
@@ -18,8 +20,9 @@
   let activePalette: PaletteType;
   let edittingTile: number | null;
   let activeColor: string;
+  let sidebarHidden: boolean;
 
-  const unsubcribe = event_state_store.subscribe((value) => {
+  const unsubcribe = event_state_store.subscribe((value: string) => {
     eventState = value;
   });
 
@@ -31,20 +34,25 @@
     activePalette = value;
   });
 
-  const unsubscribe4 = editting_tile_store.subscribe((value) => {
+  const unsubscribe4 = editting_tile_store.subscribe((value: number | null) => {
     edittingTile = value;
   });
 
-  const unsubscribe5 = active_color_store.subscribe((value) => {
+  const unsubscribe5 = active_color_store.subscribe((value: string) => {
     activeColor = value;
   });
 
-  $: onDestroy(() => {
+  const unsubscribe6 = side_bar_hidden_store.subscribe((value: boolean) => {
+    sidebarHidden = value;
+  });
+
+  onDestroy(() => {
     unsubcribe();
     unsubcribe2();
     unsubscribe3();
     unsubscribe4();
     unsubscribe5();
+    unsubscribe6();
   });
 
   $: {
@@ -54,9 +62,30 @@
       isVisible = false;
     }
   }
+
+  let left = 15;
+
+  function toggleSideBar() {
+    if (sidebarHidden) {
+      left = 15;
+      side_bar_hidden_store.set(false);
+    } else {
+      left = -254;
+      side_bar_hidden_store.set(true);
+    }
+  }
 </script>
 
-<div class="color-bar-3" class:isVisible>
+<div class="color-bar-3" class:isVisible style="left: {left}px">
+  <div class="sidebutton-container">
+    <button
+      class="move"
+      on:click={toggleSideBar}
+      style="left: {sidebarHidden ? '270px' : '20px'}"
+    >
+      <ArrowLeft {sidebarHidden} />
+    </button>
+  </div>
   <div class="content-wrapper">
     <div class="slider centered" style="flex-direction: column">
       Stroke
@@ -74,13 +103,13 @@
     border-radius: 20px;
     height: 620px;
     background-color: rgb(25, 29, 31);
-    left: 15px;
     padding: 20px;
     top: 70px;
     display: none;
     flex-direction: column;
     border: 2px solid rgba(255, 255, 255, 0.198);
     width: 208px;
+    transition: all 0.8s ease;
   }
 
   .isVisible {
@@ -96,5 +125,21 @@
   .slider {
     border-bottom: 2px solid rgba(255, 255, 255, 0.198);
     padding-bottom: 10px;
+  }
+
+  .sidebutton-container {
+    width: 100%;
+    height: 44px;
+    color: White;
+  }
+
+  .move {
+    position: absolute;
+    height: 30px;
+    width: 40px;
+    padding: 0px;
+    left: 20px;
+    top: 15px;
+    transition: left 0.8s ease;
   }
 </style>

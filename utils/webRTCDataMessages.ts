@@ -3,6 +3,7 @@ import { other_peoples_textboxes } from "../stores/drawingRoomStore";
 import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
+import { DrawOtherPersonsPoints } from "./drawBrushStroke";
 
 type textboxMsg = {
   [key: string]: TextBoxType;
@@ -22,6 +23,8 @@ type updateTextBox = {
 type deleteTextbox = {
   id: string;
 };
+
+type pointsArray = [number, number, number][];
 
 function handleJoin(msgJson: textboxMsg) {
   other_peoples_textboxes.update((current) => ({ ...current, ...msgJson }));
@@ -44,11 +47,14 @@ function handleNewTextBox(msgJson: TextBoxType) {
 
 function handleDeleteTextBoxes(msgJson: deleteTextbox) {
   textBoxesStore.update((boxes) => {
-    console.log("boxes", boxes);
-    console.log(msgJson.id);
     const { [msgJson.id]: deletedBox, ...remainingBoxes } = boxes;
     return remainingBoxes;
   });
+}
+
+function handleDrawPointsOnCanvas(msgData: pointsArray) {
+  console.log("received brush strokes", msgData)
+  DrawOtherPersonsPoints(msgData)
 }
 
 export function ParseMessage(msg: string) {
@@ -69,6 +75,9 @@ export function ParseMessage(msg: string) {
       handleDeleteTextBoxes(msgJson);
     case "mousepos":
       handleMousePos(msgJson);
+      break;
+    case "points":
+      handleDrawPointsOnCanvas(msgJson)
       break;
   }
 }

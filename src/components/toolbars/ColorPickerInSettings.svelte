@@ -16,7 +16,6 @@
   import { authStore } from "../../../utils/auth/auth_store";
   import type { TextBoxType } from "../../../utils/types/app_types";
   import iro from "@jaames/iro";
-  import Alert from "../alerts/Alert.svelte";
 
   export let location;
   export let width;

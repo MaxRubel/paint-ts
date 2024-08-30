@@ -22,7 +22,6 @@ export const data_transition = writable(<DataTransitionType>{});
 export const i_am_hosting = writable(false);
 export const myPublicId = writable("");
 export const i_have_joined = writable(false)
-export const other_peoples_textboxes = writable(<{ [key: string]: TextBoxType }>{})
 
 export function TransitionToDrawingRoom() {
   const canvas: HTMLCanvasElement = document.getElementById(

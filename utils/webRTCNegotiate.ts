@@ -12,8 +12,6 @@ type outgoingMessage = {
   data: any;
 };
 
-const initMousePos: mousePos = { id: "", x: 0, y: 0 };
-
 export const peerConnections = writable<{ [key: string]: RTCPeerConnection }>({});
 export const peerStates = writable<{ [key: string]: boolean }>({});
 export const peerIds = writable(<string[]>[]);

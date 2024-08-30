@@ -70,6 +70,7 @@ export function HandleRedo() {
   AddUndoItem(redoItem.undoItem);
   popLastItem();
 }
+
 function redoDrawBrushStrokes(lastAction: RedoItem) {
   const ctx = GetCanvasContext();
   if (!ctx) {
@@ -78,6 +79,7 @@ function redoDrawBrushStrokes(lastAction: RedoItem) {
   }
   DrawImageFromDataURL(ctx, lastAction.data.currentRaster);
 }
+
 function createOldTextBox(undoItem: any) {
   updateTextBox(undoItem.data.id, undoItem.data);
 }

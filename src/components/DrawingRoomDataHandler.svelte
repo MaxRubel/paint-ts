@@ -6,7 +6,6 @@
     i_am_hosting,
     i_have_joined,
     myPublicId,
-    other_peoples_textboxes,
   } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
   import { event_state_store } from "../../stores/eventState";
@@ -20,7 +19,6 @@
   } from "../../utils/webRTCNegotiate";
   import { textBoxesStore } from "../../stores/textBoxStore";
   import type { TextBoxType } from "../../utils/types/app_types";
-  import TextBox from "./canvas elements/Text_Box.svelte";
   import { mousePositions } from "../../utils/webRTCNegotiate";
   import type { mousePos } from "../../utils/webRTCDataMessages";
   import PeerMouse from "./canvas elements/PeerMouse.svelte";
@@ -30,7 +28,6 @@
   let peerIdArray: string[];
   let peerStateMap: { [key: string]: boolean };
   let textboxes: { [key: string]: TextBoxType };
-  let otherTextboxes: { [key: string]: TextBoxType };
   let mouseX: number = 0;
   let mouseY: number = 0;
   let peerMice: { [key: string]: mousePos };
