@@ -209,7 +209,6 @@
         });
       }
     }
-    updateTextBox(id, { x, y, height, width });
   }
 
   function handleSingleClick() {
@@ -390,6 +389,7 @@
       width = newWidth;
       height = newHeight;
     }
+    updateTextBox(id, { x, y, height, width });
     checkOverflow();
   }
 

@@ -57,10 +57,6 @@
     SendToAll(`changingTextbox&*^${JSON.stringify(value)}`);
   });
 
-  const unsubscribe6 = other_peoples_textboxes.subscribe((value) => {
-    otherTextboxes = value;
-  });
-
   const unsubscribe7 = mousePositions.subscribe((value) => {
     peerMice = value;
   });
@@ -92,7 +88,7 @@
         oldMousepos = data;
         SendToAll(`mousepos&*^${JSON.stringify(data)}`);
       }
-    }, 150);
+    }, 90);
   }
 
   function stopMouseTracker() {
@@ -122,7 +118,6 @@
     unsubscribe3();
     unsubscribe4();
     unsubscribe5();
-    unsubscribe6();
     unsubscribe7();
     CloseWebsocket();
     stopMouseTracker();
@@ -167,11 +162,11 @@
     {/each}
   </div>
 </div>
-{#if otherTextboxes}
+<!-- {#if otherTextboxes}
   {#each Object.values(otherTextboxes) as textbox}
     <TextBox data={textbox} />
   {/each}
-{/if}
+{/if} -->
 <div class="peer-video-stream-container">
   <!-- {#each $peerIds as peerId}
     <video

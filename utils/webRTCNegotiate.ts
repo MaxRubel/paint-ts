@@ -77,7 +77,6 @@ export async function CreateOffer(id: string) {
     };
 
     dataChannel.onmessage = (messageEvent) => {
-      console.log("Received data:", messageEvent.data);
       ParseMessage(messageEvent.data);
     };
   };
@@ -172,7 +171,6 @@ export async function ReceiveOffer(incoming: any) {
     const dataChannel = event.channel;
 
     dataChannel.onmessage = (messageEvent) => {
-      console.log("received message", messageEvent.data);
       ParseMessage(messageEvent.data);
     };
 

@@ -1,4 +1,6 @@
+import { get } from "svelte/store";
 import { other_peoples_textboxes } from "../stores/drawingRoomStore";
+import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
 
@@ -12,19 +14,41 @@ export type mousePos = {
   y: number;
 };
 
-function handleJoin(msgData: textboxMsg) {
-  console.log("joining now");
-  other_peoples_textboxes.update((current) => ({ ...current, ...msgData }));
+type updateTextBox = {
+  id: string;
+  updates: any;
+};
+
+type deleteTextbox = {
+  id: string;
+};
+
+function handleJoin(msgJson: textboxMsg) {
+  other_peoples_textboxes.update((current) => ({ ...current, ...msgJson }));
 }
 
-function handleUpdateTextBoxes(msgData: textboxMsg) {
-  console.log("receiving new test boxes", msgData);
-  other_peoples_textboxes.update((current) => ({ ...current, ...msgData }));
+function handleUpdateTextBoxes(msgJson: updateTextBox) {
+  textBoxesStore.update((current) => ({
+    ...current,
+    [msgJson.id]: { ...current[msgJson.id], ...msgJson.updates },
+  }));
 }
 
-function handleMousePos(msgData: mousePos) {
-  console.log(msgData);
-  mousePositions.update((current) => ({ ...current, [msgData.id]: msgData }));
+function handleMousePos(msgJson: mousePos) {
+  mousePositions.update((current) => ({ ...current, [msgJson.id]: msgJson }));
+}
+
+function handleNewTextBox(msgJson: TextBoxType) {
+  textBoxesStore.update((current) => ({ ...current, [msgJson.id]: msgJson }));
+}
+
+function handleDeleteTextBoxes(msgJson: deleteTextbox) {
+  textBoxesStore.update((boxes) => {
+    console.log("boxes", boxes);
+    console.log(msgJson.id);
+    const { [msgJson.id]: deletedBox, ...remainingBoxes } = boxes;
+    return remainingBoxes;
+  });
 }
 
 export function ParseMessage(msg: string) {
@@ -35,10 +59,16 @@ export function ParseMessage(msg: string) {
     case "userjoined":
       handleJoin(msgJson);
       break;
-    case "changingTextbox":
+    case "newtextbox":
+      handleNewTextBox(msgJson);
+      break;
+    case "updatetextbox":
       handleUpdateTextBoxes(msgJson);
       break;
+    case "deletetextbox":
+      handleDeleteTextBoxes(msgJson);
     case "mousepos":
       handleMousePos(msgJson);
+      break;
   }
 }
