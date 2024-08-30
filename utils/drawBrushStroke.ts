@@ -4,11 +4,12 @@ import { get } from "svelte/store";
 import { event_state_store, theme_store } from "../stores/eventState";
 import { AddUndoItem } from "../stores/undoStore";
 import { brush_size_store } from "../stores/brushStore";
-import { fetched_single } from "../stores/fetchDataStore";
-import { DrawImage } from "../stores/canvasStore";
 import { active_color_store } from "../stores/paletteStore";
+import { drawing_room_id } from "../stores/drawingRoomStore";
+import { peerConnections, SendToAll } from "./webRTCNegotiate";
 
 let points: [number, number, number][] = [];
+
 let paths: { pathData: string; color: string }[] = [];
 let ctx: CanvasRenderingContext2D;
 let start = 0;
@@ -16,11 +17,20 @@ let end = 0;
 let isDrawing = false;
 let color = "";
 
+type sendArray = [number, number, number][]
+
+let sendInterval: NodeJS.Timeout | null
+
+let watchingForMouseout = false
+let transmitting: boolean = false
+
 //Temporary store of canvas as DataURL on mouse down of eraser/drawing
 let oldRaster: string | null = null;
 
 //Store of canvas as DataURL on mouse up
 let currentCanvas: string = "";
+
+const BRUSH_DATA_SEND_INTERVAL = 500 //milliseconds
 
 export function InitCtx(context: CanvasRenderingContext2D) {
   ctx = context;
@@ -84,6 +94,34 @@ export function SaveOriginalRaster() {
   oldRaster = canvas.toDataURL("image/png");
 }
 
+let oldArrystart = 0
+function startTransmitting() {
+  if (Object.values(get(peerConnections)).length) {
+    sendInterval = setInterval(() => {
+      const array = points.slice(oldArrystart)
+      oldArrystart = points.length
+      SendToAll(`points&*^${JSON.stringify(array)}`)
+    }, BRUSH_DATA_SEND_INTERVAL)
+  }
+  console.log("start peers")
+}
+
+function stopTransmitting() {
+  if (sendInterval) {
+    clearInterval(sendInterval)
+    transmitting = false
+    const array = points.slice(oldArrystart)
+    oldArrystart = points.length
+    SendToAll(`points&*^${JSON.stringify(array)}`)
+    oldArrystart = 0
+  }
+}
+
+function handleMouseLeave() {
+  // console.log("Mouse left while drawing");
+  EndBrushStroke();
+}
+
 export function DrawBrushStroke(
   context: CanvasRenderingContext2D,
   e: PointerEvent,
@@ -101,6 +139,18 @@ export function DrawBrushStroke(
 
   points.push([x, y, e.pressure]);
 
+  if (get(drawing_room_id)) {
+    if (!transmitting) {
+      startTransmitting()
+      transmitting = true
+    }
+  }
+
+  if (!watchingForMouseout) {
+    canvas.addEventListener("mouseleave", handleMouseLeave);
+    watchingForMouseout = true;
+  }
+
   if (!isDrawing) {
     start = paths.length;
   }
@@ -113,6 +163,7 @@ export function DrawBrushStroke(
   } else if (eventState === "erasing") {
     ctx.globalCompositeOperation = "destination-out";
   }
+
   const stroke = getStroke(points, {
     size: get(brush_size_store),
     thinning: 0.5,
@@ -131,7 +182,7 @@ export function DrawBrushStroke(
 }
 
 export function EndBrushStroke() {
-  points = [];
+  console.log("ending brush stroke")
   end = paths.length;
   isDrawing = false;
   const canvas = document.getElementById("main-canvas");
@@ -152,8 +203,36 @@ export function EndBrushStroke() {
       data: { oldRaster },
     });
   }
+  if (transmitting) {
+    stopTransmitting();
+  }
+  if (watchingForMouseout) {
+    console.log('removing listener');
+    canvas?.removeEventListener("mouseleave", handleMouseLeave);
+    watchingForMouseout = false;
+  }
+
   oldRaster = null;
   paths = [];
+  points = [];
+}
+
+export function DrawOtherPersonsPoints(points: sendArray) {
+  const stroke = getStroke(points, {
+    size: get(brush_size_store),
+    thinning: 0.5,
+    smoothing: 0.5,
+    streamline: 0.5,
+  });
+  const pathData = getSvgPathFromStroke(stroke);
+  const canvasPath = new Path2D(pathData);
+  color = get(active_color_store);
+  if (!color) {
+    color = get(theme_store) === "dark" ? "lightgray" : "black";
+  }
+  paths.push({ color, pathData });
+  ctx.fillStyle = color;
+  ctx.fill(canvasPath);
 }
 
 export function GetCurrentCanvas() {

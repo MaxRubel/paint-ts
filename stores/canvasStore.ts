@@ -1,4 +1,4 @@
-import { get, writable } from "svelte/store";
+import { get } from "svelte/store";
 import { ClearCurrentCanvas, ClearOldPathData, GetCanvasContext, GetCurrentCanvas } from "../utils/drawBrushStroke";
 import { EmptyFetch, fetched_single } from "./fetchDataStore";
 import { clearAllTextBoxes } from "./textBoxStore";
