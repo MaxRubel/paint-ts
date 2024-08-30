@@ -1,13 +1,7 @@
-import { get } from "svelte/store";
-import { other_peoples_textboxes } from "../stores/drawingRoomStore";
 import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
 import { DrawOtherPersonsPoints } from "./drawBrushStroke";
-
-type textboxMsg = {
-  [key: string]: TextBoxType;
-};
 
 export type mousePos = {
   id: string;
@@ -26,8 +20,8 @@ type deleteTextbox = {
 
 type pointsArray = [number, number, number][];
 
-function handleJoin(msgJson: textboxMsg) {
-  other_peoples_textboxes.update((current) => ({ ...current, ...msgJson }));
+function handleJoin(msgJson) {
+  //TODO write dis func
 }
 
 function handleUpdateTextBoxes(msgJson: updateTextBox) {
