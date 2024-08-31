@@ -1,7 +1,7 @@
 import { get } from "svelte/store";
 import { drawing_room_id, i_am_hosting } from "../stores/drawingRoomStore";
 import { authStore } from "../utils/auth/auth_store";
-import { uuidv4 } from "@firebase/util";
+import { v4 as uuidv4 } from "uuid";
 
 const wsEndpoint = (import.meta as any).env.VITE_WEBSOCKET_API;
 
