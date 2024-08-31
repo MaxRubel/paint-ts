@@ -7,6 +7,8 @@ import { brush_size_store } from "../stores/brushStore";
 import { active_color_store } from "../stores/paletteStore";
 import { drawing_room_id } from "../stores/drawingRoomStore";
 import { peerConnections, SendToAll } from "./webRTCNegotiate";
+import { v4 as uuidv4 } from "uuid";
+import type { PointsMap, PointsObject } from "./webRTCDataMessages";
 
 let tempPoints: [number, number, number][] = [];
 
@@ -23,8 +25,10 @@ let isDrawing = false;
 let color = "";
 
 type sendArray = [number, number, number][]
-export type DrawSendData = { brush: { size: number, color: string, type: string }, array: sendArray }
-export type UndoSendData = { brush: { size: number, color: string, type: string }, array: sendArray }
+export type DrawSendData = { end: string | null, brush: { size: number, color: string, type: string }, array: sendArray }
+
+let oldIds: string[] = []
+
 let sendInterval: NodeJS.Timeout | null
 
 let watchingForMouseout = false
@@ -107,7 +111,7 @@ function startTransmitting() {
 
 
       const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
-      const sendData: DrawSendData = { brush: brushData, array: pointsToSend }
+      const sendData: DrawSendData = { end: null, brush: brushData, array: pointsToSend }
 
       SendToAll(`points&*^${JSON.stringify(sendData)}`)
     }, BRUSH_DATA_SEND_INTERVAL)
@@ -118,15 +122,21 @@ function stopTransmitting() {
   if (sendInterval) {
     clearInterval(sendInterval)
     transmitting = false
-    // const array = points.slice(oldArrystart)
+
+    const end = uuidv4()
     const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
-    const sendData: DrawSendData = { brush: brushData, array: pointsToSend }
+    const sendData: DrawSendData = { end, brush: brushData, array: pointsToSend }
+
+    oldIds.push(end)
+
     SendToAll(`points&*^${JSON.stringify(sendData)}`)
     pointsToSend = []
   }
 }
 
 export function TransmitUndoOldPoints() {
+  const lastPointsId = oldIds.pop()
+  SendToAll(`undobrushstroke&*^${JSON.stringify(lastPointsId)}`)
   //   const last = historyOfSentPoints.pop()
   //   if (!last) return
   //   const { start, end } = last
@@ -280,4 +290,37 @@ export function ClearOldPathData() {
 
 export function GetVectorPaths() {
   return paths;
+}
+
+export function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
+
+  requestAnimationFrame(() => {
+    ctx?.clearRect(0, 0, 2000, 3000)
+  })
+
+  console.log("pointsMap: ", pointsMap)
+
+  Object.values(pointsMap).forEach((pointsData: PointsObject) => {
+
+
+    const stroke = getStroke(pointsData.array, {
+      size: pointsData.size,
+      thinning: 0.5,
+      smoothing: 0.5,
+      streamline: 0.5,
+    });
+
+    const pathData = getSvgPathFromStroke(stroke);
+    const canvasPath = new Path2D(pathData);
+
+    color = get(active_color_store);
+    if (!color) {
+      color = get(theme_store) === "dark" ? "lightgray" : "black";
+    }
+    ctx.fillStyle = pointsData.color;
+    requestAnimationFrame(() => {
+      ctx.fill(canvasPath);
+    })
+
+  })
 }

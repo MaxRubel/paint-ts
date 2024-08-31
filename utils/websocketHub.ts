@@ -6,7 +6,7 @@ import {
   myPublicId,
 } from "../stores/drawingRoomStore";
 import { authStore } from "../utils/auth/auth_store";
-import { uuidv4 } from "@firebase/util";
+import { v4 as uuidv4 } from "uuid";
 import { alert_store } from "../stores/alertStore";
 import { navigate } from "svelte-routing";
 import {

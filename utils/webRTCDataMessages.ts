@@ -1,8 +1,8 @@
 import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
-import { DrawOtherPersonsPoints } from "./drawBrushStroke";
-import type { DrawSendData, UndoSendData } from "./drawBrushStroke";
+import { DrawBrushStroke, DrawOtherPersonsPoints, GetCanvasContext, RebuildCanvasAfterUndo } from "./drawBrushStroke";
+import type { DrawSendData } from "./drawBrushStroke";
 
 export type mousePos = {
   id: string;
@@ -19,11 +19,12 @@ type deleteTextbox = {
   id: string;
 };
 
-type pointsArray = [number, number, number][];
+type pointsArray = [number, number, number][]
+export type PointsMap = { [key: string]: PointsObject }
+export type PointsObject = { id: string, size: number, color: string, array: pointsArray };
+let pointsMap: PointsMap = {}
 
-function handleJoin(msgJson) {
-  //TODO write dis func
-}
+let tempArray: pointsArray = []
 
 function handleUpdateTextBoxes(msgJson: updateTextBox) {
   textBoxesStore.update((current) => ({
@@ -49,12 +50,26 @@ function handleDeleteTextBoxes(msgJson: deleteTextbox) {
 
 function handleDrawPointsOnCanvas(msgData: DrawSendData) {
   DrawOtherPersonsPoints(msgData)
+
+  tempArray.push(...msgData.array)
+  if (msgData.end) {
+    pointsMap[msgData.end] = {
+      id: msgData.end,
+      size: msgData.brush.size,
+      color: msgData.brush.color,
+      array: tempArray
+    }
+    console.log(pointsMap)
+    tempArray = []
+  }
 }
 
-function handleUndoBrushStroke(msgData: UndoSendData) {
+
+function handleUndoBrushStroke(msgData: string) {
   console.log("received undo data", msgData)
-  msgData.brush.size = msgData.brush.size + 10
-  DrawOtherPersonsPoints(msgData)
+
+  delete pointsMap[msgData]
+  RebuildCanvasAfterUndo(pointsMap)
 }
 
 export function ParseMessage(msg: string) {
@@ -62,9 +77,6 @@ export function ParseMessage(msg: string) {
   const msgJson = JSON.parse(msgData);
   // console.log('received msg: ', msgData)
   switch (msgType) {
-    case "userjoined":
-      handleJoin(msgJson);
-      break;
     case "newtextbox":
       handleNewTextBox(msgJson);
       break;
