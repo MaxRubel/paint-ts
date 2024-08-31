@@ -184,6 +184,5 @@ export function SendInitialRoomData(id: string) {
     data
   }
 
-  console.log("sending message")
   ws?.send(JSON.stringify(msg))
 }

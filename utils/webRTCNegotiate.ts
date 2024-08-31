@@ -3,7 +3,6 @@ import { drawing_room_id, i_am_hosting, myPublicId } from "../stores/drawingRoom
 import { SendInitialRoomData, SendWSMessage } from "./websocketHub";
 import { textBoxesStore } from "../stores/textBoxStore";
 import { ParseMessage, type mousePos } from "./webRTCDataMessages";
-import { GetCurrentCanvas } from "./drawBrushStroke";
 
 export type OutgoingMessage = {
   type: string;
@@ -28,7 +27,6 @@ const iceServers = [
 function sendSingleDataMessage(id: string, message: string) {
   const dataChannel = get(dataChannels)[id];
   dataChannel.send(message);
-  console.log("sending message to: ", dataChannel);
 }
 
 export function SendToAll(message: string) {

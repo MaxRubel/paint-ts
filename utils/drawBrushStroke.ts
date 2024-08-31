@@ -5,28 +5,24 @@ import { event_state_store, theme_store } from "../stores/eventState";
 import { AddUndoItem } from "../stores/undoStore";
 import { brush_size_store } from "../stores/brushStore";
 import { active_color_store } from "../stores/paletteStore";
-import { drawing_room_id } from "../stores/drawingRoomStore";
+import { drawing_room_id, myPublicId } from "../stores/drawingRoomStore";
 import { peerConnections, SendToAll } from "./webRTCNegotiate";
 import { v4 as uuidv4 } from "uuid";
 import type { PointsMap, PointsObject } from "./webRTCDataMessages";
 
+type sendArray = [number, number, number][]
+
+export type DrawSendData = { end: string | null, brush: { size: number, color: string, type: string }, array: sendArray }
+
 let tempPoints: [number, number, number][] = [];
 let pointsToSend: [number, number, number][] = [];
-
-// let startIndex: number
-// let endIndex: number
-// let historyOfSentPoints: { start: number, end: number }[] = []
 let paths: { pathData: string; color: string }[] = [];
 let ctx: CanvasRenderingContext2D;
-
 let color = "";
 let publicMoveId: string
 
-type sendArray = [number, number, number][]
-export type DrawSendData = { end: string | null, brush: { size: number, color: string, type: string }, array: sendArray }
 
 let oldIds: string[] = []
-
 let sendInterval: NodeJS.Timeout | null
 
 let watchingForMouseout = false
@@ -37,6 +33,8 @@ let oldRaster: string | null = null;
 
 //Store of canvas as DataURL on mouse up
 let currentCanvas: string = "";
+
+export let pointsMap: PointsMap = {}
 
 const BRUSH_DATA_SEND_INTERVAL = 20 //milliseconds
 
@@ -104,24 +102,21 @@ export function SaveOriginalRaster() {
 
 
 function startTransmitting() {
-  if (Object.values(get(peerConnections)).length) {
-    sendInterval = setInterval(() => {
+  publicMoveId = uuidv4()
+  sendInterval = setInterval(() => {
+    const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
+    const sendData: DrawSendData = { end: null, brush: brushData, array: pointsToSend }
 
+    SendToAll(`points&*^${JSON.stringify(sendData)}`)
+  }, BRUSH_DATA_SEND_INTERVAL)
 
-      const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
-      const sendData: DrawSendData = { end: null, brush: brushData, array: pointsToSend }
-
-      SendToAll(`points&*^${JSON.stringify(sendData)}`)
-    }, BRUSH_DATA_SEND_INTERVAL)
-  }
 }
 
 function stopTransmitting() {
+  transmitting = false
   if (sendInterval) {
     clearInterval(sendInterval)
-    transmitting = false
 
-    publicMoveId = uuidv4()
     const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
     const sendData: DrawSendData = { end: publicMoveId, brush: brushData, array: pointsToSend }
 
@@ -133,8 +128,16 @@ function stopTransmitting() {
     })
 
     SendToAll(`points&*^${JSON.stringify(sendData)}`)
-    pointsToSend = []
+
   }
+  pointsMap[publicMoveId] = {
+    id: publicMoveId,
+    size: get(brush_size_store),
+    color: get(active_color_store),
+    array: tempPoints
+  }
+  pointsToSend = []
+  publicMoveId = ""
 }
 
 export function TransmitUndoOldPoints() {
@@ -250,7 +253,7 @@ export function EndBrushStroke() {
 
   oldRaster = null;
   paths = [];
-  tempPoints = [];
+  tempPoints = []
 }
 
 export function DrawOtherPersonsPoints(msg: DrawSendData) {
@@ -293,13 +296,13 @@ export function GetVectorPaths() {
   return paths;
 }
 
-export function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
+export function RebuildCanvasAfterUndo() {
+  console.log("pointsMap length: ", Object.values(pointsMap).length)
 
   requestAnimationFrame(() => {
     ctx?.clearRect(0, 0, 2000, 3000)
   })
 
-  console.log("pointsMap: ", pointsMap)
 
   Object.values(pointsMap).forEach((pointsData: PointsObject) => {
 
