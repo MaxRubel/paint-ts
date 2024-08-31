@@ -53,19 +53,14 @@ function handleDrawPointsOnCanvas(msgData: DrawSendData) {
 
 function handleUndoBrushStroke(msgData: UndoSendData) {
   console.log("received undo data", msgData)
-  if (msgData.brush.type === "drawing") {
-    msgData.brush.type = "erasing"
-    msgData.brush.size = msgData.brush.size + (msgData.brush.size * .4)
-  } else {
-    msgData.brush.type = "drawing"
-  }
+  msgData.brush.size = msgData.brush.size + 10
   DrawOtherPersonsPoints(msgData)
 }
 
 export function ParseMessage(msg: string) {
   const [msgType, msgData] = msg.split("&*^");
   const msgJson = JSON.parse(msgData);
-
+  // console.log('received msg: ', msgData)
   switch (msgType) {
     case "userjoined":
       handleJoin(msgJson);

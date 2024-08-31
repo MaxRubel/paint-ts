@@ -22,6 +22,7 @@
   import { mousePositions } from "../../utils/webRTCNegotiate";
   import type { mousePos } from "../../utils/webRTCDataMessages";
   import PeerMouse from "./canvas elements/PeerMouse.svelte";
+  import { TransmitUndoOldPoints } from "../../utils/drawBrushStroke";
 
   let iHaveJoined: boolean;
   let myId: string;
@@ -143,6 +144,8 @@
 <div class="debug-webrtc">
   <div>My Id: {$myPublicId}</div>
   <div class="peerIds top">
+    <button style="width: auto;" on:click={TransmitUndoOldPoints}>Undo Canvas</button
+    >
     <!-- <button style="width: auto" on:click={checkIceState}>Check Ice State</button>
     <button style="width: auto" on:click={checkLocalDesc}>Check Local Desc</button>
     <button style="width: auto" on:click={checkRemoteDesc}>Check Remote Desc</button>
