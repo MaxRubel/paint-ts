@@ -23,6 +23,7 @@
   import type { mousePos } from "../../utils/webRTCDataMessages";
   import PeerMouse from "./canvas elements/PeerMouse.svelte";
   import { TransmitUndoOldPoints } from "../../utils/drawBrushStroke";
+  import PeopleCounter from "./toolbars/PeopleCounter.svelte";
 
   let iHaveJoined: boolean;
   let myId: string;
@@ -141,17 +142,12 @@
   }
 </script>
 
-<div class="debug-webrtc">
+<!-- <div class="debug-webrtc">
   <div>My Id: {$myPublicId}</div>
   <div class="peerIds top">
     <button style="width: auto;" on:click={TransmitUndoOldPoints}>Undo Canvas</button
     >
-    <!-- <button style="width: auto" on:click={checkIceState}>Check Ice State</button>
-    <button style="width: auto" on:click={checkLocalDesc}>Check Local Desc</button>
-    <button style="width: auto" on:click={checkRemoteDesc}>Check Remote Desc</button>
-    <button style="width: auto" on:click={checkIceStatuses}>Check Ice Status</button>
-    <button style="width: auto" on:click={sendDateMessage}>Send Data Message</button> -->
-    <!-- <button style="width: auto" on:click={testIce}>Test Ice</button> -->
+  
     <div><strong>Other user's IDs</strong></div>
     {#each peerIdArray as id}
       {#if peerStateMap[id]}
@@ -161,26 +157,9 @@
       {/if}
     {/each}
   </div>
-</div>
-<!-- {#if otherTextboxes}
-  {#each Object.values(otherTextboxes) as textbox}
-    <TextBox data={textbox} />
-  {/each}
-{/if} -->
+</div> -->
+<PeopleCounter />
 <div class="peer-video-stream-container">
-  <!-- {#each $peerIds as peerId}
-    <video
-      class="peer-video"
-      height="2000px"
-      width="3000px"
-      id={`video-element-${peerId}`}
-      autoplay
-      playsinline
-    >
-      <track kind="captions" />
-    </video>
-    <canvas id={`canvas-element-${peerId}`} class="peer-canvas"> </canvas>
-  {/each} -->
   {#each Object.values(peerMice) as mouseData}
     <PeerMouse {mouseData} />
   {/each}

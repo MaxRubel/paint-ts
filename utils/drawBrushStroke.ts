@@ -5,8 +5,8 @@ import { event_state_store, theme_store } from "../stores/eventState";
 import { AddUndoItem } from "../stores/undoStore";
 import { brush_size_store } from "../stores/brushStore";
 import { active_color_store } from "../stores/paletteStore";
-import { drawing_room_id, myPublicId } from "../stores/drawingRoomStore";
-import { peerConnections, SendToAll } from "./webRTCNegotiate";
+import { drawing_room_id } from "../stores/drawingRoomStore";
+import { SendToAll } from "./webRTCNegotiate";
 import { v4 as uuidv4 } from "uuid";
 import type { PointsMap, PointsObject } from "./webRTCDataMessages";
 
