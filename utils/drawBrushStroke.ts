@@ -11,7 +11,6 @@ import { v4 as uuidv4 } from "uuid";
 import type { PointsMap, PointsObject } from "./webRTCDataMessages";
 
 let tempPoints: [number, number, number][] = [];
-
 let pointsToSend: [number, number, number][] = [];
 
 // let startIndex: number
@@ -19,10 +18,9 @@ let pointsToSend: [number, number, number][] = [];
 // let historyOfSentPoints: { start: number, end: number }[] = []
 let paths: { pathData: string; color: string }[] = [];
 let ctx: CanvasRenderingContext2D;
-let start = 0;
-let end = 0;
-let isDrawing = false;
+
 let color = "";
+let publicMoveId: string
 
 type sendArray = [number, number, number][]
 export type DrawSendData = { end: string | null, brush: { size: number, color: string, type: string }, array: sendArray }
@@ -123,11 +121,16 @@ function stopTransmitting() {
     clearInterval(sendInterval)
     transmitting = false
 
-    const end = uuidv4()
+    publicMoveId = uuidv4()
     const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
-    const sendData: DrawSendData = { end, brush: brushData, array: pointsToSend }
+    const sendData: DrawSendData = { end: publicMoveId, brush: brushData, array: pointsToSend }
 
-    oldIds.push(end)
+    oldIds.push(publicMoveId)
+
+    AddUndoItem({
+      action: "drewBrushPublic",
+      data: { publicMoveId }
+    })
 
     SendToAll(`points&*^${JSON.stringify(sendData)}`)
     pointsToSend = []
@@ -188,11 +191,6 @@ export function DrawBrushStroke(
     watchingForMouseout = true;
   }
 
-  if (!isDrawing) {
-    start = paths.length;
-  }
-
-  isDrawing = true;
   const eventState = get(event_state_store);
 
   if (eventState === "drawing") {
@@ -219,25 +217,28 @@ export function DrawBrushStroke(
 }
 
 export function EndBrushStroke() {
-  end = paths.length;
-  isDrawing = false;
+
   const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
   const eventState = get(event_state_store);
   if (canvas) {
     currentCanvas = canvas.toDataURL();
   }
 
-  if (eventState === "drawing") {
-    AddUndoItem({
-      action: "drewBrush",
-      data: { start, end, color, oldRaster },
-    });
-  } else if (eventState === "erasing") {
-    AddUndoItem({
-      action: "erased",
-      data: { oldRaster },
-    });
+  //undo items for non-drawing room
+  if (!get(drawing_room_id)) {
+    if (eventState === "drawing") {
+      AddUndoItem({
+        action: "drewBrush",
+        data: { color, oldRaster },
+      });
+    } else if (eventState === "erasing") {
+      AddUndoItem({
+        action: "erased",
+        data: { oldRaster },
+      });
+    }
   }
+
   if (transmitting) {
     stopTransmitting();
   }
@@ -313,14 +314,9 @@ export function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
     const pathData = getSvgPathFromStroke(stroke);
     const canvasPath = new Path2D(pathData);
 
-    color = get(active_color_store);
-    if (!color) {
-      color = get(theme_store) === "dark" ? "lightgray" : "black";
-    }
     ctx.fillStyle = pointsData.color;
     requestAnimationFrame(() => {
       ctx.fill(canvasPath);
     })
-
   })
 }
