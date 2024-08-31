@@ -2,7 +2,7 @@ import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
 import { DrawOtherPersonsPoints } from "./drawBrushStroke";
-import type { DrawSendData } from "./drawBrushStroke";
+import type { DrawSendData, UndoSendData } from "./drawBrushStroke";
 
 export type mousePos = {
   id: string;
@@ -48,14 +48,19 @@ function handleDeleteTextBoxes(msgJson: deleteTextbox) {
 }
 
 function handleDrawPointsOnCanvas(msgData: DrawSendData) {
-  console.log("received brush strokes", msgData)
+  DrawOtherPersonsPoints(msgData)
+}
+
+function handleUndoBrushStroke(msgData: UndoSendData) {
+  console.log("received undo data", msgData)
+  msgData.brush.size = msgData.brush.size + 10
   DrawOtherPersonsPoints(msgData)
 }
 
 export function ParseMessage(msg: string) {
   const [msgType, msgData] = msg.split("&*^");
   const msgJson = JSON.parse(msgData);
-
+  // console.log('received msg: ', msgData)
   switch (msgType) {
     case "userjoined":
       handleJoin(msgJson);
@@ -74,5 +79,7 @@ export function ParseMessage(msg: string) {
     case "points":
       handleDrawPointsOnCanvas(msgJson)
       break;
+    case "undobrushstroke":
+      handleUndoBrushStroke(msgJson)
   }
 }

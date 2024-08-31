@@ -15,6 +15,7 @@ import {
 } from "./textBoxStore";
 import { event_state_store } from "./eventState";
 import { AddRedoItem } from "../stores/redoStore";
+import { drawing_room_id } from "./drawingRoomStore";
 
 export const undo_store = writable<UndoType[]>([]);
 

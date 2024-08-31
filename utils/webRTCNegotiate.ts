@@ -1,10 +1,11 @@
 import { get, writable } from "svelte/store";
-import { drawing_room_id, myPublicId } from "../stores/drawingRoomStore";
-import { SendWSMessage } from "./websocketHub";
+import { drawing_room_id, i_am_hosting, myPublicId } from "../stores/drawingRoomStore";
+import { SendInitialRoomData, SendWSMessage } from "./websocketHub";
 import { textBoxesStore } from "../stores/textBoxStore";
 import { ParseMessage, type mousePos } from "./webRTCDataMessages";
+import { GetCurrentCanvas } from "./drawBrushStroke";
 
-type outgoingMessage = {
+export type OutgoingMessage = {
   type: string;
   to: string;
   from: string;
@@ -49,13 +50,7 @@ export async function CreateOffer(id: string) {
     [id]: { id, x: 0, y: 0 },
   }));
 
-  const offerOptions = {
-    offerToReceiveAudio: false,
-    offerToReceiveVideo: true,
-    videoCodecPreference: "VP8",
-  };
-
-  const offer = await peerConnection.createOffer(offerOptions);
+  const offer = await peerConnection.createOffer();
 
   await peerConnection.setLocalDescription(new RTCSessionDescription(offer));
 
@@ -63,7 +58,7 @@ export async function CreateOffer(id: string) {
     const dataChannel = event.channel;
 
     dataChannel.onopen = () => {
-      sendSingleDataMessage(id, "iamreadytojoin&*^{}");
+      sendSingleDataMessage(id, "ihavejoined&*^{}");
     };
 
     dataChannel.onmessage = (messageEvent) => {
@@ -73,7 +68,7 @@ export async function CreateOffer(id: string) {
 
   peerConnection.onicecandidate = (event) => {
     if (event.candidate) {
-      const dataToSend: outgoingMessage = {
+      const dataToSend: OutgoingMessage = {
         type: "iceCandidate",
         from: get(myPublicId),
         to: id,
@@ -92,33 +87,12 @@ export async function CreateOffer(id: string) {
     }
   });
 
-  const dataToSend: outgoingMessage = {
+  const dataToSend: OutgoingMessage = {
     type: "offer",
     to: id,
     from: get(myPublicId),
     room: get(drawing_room_id),
     data: offer,
-  };
-  //herehere
-  peerConnection.ontrack = (e) => {
-    if (e.track.kind === "video") {
-      const videoElem = document.getElementById(
-        `video-element-${id}`,
-      ) as HTMLVideoElement;
-      if (!videoElem) {
-        console.warn("video not found");
-        return;
-      }
-      videoElem.style.backgroundColor = "transparent";
-      videoElem.style.objectFit = "contain";
-      videoElem.playsInline = true;
-      videoElem.srcObject = e.streams[0];
-      videoElem.play().catch((e) => console.error("Error playing video:", e));
-      console.log("got stream", e.streams[0]);
-      // videoElem.addEventListener("play", () => {
-      //   VideoToCanvas(id, videoElem);
-      // });
-    }
   };
 
   SendWSMessage(dataToSend);
@@ -133,15 +107,6 @@ export async function ReceiveOffer(incoming: any) {
 
   const peerConnection = new RTCPeerConnection({ iceServers });
   const dataChannel = peerConnection.createDataChannel(from);
-
-  const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
-  if (!canvas) {
-    console.error("error setting up canvas for WebRTC");
-    return;
-  }
-  const stream = canvas.captureStream(30);
-
-  peerConnection.addTrack(stream.getTracks()[0], stream);
 
   peerConnections.update((current) => ({ ...current, [from]: peerConnection }));
   peerStates.update((current) => ({ ...current, [from]: false }));
@@ -167,38 +132,15 @@ export async function ReceiveOffer(incoming: any) {
     dataChannel.onopen = () => {
       const textboxes = get(textBoxesStore);
       sendSingleDataMessage(from, `userjoined&*^${JSON.stringify(textboxes)}`);
-    };
-
-    dataChannel.onclose = () => {
-      console.log("Data channel has closed");
-    };
-  };
-  //herehere
-  peerConnection.ontrack = (e) => {
-    if (e.track.kind === "video") {
-      const videoElem = document.getElementById(
-        `video-element-${from}`,
-      ) as HTMLVideoElement;
-      if (!videoElem) {
-        console.warn("video not found");
-        return;
+      if (get(i_am_hosting)) {
+        SendInitialRoomData(from)
       }
-      videoElem.style.backgroundColor = "transparent";
-      videoElem.style.mixBlendMode = "source-over";
-      videoElem.style.objectFit = "contain";
-      videoElem.playsInline = true;
-      videoElem.srcObject = e.streams[0];
-      videoElem.play().catch((e) => console.error("Error playing video:", e));
-      console.log("got stream", e.streams[0]);
-      // videoElem.addEventListener("play", () => {
-      //   VideoToCanvas(from, videoElem);
-      // });
-    }
+    };
   };
 
   peerConnection.onicecandidate = (event) => {
     if (event.candidate) {
-      const dataToSend: outgoingMessage = {
+      const dataToSend: OutgoingMessage = {
         type: "iceCandidate",
         from: get(myPublicId),
         to: incoming.from,
@@ -217,7 +159,7 @@ export async function ReceiveOffer(incoming: any) {
     }
   });
 
-  const dataToSend: outgoingMessage = {
+  const dataToSend: OutgoingMessage = {
     type: "answer",
     to: from,
     from: get(myPublicId),

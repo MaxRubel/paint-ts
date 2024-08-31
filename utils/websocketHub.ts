@@ -17,6 +17,8 @@ import {
   ReceiveAnswer,
   ReceiveOffer,
 } from "./webRTCNegotiate";
+import { textBoxesStore } from "../stores/textBoxStore";
+import { GetCanvasContext } from "./drawBrushStroke";
 
 type outgoingMessage = {
   type: string;
@@ -97,6 +99,23 @@ function startNegotiations() {
   });
 }
 
+function parseInitialRoomData(msg) {
+  const { canvasImage, textboxes } = msg.data
+
+  //set text boxes:
+  textBoxesStore.set(textboxes)
+
+  //draw canvas:
+  const ctx = GetCanvasContext();
+  const img = new Image();
+  img.onload = () => {
+    requestAnimationFrame(() => {
+      ctx?.drawImage(img, 0, 0);
+    })
+  };
+  img.src = `data:image/png;base64,${canvasImage}`;
+}
+
 function parseMessage(e: any) {
   const { data } = e;
   const parsed = JSON.parse(data);
@@ -123,6 +142,9 @@ function parseMessage(e: any) {
     case "bounceBack":
       handleBounceBack();
       break;
+    case "initalJoinData":
+      parseInitialRoomData(parsed);
+      break;
   }
 }
 
@@ -143,4 +165,25 @@ export function CloseWebsocket() {
 
 export function SendWSMessage(message: outgoingMessage) {
   ws?.send(JSON.stringify(message));
+}
+
+export function SendInitialRoomData(id: string) {
+  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
+  const dataURL = canvas.toDataURL('image/png');
+  const canvasImage = dataURL.split(',')[1];
+
+  const data = {
+    textboxes: get(textBoxesStore),
+    canvasImage
+  }
+  const msg: outgoingMessage = {
+    type: "initalJoinData",
+    to: id,
+    from: get(myPublicId),
+    room: get(drawing_room_id),
+    data
+  }
+
+  console.log("sending message")
+  ws?.send(JSON.stringify(msg))
 }

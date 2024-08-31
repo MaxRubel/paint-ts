@@ -17,6 +17,8 @@
   import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
   import PaletteInSettings from "./PaletteInSettings.svelte";
   import { authStore } from "../../../utils/auth/auth_store";
+  import { side_bar_hidden_store } from "../../../stores/userPrefsStore";
+  import SideBarCollapseButton from "./SideBarCollapseButton.svelte";
 
   let isVisible = false;
   let eventState: string;
@@ -24,6 +26,7 @@
   let textAlignment: string;
   let fontFamily = "";
   let auth: any;
+  let sidebarHidden: boolean;
 
   const unsubcribe = event_state_store.subscribe((value) => {
     eventState = value;
@@ -45,12 +48,17 @@
     auth = value.user;
   });
 
+  const unsubscribe6 = side_bar_hidden_store.subscribe((value) => {
+    sidebarHidden = value;
+  });
+
   onDestroy(() => {
     unsubcribe();
     unsubcribe2();
     unsubscribe3();
     unsubscribe4();
     unsubscribe5();
+    unsubscribe6();
   });
 
   function handleFontChange(e: any) {
@@ -134,9 +142,18 @@
       isVisible = false;
     }
   }
+  let left: number;
+  $: {
+    if (sidebarHidden) {
+      left = -254;
+    } else {
+      left = 15;
+    }
+  }
 </script>
 
-<div class="text-settings" class:isVisible>
+<div class="text-settings" class:isVisible style="left: {left}px;">
+  <SideBarCollapseButton {sidebarHidden} />
   <div class="content-wrapper">
     <div class="font-container centered">
       Font
@@ -196,20 +213,21 @@
     position: fixed;
     color: white;
     border-radius: 20px;
-    height: 620px;
+    height: 640px;
     background-color: rgb(25, 29, 31);
-    left: 15px;
     padding: 20px;
     top: 70px;
     display: none;
     flex-direction: column;
     border: 2px solid rgba(255, 255, 255, 0.198);
     width: 208px;
+    transition: all 0.8s ease;
   }
 
   .font-container {
     display: flex;
     justify-content: space-between;
+    margin-top: 20px;
   }
 
   .font-box {
