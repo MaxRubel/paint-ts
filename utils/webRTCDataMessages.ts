@@ -1,7 +1,7 @@
 import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
-import { DrawBrushStroke, DrawOtherPersonsPoints, GetCanvasContext, RebuildCanvasAfterUndo } from "./drawBrushStroke";
+import { DrawOtherPersonsPoints, RebuildCanvasAfterUndo } from "./drawBrushStroke";
 import type { DrawSendData } from "./drawBrushStroke";
 
 export type mousePos = {
