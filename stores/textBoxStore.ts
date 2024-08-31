@@ -68,7 +68,6 @@ export function createNewTextBox(
 }
 
 export function updateTextBox(id: string, updates: any) {
-  console.log("updating text box!", id, updates);
   textBoxesStore.update((boxes) => {
     if (boxes[id]) {
       boxes = { ...boxes, [id]: { ...boxes[id], ...updates } };

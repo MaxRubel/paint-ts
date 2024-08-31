@@ -1,10 +1,11 @@
 import { get, writable } from "svelte/store";
-import { DrawImageFromDataURL, GetCanvasContext } from "../utils/drawBrushStroke";
+import { DrawImageFromDataURL, GetCanvasContext, pointsMap, RebuildCanvasAfterUndo } from "../utils/drawBrushStroke";
 import { AddUndoItem } from "./undoStore";
 import { deleteTextBox, textBoxesStore, updateTextBox } from "./textBoxStore";
 import type { TextBoxType, UndoType } from "../utils/types/app_types";
+import { SendToAll } from "../utils/webRTCNegotiate";
 
-interface RedoItem {
+type RedoItem = {
   action: string;
   data: any;
   undoItem: UndoType;
@@ -12,7 +13,7 @@ interface RedoItem {
 
 export const redo_store = writable<RedoItem[]>([]);
 
-export function AddRedoItem(redoItem: any) {
+export function AddRedoItem(redoItem: RedoItem) {
   redo_store.update((oldItems) => {
     return [...oldItems, redoItem];
   });
@@ -57,6 +58,9 @@ export function HandleRedo() {
       break;
     case "redoChangedFontSingle":
       redoChangedFontSingle(redoItem);
+      break;
+    case "undidpublicbrushstroke":
+      redoPublicBrushStroke(redoItem);
       break;
   }
   if (
@@ -135,6 +139,13 @@ function resetManyTextBoxes(redoItem: any) {
   data.forEach((textbox: TextBoxType) => {
     updateTextBox(textbox.id, textbox);
   });
+}
+
+function redoPublicBrushStroke(redoItem: any) {
+  const { data } = redoItem
+  pointsMap[data.id] = data
+  SendToAll(`redopublicbrush&*^${JSON.stringify(data)}`)
+  RebuildCanvasAfterUndo()
 }
 
 function popLastItem() {

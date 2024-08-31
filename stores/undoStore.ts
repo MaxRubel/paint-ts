@@ -1,5 +1,5 @@
 import { get, writable } from "svelte/store";
-import { DrawImageFromDataURL, GetCanvasContext } from "../utils/drawBrushStroke";
+import { DrawImageFromDataURL, GetCanvasContext, pointsMap, RebuildCanvasAfterUndo } from "../utils/drawBrushStroke";
 import type {
   UndoBrushStroke,
   UndoDragSingle,
@@ -16,6 +16,7 @@ import {
 import { event_state_store } from "./eventState";
 import { AddRedoItem } from "../stores/redoStore";
 import { drawing_room_id } from "./drawingRoomStore";
+import { SendToAll } from "../utils/webRTCNegotiate";
 
 export const undo_store = writable<UndoType[]>([]);
 
@@ -85,6 +86,9 @@ export function HandleUndo() {
       break;
     case "manyTextBoxAligned":
       undoManyTextBoxAligned(lastAction);
+      break;
+    case "drewBrushPublic":
+      undoBrushPublic(lastAction)
       break;
   }
   popLastItem();
@@ -286,6 +290,20 @@ function packageMultipleRedos(action: string, undoItem: any) {
     data.push(get(textBoxesStore)[textBox.id]);
   });
   AddRedoItem({ action, data, undoItem });
+}
+
+function undoBrushPublic(lastAction: any) {
+  const { publicMoveId } = lastAction.data
+  const item = pointsMap[publicMoveId]
+
+  AddRedoItem({
+    action: "undidpublicbrushstroke",
+    data: item,
+    undoItem: lastAction
+  })
+  delete pointsMap[publicMoveId]
+  SendToAll(`undobrushstroke&*^${JSON.stringify({ publicMoveId })}`)
+  RebuildCanvasAfterUndo()
 }
 
 function popLastItem() {

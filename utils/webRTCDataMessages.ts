@@ -1,7 +1,7 @@
 import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
-import { DrawOtherPersonsPoints, RebuildCanvasAfterUndo } from "./drawBrushStroke";
+import { DrawOtherPersonsPoints, pointsMap, RebuildCanvasAfterUndo } from "./drawBrushStroke";
 import type { DrawSendData } from "./drawBrushStroke";
 
 export type mousePos = {
@@ -22,7 +22,6 @@ type deleteTextbox = {
 type pointsArray = [number, number, number][]
 export type PointsMap = { [key: string]: PointsObject }
 export type PointsObject = { id: string, size: number, color: string, array: pointsArray };
-let pointsMap: PointsMap = {}
 
 let tempArray: pointsArray = []
 
@@ -52,24 +51,28 @@ function handleDrawPointsOnCanvas(msgData: DrawSendData) {
   DrawOtherPersonsPoints(msgData)
 
   tempArray.push(...msgData.array)
-  if (msgData.end) {
+  if (msgData.end) { //store the whole stroke in the pointsMap
     pointsMap[msgData.end] = {
       id: msgData.end,
       size: msgData.brush.size,
       color: msgData.brush.color,
       array: tempArray
     }
-    console.log(pointsMap)
     tempArray = []
   }
 }
 
 
-function handleUndoBrushStroke(msgData: string) {
-  console.log("received undo data", msgData)
+function handleUndoBrushStroke(msgData: { ["publicMoveId"]: string }) {
+  const { publicMoveId } = msgData
 
-  delete pointsMap[msgData]
-  RebuildCanvasAfterUndo(pointsMap)
+  delete pointsMap[publicMoveId]
+  RebuildCanvasAfterUndo()
+}
+
+function handleRedoPublicBrush(msgData: PointsObject) {
+  pointsMap[msgData.id] = msgData
+  RebuildCanvasAfterUndo()
 }
 
 export function ParseMessage(msg: string) {
@@ -93,5 +96,9 @@ export function ParseMessage(msg: string) {
       break;
     case "undobrushstroke":
       handleUndoBrushStroke(msgJson)
+      break;
+    case "redopublicbrush":
+      handleRedoPublicBrush(msgJson)
+      break;
   }
 }
