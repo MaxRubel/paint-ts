@@ -2,7 +2,7 @@ import { textBoxesStore } from "../stores/textBoxStore";
 import type { TextBoxType } from "./types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
 import { DrawOtherPersonsPoints } from "./drawBrushStroke";
-import type { DrawSendData } from "./drawBrushStroke";
+import type { DrawSendData, UndoSendData } from "./drawBrushStroke";
 
 export type mousePos = {
   id: string;
@@ -48,7 +48,17 @@ function handleDeleteTextBoxes(msgJson: deleteTextbox) {
 }
 
 function handleDrawPointsOnCanvas(msgData: DrawSendData) {
-  console.log("received brush strokes", msgData)
+  DrawOtherPersonsPoints(msgData)
+}
+
+function handleUndoBrushStroke(msgData: UndoSendData) {
+  console.log("received undo data", msgData)
+  if (msgData.brush.type === "drawing") {
+    msgData.brush.type = "erasing"
+    msgData.brush.size = msgData.brush.size + (msgData.brush.size * .4)
+  } else {
+    msgData.brush.type = "drawing"
+  }
   DrawOtherPersonsPoints(msgData)
 }
 
@@ -74,5 +84,7 @@ export function ParseMessage(msg: string) {
     case "points":
       handleDrawPointsOnCanvas(msgJson)
       break;
+    case "undobrushstroke":
+      handleUndoBrushStroke(msgJson)
   }
 }

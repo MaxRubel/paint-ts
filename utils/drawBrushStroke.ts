@@ -19,6 +19,7 @@ let color = "";
 
 type sendArray = [number, number, number][]
 export type DrawSendData = { brush: { size: number, color: string, type: string }, array: sendArray }
+export type UndoSendData = { start: number, end: number, brush: { size: number, color: string, type: string }, array: sendArray }
 let sendInterval: NodeJS.Timeout | null
 
 let watchingForMouseout = false
@@ -95,15 +96,16 @@ export function SaveOriginalRaster() {
 }
 
 let oldArrystart = 0
+
 function startTransmitting() {
   if (Object.values(get(peerConnections)).length) {
     sendInterval = setInterval(() => {
       const array = points.slice(oldArrystart)
-      oldArrystart = points.length - 2
-      const sendData: DrawSendData = {
-        brush: { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) },
-        array
-      }
+      oldArrystart = points.length - 1
+
+      const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
+      const sendData: DrawSendData = { brush: brushData, array }
+
       SendToAll(`points&*^${JSON.stringify(sendData)}`)
     }, BRUSH_DATA_SEND_INTERVAL)
   }
@@ -114,19 +116,26 @@ function stopTransmitting() {
     clearInterval(sendInterval)
     transmitting = false
     const array = points.slice(oldArrystart)
-    const sendData: DrawSendData = {
-      brush: { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) },
-      array
-    }
+    const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
+    const sendData: DrawSendData = { brush: brushData, array }
+
     SendToAll(`points&*^${JSON.stringify(sendData)}`)
   }
+
   oldArrystart = 0
+
 }
 
 function handleMouseLeave() {
   // console.log("Mouse left while drawing");
   EndBrushStroke();
 }
+
+// export function TransmitUndoBrushStroke() {
+//   const item = collectionOfSendData.pop()
+//   console.log("sending undo item", item)
+//   SendToAll(`undobrushstroke&*^${JSON.stringify(item)}`)
+// }
 
 export function DrawBrushStroke(
   context: CanvasRenderingContext2D,

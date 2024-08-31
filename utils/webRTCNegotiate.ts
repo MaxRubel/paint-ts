@@ -1,8 +1,9 @@
 import { get, writable } from "svelte/store";
-import { drawing_room_id, myPublicId } from "../stores/drawingRoomStore";
-import { SendWSMessage } from "./websocketHub";
+import { drawing_room_id, i_am_hosting, myPublicId } from "../stores/drawingRoomStore";
+import { SendInitialRoomData, SendWSMessage } from "./websocketHub";
 import { textBoxesStore } from "../stores/textBoxStore";
 import { ParseMessage, type mousePos } from "./webRTCDataMessages";
+import { GetCurrentCanvas } from "./drawBrushStroke";
 
 type outgoingMessage = {
   type: string;
@@ -63,7 +64,7 @@ export async function CreateOffer(id: string) {
     const dataChannel = event.channel;
 
     dataChannel.onopen = () => {
-      sendSingleDataMessage(id, "iamreadytojoin&*^{}");
+      sendSingleDataMessage(id, "ihavejoined&*^{}");
     };
 
     dataChannel.onmessage = (messageEvent) => {
@@ -167,10 +168,9 @@ export async function ReceiveOffer(incoming: any) {
     dataChannel.onopen = () => {
       const textboxes = get(textBoxesStore);
       sendSingleDataMessage(from, `userjoined&*^${JSON.stringify(textboxes)}`);
-    };
-
-    dataChannel.onclose = () => {
-      console.log("Data channel has closed");
+      if (get(i_am_hosting)) {
+        SendInitialRoomData(from)
+      }
     };
   };
   //herehere

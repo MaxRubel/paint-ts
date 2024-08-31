@@ -13,6 +13,7 @@
   import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
   import ArrowLeft from "../../graphics/ArrowLeft.svelte";
   import { side_bar_hidden_store } from "../../../stores/userPrefsStore";
+  import SideBarCollapseButton from "./SideBarCollapseButton.svelte";
 
   let eventState: string = "";
   let isVisible: boolean = false;
@@ -63,28 +64,19 @@
     }
   }
 
-  let left = 15;
-
-  function toggleSideBar() {
+  let left: number;
+  $: {
     if (sidebarHidden) {
-      left = 15;
-      side_bar_hidden_store.set(false);
-    } else {
       left = -254;
-      side_bar_hidden_store.set(true);
+    } else {
+      left = 15;
     }
   }
 </script>
 
 <div class="color-bar-3" class:isVisible style="left: {left}px">
   <div class="sidebutton-container">
-    <button
-      class="move"
-      on:click={toggleSideBar}
-      style="left: {sidebarHidden ? '270px' : '20px'}"
-    >
-      <ArrowLeft {sidebarHidden} />
-    </button>
+    <SideBarCollapseButton {sidebarHidden} />
   </div>
   <div class="content-wrapper">
     <div class="slider centered" style="flex-direction: column">
@@ -131,15 +123,5 @@
     width: 100%;
     height: 44px;
     color: White;
-  }
-
-  .move {
-    position: absolute;
-    height: 30px;
-    width: 40px;
-    padding: 0px;
-    left: 20px;
-    top: 15px;
-    transition: left 0.8s ease;
   }
 </style>
