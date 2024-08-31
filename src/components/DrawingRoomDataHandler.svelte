@@ -166,7 +166,7 @@
 </div>
 
 <style>
-  .debug-webrtc {
+  /* .debug-webrtc {
     background-color: white;
     height: 500px;
     width: 100px;
@@ -176,7 +176,7 @@
     z-index: 1000;
     border-radius: 10%;
     padding: 20px;
-  }
+  } */
 
   .peer-video-stream-container {
     height: 2000px;
@@ -188,8 +188,8 @@
     pointer-events: none;
     background-color: transparent;
   }
-
+  /* 
   .top {
     margin-top: 20px;
-  }
+  } */
 </style>
