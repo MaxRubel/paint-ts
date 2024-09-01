@@ -6,7 +6,7 @@ import { get } from "svelte/store";
 import type { TextBoxType } from "../utils/types/app_types";
 import { AddUndoItem } from "./undoStore";
 import { active_color_store } from "./paletteStore";
-import { SendToAll } from "../utils/webRTCNegotiate";
+import { SendToAll } from "../utils/webRTC/webRTCNegotiate";
 import { drawing_room_id } from "./drawingRoomStore";
 
 export interface TextBoxMap {

@@ -1,8 +1,8 @@
-import { textBoxesStore } from "../stores/textBoxStore";
-import type { TextBoxType } from "./types/app_types";
+import { textBoxesStore } from "../../stores/textBoxStore";
+import type { TextBoxType } from "../types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
-import { DrawOtherPersonsPoints, pointsMap, RebuildCanvasAfterUndo } from "./drawBrushStroke";
-import type { DrawSendData } from "./drawBrushStroke";
+import { DrawOtherPersonsPoints, pointsMap, RebuildCanvasAfterUndo } from "../drawBrushStroke";
+import type { DrawSendData } from "../drawBrushStroke";
 
 export type mousePos = {
   id: string;
@@ -52,6 +52,7 @@ function handleDrawPointsOnCanvas(msgData: DrawSendData) {
 
   tempArray.push(...msgData.array)
   if (msgData.end) { //store the whole stroke in the pointsMap
+    console.log("received end of transmission")
     pointsMap[msgData.end] = {
       id: msgData.end,
       size: msgData.brush.size,

@@ -3,7 +3,7 @@ import { DrawImageFromDataURL, GetCanvasContext, pointsMap, RebuildCanvasAfterUn
 import { AddUndoItem } from "./undoStore";
 import { deleteTextBox, textBoxesStore, updateTextBox } from "./textBoxStore";
 import type { TextBoxType, UndoType } from "../utils/types/app_types";
-import { SendToAll } from "../utils/webRTCNegotiate";
+import { SendToAll } from "../utils/webRTC/webRTCNegotiate";
 
 type RedoItem = {
   action: string;
@@ -27,7 +27,7 @@ export function HandleRedo() {
   const redoArray = get(redo_store);
   if (redoArray.length === 0) return;
   const redoItem: RedoItem = redoArray[redoArray.length - 1];
-
+  console.log("firing redo")
   switch (redoItem.action) {
     case "drawBushStroke":
       redoDrawBrushStrokes(redoItem);

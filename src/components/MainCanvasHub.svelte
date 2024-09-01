@@ -39,6 +39,7 @@
   import TopToolBar from "./toolbars/TopToolBar.svelte";
   import EraserSettings from "./toolbars/EraserSettings.svelte";
   import DrawingRoomDataHandler from "./DrawingRoomDataHandler.svelte";
+  import DebugMenu from "./menus/DebugMenu.svelte";
 
   export let drawingRoomId = null;
 
@@ -286,6 +287,7 @@
   {#if drawingRoomId}
     <DrawingRoomDataHandler />
   {/if}
+  <DebugMenu />
   <NavMenu {handleClear} />
   <MultiplayerDebug />
   <TopToolBar

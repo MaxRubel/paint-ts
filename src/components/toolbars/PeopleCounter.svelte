@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
-  import { peerStates } from "../../../utils/webRTCNegotiate";
+  import { peerStates } from "../../../utils/webRTC/webRTCNegotiate";
   import PeopleIcon from "../../graphics/PeopleIcon.svelte";
 
   let amount = 0;

@@ -15,8 +15,7 @@ import {
 } from "./textBoxStore";
 import { event_state_store } from "./eventState";
 import { AddRedoItem } from "../stores/redoStore";
-import { drawing_room_id } from "./drawingRoomStore";
-import { SendToAll } from "../utils/webRTCNegotiate";
+import { SendToAll } from "../utils/webRTC/webRTCNegotiate";
 
 export const undo_store = writable<UndoType[]>([]);
 
@@ -41,6 +40,7 @@ export function HandleUndo() {
   }
   const lastAction = arr[arr.length - 1];
 
+  console.log(lastAction.action)
   switch (lastAction.action) {
     case "drewBrush": //
       undoBrushStroke(lastAction);
