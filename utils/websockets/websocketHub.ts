@@ -4,10 +4,10 @@ import {
   drawing_room_store,
   i_am_hosting,
   myPublicId,
-} from "../stores/drawingRoomStore";
-import { authStore } from "../utils/auth/auth_store";
+} from "../../stores/drawingRoomStore";
+import { authStore } from "../auth/auth_store";
 import { v4 as uuidv4 } from "uuid";
-import { alert_store } from "../stores/alertStore";
+import { alert_store } from "../../stores/alertStore";
 import { navigate } from "svelte-routing";
 import {
   CreateOffer,
@@ -16,9 +16,9 @@ import {
   peerIds,
   ReceiveAnswer,
   ReceiveOffer,
-} from "./webRTCNegotiate";
-import { textBoxesStore } from "../stores/textBoxStore";
-import { GetCanvasContext } from "./drawBrushStroke";
+} from "../webRTCNegotiate";
+import { textBoxesStore } from "../../stores/textBoxStore";
+import { GetCanvasContext, pointsMap, ReceiveNewPointsMap } from "../drawBrushStroke";
 
 type outgoingMessage = {
   type: string;
@@ -101,6 +101,7 @@ function startNegotiations() {
 
 function parseInitialRoomData(msg) {
   const { canvasImage, textboxes } = msg.data
+  const newPointsMap = msg.data.pointsMap
 
   //set text boxes:
   textBoxesStore.set(textboxes)
@@ -114,6 +115,7 @@ function parseInitialRoomData(msg) {
     })
   };
   img.src = `data:image/png;base64,${canvasImage}`;
+  ReceiveNewPointsMap(newPointsMap)
 }
 
 function parseMessage(e: any) {
@@ -174,7 +176,7 @@ export function SendInitialRoomData(id: string) {
 
   const data = {
     textboxes: get(textBoxesStore),
-    canvasImage
+    canvasImage, pointsMap
   }
   const msg: outgoingMessage = {
     type: "initalJoinData",

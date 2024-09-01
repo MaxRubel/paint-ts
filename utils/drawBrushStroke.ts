@@ -100,12 +100,25 @@ export function SaveOriginalRaster() {
   oldRaster = canvas.toDataURL("image/png");
 }
 
+export function ReceiveNewPointsMap(value: PointsMap) {
+  pointsMap = value
+}
+
+let mouseHasLeftCanvas = false
 
 function startTransmitting() {
   publicMoveId = uuidv4()
   sendInterval = setInterval(() => {
-    const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
-    const sendData: DrawSendData = { end: null, brush: brushData, array: pointsToSend }
+    const brushData = {
+      size: get(brush_size_store),
+      color: get(active_color_store),
+      type: get(event_state_store)
+    }
+    const sendData: DrawSendData = {
+      end: null,
+      brush: brushData,
+      array: pointsToSend
+    }
 
     SendToAll(`points&*^${JSON.stringify(sendData)}`)
   }, BRUSH_DATA_SEND_INTERVAL)
@@ -116,51 +129,20 @@ function stopTransmitting() {
   transmitting = false
   if (sendInterval) {
     clearInterval(sendInterval)
-
-    const brushData = { size: get(brush_size_store), color: get(active_color_store), type: get(event_state_store) }
-    const sendData: DrawSendData = { end: publicMoveId, brush: brushData, array: pointsToSend }
-
-    oldIds.push(publicMoveId)
-
-    AddUndoItem({
-      action: "drewBrushPublic",
-      data: { publicMoveId }
-    })
-
-    SendToAll(`points&*^${JSON.stringify(sendData)}`)
-
   }
-  pointsMap[publicMoveId] = {
-    id: publicMoveId,
-    size: get(brush_size_store),
-    color: get(active_color_store),
-    array: tempPoints
-  }
-  pointsToSend = []
-  publicMoveId = ""
-}
-
-export function TransmitUndoOldPoints() {
-  const lastPointsId = oldIds.pop()
-  SendToAll(`undobrushstroke&*^${JSON.stringify(lastPointsId)}`)
-  //   const last = historyOfSentPoints.pop()
-  //   if (!last) return
-  //   const { start, end } = last
-
-  //   const msg: UndoSendData = {
-  //     brush: {
-  //       size: get(brush_size_store),
-  //       color: get(active_color_store),
-  //       type: "erasing"
-  //     },
-  //     array: undoPoints
-  //   }
-  //   SendToAll(`undobrushstroke&*^${JSON.stringify(msg)}`)
 }
 
 function handleMouseLeave() {
-  // console.log("Mouse left while drawing");
+  mouseHasLeftCanvas = true
   EndBrushStroke();
+  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
+  canvas.addEventListener("mouseenter", handleMouseEnter);
+}
+
+function handleMouseEnter() {
+  mouseHasLeftCanvas = false
+  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
+  canvas.removeEventListener("mouseenter", handleMouseEnter);
 }
 
 
@@ -220,8 +202,8 @@ export function DrawBrushStroke(
 }
 
 export function EndBrushStroke() {
-
   const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
+
   const eventState = get(event_state_store);
   if (canvas) {
     currentCanvas = canvas.toDataURL();
@@ -246,8 +228,54 @@ export function EndBrushStroke() {
     stopTransmitting();
   }
 
+  if (!mouseHasLeftCanvas) {
+    const brushData = {
+      size: get(brush_size_store),
+      color: get(active_color_store),
+      type: get(event_state_store)
+    }
+
+    const sendData: DrawSendData = {
+      end: publicMoveId,
+      brush: brushData,
+      array: pointsToSend
+    }
+
+    SendToAll(`points&*^${JSON.stringify(sendData)}`)
+    oldIds.push(publicMoveId)
+
+    AddUndoItem({
+      action: "drewBrushPublic",
+      data: { publicMoveId }
+    })
+
+    pointsMap[publicMoveId] = {
+      id: publicMoveId, //important: end id only gets sent if mouse is on canvas
+      size: get(brush_size_store),
+      color: get(active_color_store),
+      array: tempPoints
+    }
+    pointsToSend = []
+    publicMoveId = ""
+  } else { //mouse is not on cavas
+    const brushData = {
+      size: get(brush_size_store),
+      color: get(active_color_store),
+      type: get(event_state_store)
+    }
+
+    const sendData: DrawSendData = {
+      end: null,
+      brush: brushData,
+      array: pointsToSend
+    }
+
+    SendToAll(`points&*^${JSON.stringify(sendData)}`)
+    oldIds.push(publicMoveId)
+  }
+
   if (watchingForMouseout) {
-    canvas?.removeEventListener("mouseleave", handleMouseLeave);
+    canvas.removeEventListener("mouseleave", handleMouseLeave);
     watchingForMouseout = false;
   }
 
@@ -297,8 +325,6 @@ export function GetVectorPaths() {
 }
 
 export function RebuildCanvasAfterUndo() {
-  console.log("pointsMap length: ", Object.values(pointsMap).length)
-
   requestAnimationFrame(() => {
     ctx?.clearRect(0, 0, 2000, 3000)
   })

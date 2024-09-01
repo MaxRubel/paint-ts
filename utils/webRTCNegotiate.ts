@@ -1,6 +1,6 @@
 import { get, writable } from "svelte/store";
 import { drawing_room_id, i_am_hosting, myPublicId } from "../stores/drawingRoomStore";
-import { SendInitialRoomData, SendWSMessage } from "./websocketHub";
+import { SendInitialRoomData, SendWSMessage } from "./websockets/websocketHub";
 import { textBoxesStore } from "../stores/textBoxStore";
 import { ParseMessage, type mousePos } from "./webRTCDataMessages";
 

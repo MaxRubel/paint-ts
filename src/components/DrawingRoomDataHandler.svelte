@@ -9,7 +9,10 @@
   } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
   import { event_state_store } from "../../stores/eventState";
-  import { CloseWebsocket, InitWebsockets } from "../../utils/websocketHub";
+  import {
+    CloseWebsocket,
+    InitWebsockets,
+  } from "../../utils/websockets/websocketHub";
   import {
     dataChannels,
     peerConnections,
@@ -22,7 +25,6 @@
   import { mousePositions } from "../../utils/webRTCNegotiate";
   import type { mousePos } from "../../utils/webRTCDataMessages";
   import PeerMouse from "./canvas elements/PeerMouse.svelte";
-  import { TransmitUndoOldPoints } from "../../utils/drawBrushStroke";
   import PeopleCounter from "./toolbars/PeopleCounter.svelte";
 
   let iHaveJoined: boolean;

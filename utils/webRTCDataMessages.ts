@@ -52,6 +52,7 @@ function handleDrawPointsOnCanvas(msgData: DrawSendData) {
 
   tempArray.push(...msgData.array)
   if (msgData.end) { //store the whole stroke in the pointsMap
+    console.log("received end of transmission")
     pointsMap[msgData.end] = {
       id: msgData.end,
       size: msgData.brush.size,
