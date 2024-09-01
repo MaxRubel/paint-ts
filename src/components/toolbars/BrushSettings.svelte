@@ -11,7 +11,6 @@
   import type { PaletteType } from "../../../stores/paletteStore";
   import PaletteInSettings from "./PaletteInSettings.svelte";
   import ColorPickerInSettings from "./ColorPickerInSettings.svelte";
-  import ArrowLeft from "../../graphics/ArrowLeft.svelte";
   import { side_bar_hidden_store } from "../../../stores/userPrefsStore";
   import SideBarCollapseButton from "./SideBarCollapseButton.svelte";
 

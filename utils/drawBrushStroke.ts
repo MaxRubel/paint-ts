@@ -1,6 +1,6 @@
 import getStroke from "perfect-freehand";
 import { getSvgPathFromStroke } from "./getSvgPathFromStroke";
-import { get } from "svelte/store";
+import { get, writable } from "svelte/store";
 import { event_state_store, theme_store } from "../stores/eventState";
 import { AddUndoItem } from "../stores/undoStore";
 import { brush_size_store } from "../stores/brushStore";
@@ -74,6 +74,7 @@ export function DrawImageFromDataURL(
 
     img.onerror = (error) => {
       console.error("Error loading image:", error);
+      console.log("here is the data url: ", dataURL)
       reject(error);
     };
 
@@ -103,8 +104,6 @@ export function ReceiveNewPointsMap(value: PointsMap) {
   pointsMap = value
 }
 
-let mouseHasLeftCanvas = false
-
 function startTransmitting() {
   publicMoveId = uuidv4()
   sendInterval = setInterval(() => {
@@ -130,20 +129,6 @@ function stopTransmitting() {
     clearInterval(sendInterval)
   }
 }
-
-function handleMouseLeave() {
-  mouseHasLeftCanvas = true
-  EndBrushStroke();
-  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
-  canvas.addEventListener("mouseenter", handleMouseEnter);
-}
-
-function handleMouseEnter() {
-  mouseHasLeftCanvas = false
-  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
-  canvas.removeEventListener("mouseenter", handleMouseEnter);
-}
-
 
 export function DrawBrushStroke(
   context: CanvasRenderingContext2D,
@@ -179,11 +164,6 @@ export function DrawBrushStroke(
   tempPoints.push([x, y, e.pressure]);
   pointsToSend.push([x, y, e.pressure])
 
-  if (!watchingForMouseout) {
-    canvas.addEventListener("mouseleave", handleMouseLeave);
-    watchingForMouseout = true;
-  }
-
   const stroke = getStroke(tempPoints, {
     size: get(brush_size_store),
     thinning: 0.5,
@@ -204,17 +184,16 @@ export function DrawBrushStroke(
 
 export function EndBrushStroke() {
   const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
-  canvas.removeEventListener("mouseleave", handleMouseLeave);
+  // canvas.removeEventListener("mouseleave", handleMouseLeave);
 
   const eventState = get(event_state_store);
 
   if (canvas) { currentCanvas = canvas.toDataURL(); }
   if (watchingForMouseout) { watchingForMouseout = false; }
 
-  //undo items for non-drawing room
-  if (!get(drawing_room_id)) {
+
+  if (!get(drawing_room_id)) { //not in drawing room:
     if (eventState === "drawing") {
-      console.log('adding undo item')
       AddUndoItem({
         action: "drewBrush",
         data: { color, oldRaster },
@@ -225,8 +204,7 @@ export function EndBrushStroke() {
         data: { oldRaster },
       });
     }
-    tempPoints = []
-  } else {
+  } else { //in drawing room:
     if (transmitting) {
       stopTransmitting();
     }
@@ -237,41 +215,31 @@ export function EndBrushStroke() {
       type: get(event_state_store)
     }
 
-    if (!mouseHasLeftCanvas) {
-      const sendData: DrawSendData = {
-        end: publicMoveId,
-        brush: brushData,
-        array: pointsToSend
-      }
-
-      SendToAll(`points&*^${JSON.stringify(sendData)}`)
-
-      AddUndoItem({
-        action: "drewBrushPublic",
-        data: { publicMoveId }
-      })
-
-      pointsMap[publicMoveId] = {
-        id: publicMoveId, //important: end id only gets sent if mouse is on canvas
-        size: get(brush_size_store),
-        color: get(active_color_store),
-        array: tempPoints
-      }
-      tempPoints = []
-      publicMoveId = ""
-    } else { //mouse is not on cavas
-      const sendData: DrawSendData = {
-        end: null,
-        brush: brushData,
-        array: pointsToSend
-      }
-      SendToAll(`points&*^${JSON.stringify(sendData)}`)
+    const sendData: DrawSendData = {
+      end: publicMoveId,
+      brush: brushData,
+      array: pointsToSend
     }
+
+    SendToAll(`points&*^${JSON.stringify(sendData)}`)
+
+    AddUndoItem({
+      action: "drewBrushPublic",
+      data: { publicMoveId }
+    })
+
+    pointsMap[publicMoveId] = {
+      id: publicMoveId,
+      size: get(brush_size_store),
+      color: get(active_color_store),
+      array: tempPoints
+    }
+    publicMoveId = ""
   }
 
+  tempPoints = []
   pointsToSend = []
   paths = [];
-  oldRaster = null;
 }
 
 export function DrawOtherPersonsPoints(msg: DrawSendData) {

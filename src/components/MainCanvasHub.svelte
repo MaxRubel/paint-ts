@@ -47,11 +47,15 @@
   let ctx: CanvasRenderingContext2D;
   let textBoxes: TextBoxMap;
   let cursor = "arrow";
-  let event_state = "arrow";
+  let event_state: string;
   let selected: string = "";
   let xStart = 0;
   let yStart = 0;
   let locked = true;
+
+  let oldState: string;
+  let iAmDrawing = false;
+  let mouseHasLeft = false;
 
   const unsubcribe = textBoxesStore.subscribe((value) => {
     textBoxes = value;
@@ -158,10 +162,9 @@
     ClearRedoItems();
   }
 
-  let oldState: string;
-
   function handlePointerDown(e: PointerEvent): void {
     oldState = event_state;
+    mouseHasLeft = false;
     if (e.buttons === 2) {
       event_state_store.set("erasing");
     }
@@ -174,6 +177,7 @@
     if (event_state.includes("typing")) {
       event_state_store.set("arrow");
     }
+
     switch (event_state) {
       case "selected":
         if ((e.target as HTMLElement)?.id === "main-canvas") {
@@ -182,10 +186,12 @@
         }
         break;
       case "drawing":
+        iAmDrawing = true;
         SaveOriginalRaster();
         DrawBrushStroke(ctx, e);
         break;
       case "erasing":
+        iAmDrawing = true;
         SaveOriginalRaster();
         DrawBrushStroke(ctx, e);
         break;
@@ -198,15 +204,16 @@
         break;
     }
   }
-
   function handlePointerMove(e: PointerEvent) {
     if (e.buttons !== 1) return; //stop right click from drawing
 
     switch (event_state) {
       case "drawing":
+        if (mouseHasLeft) return;
         DrawBrushStroke(ctx, e);
         break;
       case "erasing":
+        if (mouseHasLeft) return;
         DrawBrushStroke(ctx, e);
         break;
       case "rectangle-draw":
@@ -221,11 +228,14 @@
   function handlePointerUp(e: any): void {
     switch (event_state) {
       case "drawing":
+        if (mouseHasLeft) return;
         EndBrushStroke();
-        AddUndoItem;
+        iAmDrawing = false;
         break;
       case "erasing":
+        if (mouseHasLeft) return;
         EndBrushStroke();
+        iAmDrawing = false;
         break;
       case "selecting":
         ClearSelectionRect();
@@ -281,6 +291,12 @@
       });
     }
   }
+
+  $: {
+    if (mouseHasLeft && iAmDrawing) {
+      EndBrushStroke();
+    }
+  }
 </script>
 
 <main>
@@ -310,6 +326,9 @@
       on:pointerdown={handlePointerDown}
       on:pointerup={handlePointerUp}
       on:pointermove={handlePointerMove}
+      on:pointerleave={() => {
+        mouseHasLeft = true;
+      }}
     >
     </canvas>
     <BrushSettings />
