@@ -16,7 +16,7 @@ import {
   peerIds,
   ReceiveAnswer,
   ReceiveOffer,
-} from "../webRTCNegotiate";
+} from "../webRTC/webRTCNegotiate";
 import { textBoxesStore } from "../../stores/textBoxStore";
 import { GetCanvasContext, pointsMap, ReceiveNewPointsMap } from "../drawBrushStroke";
 

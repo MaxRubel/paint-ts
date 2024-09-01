@@ -14,18 +14,18 @@
     InitWebsockets,
   } from "../../utils/websockets/websocketHub";
   import {
-    dataChannels,
-    peerConnections,
     peerIds,
     peerStates,
     SendToAll,
-  } from "../../utils/webRTCNegotiate";
+  } from "../../utils/webRTC/webRTCNegotiate";
   import { textBoxesStore } from "../../stores/textBoxStore";
   import type { TextBoxType } from "../../utils/types/app_types";
-  import { mousePositions } from "../../utils/webRTCNegotiate";
-  import type { mousePos } from "../../utils/webRTCDataMessages";
+  import { mousePositions } from "../../utils/webRTC/webRTCNegotiate";
+  import type { mousePos } from "../../utils/webRTC/webRTCDataMessages";
   import PeerMouse from "./canvas elements/PeerMouse.svelte";
   import PeopleCounter from "./toolbars/PeopleCounter.svelte";
+  import { undo_store } from "../../stores/undoStore";
+  import { redo_store } from "../../stores/redoStore";
 
   let iHaveJoined: boolean;
   let myId: string;
@@ -107,6 +107,8 @@
       event_state_store.set("confirm_join_drawing_room_form");
     }
     startMouseTracker();
+    undo_store.set([]);
+    redo_store.set([]);
   });
 
   onDestroy(() => {
@@ -123,43 +125,8 @@
     CloseWebsocket();
     stopMouseTracker();
   });
-
-  //debug functions
-  function checkIceState() {
-    console.log(Object.values(peerConnections)[0].iceGatheringState);
-  }
-
-  function checkLocalDesc() {
-    console.log(Object.values(peerConnections)[0].localDescription);
-  }
-
-  function checkRemoteDesc() {
-    console.log(Object.values(peerConnections)[0].remoteDescription);
-  }
-
-  function sendDateMessage() {
-    Object.values(get(dataChannels)).forEach((chan) => {
-      chan.send("hello this is a test thank u");
-    });
-  }
 </script>
 
-<!-- <div class="debug-webrtc">
-  <div>My Id: {$myPublicId}</div>
-  <div class="peerIds top">
-    <button style="width: auto;" on:click={TransmitUndoOldPoints}>Undo Canvas</button
-    >
-  
-    <div><strong>Other user's IDs</strong></div>
-    {#each peerIdArray as id}
-      {#if peerStateMap[id]}
-        <div style="color: green; width: 100%">{id}</div>
-      {:else}
-        <div style="color: red; width: 100%">{id}</div>
-      {/if}
-    {/each}
-  </div>
-</div> -->
 <PeopleCounter />
 <div class="peer-video-stream-container">
   {#each Object.values(peerMice) as mouseData}
@@ -168,18 +135,6 @@
 </div>
 
 <style>
-  /* .debug-webrtc {
-    background-color: white;
-    height: 500px;
-    width: 100px;
-    position: fixed;
-    right: 10px;
-    top: 70px;
-    z-index: 1000;
-    border-radius: 10%;
-    padding: 20px;
-  } */
-
   .peer-video-stream-container {
     height: 2000px;
     width: 3000px;
@@ -190,8 +145,4 @@
     pointer-events: none;
     background-color: transparent;
   }
-  /* 
-  .top {
-    margin-top: 20px;
-  } */
 </style>

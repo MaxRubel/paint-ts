@@ -1,8 +1,9 @@
 import { get, writable } from "svelte/store";
-import { drawing_room_id, i_am_hosting, myPublicId } from "../stores/drawingRoomStore";
-import { SendInitialRoomData, SendWSMessage } from "./websockets/websocketHub";
-import { textBoxesStore } from "../stores/textBoxStore";
-import { ParseMessage, type mousePos } from "./webRTCDataMessages";
+import { drawing_room_id, i_am_hosting, myPublicId } from "../../stores/drawingRoomStore"
+import { SendInitialRoomData, SendWSMessage } from "../websockets/websocketHub"
+import { textBoxesStore } from "../../stores/textBoxStore";
+import { ParseMessage, type mousePos } from "../webRTC/webRTCDataMessages";
+import { alert_store } from "../../stores/alertStore";
 
 export type OutgoingMessage = {
   type: string;
@@ -134,6 +135,10 @@ export async function ReceiveOffer(incoming: any) {
         SendInitialRoomData(from)
       }
     };
+
+    dataChannel.onclose = () => {
+      peerConnection.close()
+    }
   };
 
   peerConnection.onicecandidate = (event) => {
@@ -179,16 +184,25 @@ export function HandleRemovePeer(incoming: any) {
   const PCs = get(peerConnections);
   const peerSts = get(peerStates);
   const peerIs = get(peerIds);
+  const datachans = get(dataChannels)
+  const mice = get(mousePositions)
+
 
   PCs[cliendId].close();
+
   delete PCs[cliendId];
   delete peerSts[cliendId];
-
+  delete datachans[cliendId]
+  delete mice[cliendId]
   const filtered = peerIs.filter((item) => item !== cliendId);
 
   peerConnections.set(PCs);
   peerStates.set(peerSts);
   peerIds.set(filtered);
+  dataChannels.set(datachans)
+  mousePositions.set(mice)
+
+  alert_store.set("alert:Someone left!")
 }
 
 export async function HandleIceCandidate(incoming: any) {
