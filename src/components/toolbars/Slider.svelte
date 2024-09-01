@@ -113,17 +113,21 @@
   }
 
   function calculateNewValue(clientX) {
-    // Find distance between cursor and element's left cord (20px / 2 = 10px) - Center of thumb
-    let delta = clientX - (elementX + 10);
+    // Calculate the position of the click relative to the container
+    let containerRect = container.getBoundingClientRect();
+    let clickPosition = clientX - containerRect.left;
 
-    // Use width of the container minus (5px * 2 sides) offset for percent calc
-    let percent = (delta * 100) / (container.clientWidth - 10);
+    // Calculate the percentage of the click position relative to the container width
+    let percent = (clickPosition / containerRect.width) * 100;
 
     // Limit percent 0 -> 100
-    percent = percent < 0 ? 0 : percent > 100 ? 100 : percent;
+    percent = Math.min(Math.max(percent, 0), 100);
 
-    // Limit value min -> max
-    setValue(parseInt((percent * (max - min)) / 100) + min);
+    // Calculate the new value based on the percentage
+    let newValue = Math.round(((max - min) * percent) / 100 + min);
+
+    // Set the new value
+    setValue(newValue);
   }
 
   // Handles both dragging of touch/mouse as well as simple one-off click/touches
@@ -154,6 +158,7 @@
   $: if (
     progressBar &&
     thumb &&
+    // sidebarHidden &&
     (eventState === "drawing" ||
       eventState === "erasing" ||
       eventState.includes("color_palette_edit_form"))

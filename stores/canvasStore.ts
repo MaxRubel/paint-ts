@@ -15,7 +15,7 @@ export function DrawImage() {
 
   const fetchedData = get(fetched_single)
 
-  let fetchedImage
+  let fetchedImage = ""
 
   if (fetchedData.id) {
     fetchedImage = get(fetched_single).data.canvasImage

@@ -203,7 +203,7 @@
   .debug-menu {
     position: fixed;
     z-index: 1003;
-    top: 50px;
+    top: 70px;
     right: 0;
     width: 215px;
     background-color: rgb(192, 189, 189);
