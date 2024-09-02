@@ -71,7 +71,7 @@ export function HandleRedo() {
   ) {
     resetManyTextBoxes(redoItem);
   }
-  AddUndoItem(redoItem.undoItem);
+  AddUndoItem(redoItem.undoItem, true);
   popLastItem();
 }
 
