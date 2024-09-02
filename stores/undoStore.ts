@@ -14,7 +14,7 @@ import {
   updateTextBox,
 } from "./textBoxStore";
 import { event_state_store } from "./eventState";
-import { AddRedoItem } from "../stores/redoStore";
+import { AddRedoItem, redo_store } from "../stores/redoStore";
 import { SendToAll } from "../utils/webRTC/webRTCNegotiate";
 
 export const undo_store = writable<UndoType[]>([]);
@@ -23,7 +23,11 @@ export function ClearUndoStore() {
   undo_store.set([]);
 }
 // Function to add a new Undo Item
-export function AddUndoItem(newItem: UndoType) {
+export function AddUndoItem(newItem: UndoType, fromRedo = false) {
+  console.log("new undo: ", newItem)
+  if (!fromRedo) {
+    redo_store.set([])
+  }
   undo_store.update((oldItems) => {
     return [...oldItems, newItem];
   });

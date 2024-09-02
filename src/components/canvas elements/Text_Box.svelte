@@ -44,7 +44,7 @@
   let textContainer: HTMLElement;
   let selected: HTMLTextAreaElement[] = [];
   let iAmSelected = false;
-  let typeStart = "";
+  let iAmNew = true;
 
   onMount(() => {
     hidden = false;
@@ -82,7 +82,7 @@
     if (!value) return;
     if (eventState.includes("typing")) {
       const [, boxId] = eventState.split("&");
-      if (value !== fontColor && boxId === id) {
+      if (value !== fontColor && boxId === id && !iAmNew) {
         AddUndoItem({
           action: "changedFontColor",
           data: { id, oldColor: fontColor },
@@ -105,6 +105,8 @@
 
   function handleChange(e: Event): void {
     const target = e.target as HTMLTextAreaElement;
+
+    if (iAmNew) iAmNew = false;
 
     if (target) {
       const value = target.value;
@@ -197,7 +199,10 @@
     }
   }
 
+  $: console.log("new ", iAmNew);
+
   function handleBlur() {
+    if (iAmNew) return;
     if (eventState.includes("typing")) {
       if (oldValue !== textareaElement.value) {
         AddUndoItem({
@@ -488,7 +493,6 @@
       const [_, eventId] = eventState.split("&");
       if (eventId === id) {
         typing = true;
-        typeStart = textareaElement?.value;
       }
     } else {
       typing = false;

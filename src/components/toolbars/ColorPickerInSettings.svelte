@@ -72,8 +72,6 @@
             sliderType: "hue",
             direction: "vertical",
             width,
-            // width: 200,
-            // height: 20,
           },
         },
       ],
@@ -109,7 +107,9 @@
           }
         }
       });
-      if (undoArray.length > 0) {
+      if (draggingColor) {
+        return;
+      } else {
         AddUndoItem({
           action: "changedManyFontColors",
           data: undoArray,
@@ -178,7 +178,6 @@
       }
     }}
     on:pointerup={() => {
-      handleChangeColor();
       //@ts-ignore
       border_index_store.set(edittingTile);
       if (edittingTile) {
@@ -193,6 +192,8 @@
       }
       draggingColor = false;
       creatingNew = false;
+
+      handleChangeColor();
     }}
   />
 </div>
