@@ -81,14 +81,16 @@
     element.style.outline = "2px solid white";
   }
 
-  function handleClickSmall(color: string, index: number) {
+  function handleClickSmall(newColor: string, index: number) {
     border_index_store.set(index);
     if (!eventState.includes("color_palette_edit")) {
-      active_color_store.set(color);
+      active_color_store.set(newColor);
     } else {
       editting_tile_store.set(index);
     }
+
     clearSmallBorders();
+
     const element = document.getElementById(`small-color-button&${index}`);
     if (element) {
       addBorder(element);
@@ -97,17 +99,18 @@
     if (eventState === "selected") {
       const selectedArray = get(selected_store);
       const undoArray: any[] = [];
+
       selectedArray.forEach((item) => {
         const [, id] = item.id.split("&");
         if (item.id.includes("textbox")) {
           const ogTextbox = get(textBoxesStore)[id];
           const oldColor = ogTextbox.fontColor;
-          if (oldColor !== activeColor) {
+          if (oldColor !== newColor) {
             undoArray.push({
               id,
               fontColor: ogTextbox.fontColor,
             });
-            updateTextBox(id, { fontColor: activeColor });
+            updateTextBox(id, { fontColor: newColor });
           }
         }
       });

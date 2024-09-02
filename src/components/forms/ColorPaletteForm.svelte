@@ -15,7 +15,7 @@
   } from "../../../stores/paletteStore";
   import Close from "../../graphics/Close.svelte";
   import SaveIcon from "../../graphics/SaveIcon.svelte";
-  import Folder from "../../graphics/Folder.svelte";
+  import Folder from "../../graphics/NavMenu/Folder.svelte";
   import TrashCanBig from "../../graphics/TrashCanBig.svelte";
   import { event_state_store } from "../../../stores/eventState";
   import { get } from "svelte/store";

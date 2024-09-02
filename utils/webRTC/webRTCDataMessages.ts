@@ -1,7 +1,11 @@
 import { textBoxesStore } from "../../stores/textBoxStore";
 import type { TextBoxType } from "../types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
-import { DrawOtherPersonsPoints, pointsMap, RebuildCanvasAfterUndo } from "../drawBrushStroke";
+import {
+  DrawOtherPersonsPoints,
+  pointsMap,
+  RebuildCanvasAfterUndo,
+} from "../drawBrushStroke";
 import type { DrawSendData } from "../drawBrushStroke";
 
 export type mousePos = {
@@ -19,11 +23,18 @@ type deleteTextbox = {
   id: string;
 };
 
-type pointsArray = [number, number, number][]
-export type PointsMap = { [key: string]: PointsObject }
-export type PointsObject = { id: string, size: number, color: string, array: pointsArray };
+type pointsArray = [number, number, number][];
 
-let tempArray: pointsArray = []
+export type PointsMap = { [key: string]: PointsObject };
+
+export type PointsObject = {
+  id: string;
+  size: number;
+  color: string;
+  array: pointsArray;
+};
+
+let tempArray: pointsArray = [];
 
 function handleUpdateTextBoxes(msgJson: updateTextBox) {
   textBoxesStore.update((current) => ({
@@ -48,38 +59,37 @@ function handleDeleteTextBoxes(msgJson: deleteTextbox) {
 }
 
 function handleDrawPointsOnCanvas(msgData: DrawSendData) {
-  DrawOtherPersonsPoints(msgData)
+  DrawOtherPersonsPoints(msgData);
 
-  tempArray.push(...msgData.array)
-  if (msgData.end) { //store the whole stroke in the pointsMap
-    console.log("received end of transmission")
+  tempArray.push(...msgData.array);
+  if (msgData.end) {
+    //store the whole stroke in the pointsMap
     pointsMap[msgData.end] = {
       id: msgData.end,
       size: msgData.brush.size,
       color: msgData.brush.color,
-      array: tempArray
-    }
-    tempArray = []
+      array: tempArray,
+    };
+    tempArray = [];
   }
 }
 
-
 function handleUndoBrushStroke(msgData: { ["publicMoveId"]: string }) {
-  const { publicMoveId } = msgData
+  const { publicMoveId } = msgData;
 
-  delete pointsMap[publicMoveId]
-  RebuildCanvasAfterUndo()
+  delete pointsMap[publicMoveId];
+  RebuildCanvasAfterUndo();
 }
 
 function handleRedoPublicBrush(msgData: PointsObject) {
-  pointsMap[msgData.id] = msgData
-  RebuildCanvasAfterUndo()
+  pointsMap[msgData.id] = msgData;
+  RebuildCanvasAfterUndo();
 }
 
 export function ParseMessage(msg: string) {
   const [msgType, msgData] = msg.split("&*^");
   const msgJson = JSON.parse(msgData);
-  // console.log('received msg: ', msgData)
+
   switch (msgType) {
     case "newtextbox":
       handleNewTextBox(msgJson);
@@ -93,13 +103,13 @@ export function ParseMessage(msg: string) {
       handleMousePos(msgJson);
       break;
     case "points":
-      handleDrawPointsOnCanvas(msgJson)
+      handleDrawPointsOnCanvas(msgJson);
       break;
     case "undobrushstroke":
-      handleUndoBrushStroke(msgJson)
+      handleUndoBrushStroke(msgJson);
       break;
     case "redopublicbrush":
-      handleRedoPublicBrush(msgJson)
+      handleRedoPublicBrush(msgJson);
       break;
   }
 }

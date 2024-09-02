@@ -10,30 +10,34 @@ import { SendToAll } from "./webRTC/webRTCNegotiate";
 import { v4 as uuidv4 } from "uuid";
 import type { PointsMap, PointsObject } from "./webRTC/webRTCDataMessages";
 
-type sendArray = [number, number, number][]
+type sendArray = [number, number, number][];
 
-export type DrawSendData = { end: string | null, brush: { size: number, color: string, type: string }, array: sendArray }
+export type DrawSendData = {
+  end: string | null;
+  brush: { size: number; color: string; type: string };
+  array: sendArray;
+};
 
 let ctx: CanvasRenderingContext2D;
 
 let tempPoints: [number, number, number][] = []; //stores the mouse points for one full stroke
 let pointsToSend: [number, number, number][] = []; //store the mouse points for rapid/RTC transmission
 let paths: { pathData: string; color: string }[] = []; //stores the vector paths and color (Big MB!)
-export let pointsMap: PointsMap = {} //a map of every single stroke key: publicMoveId, value: tempPoints
 
+export let pointsMap: PointsMap = {}; //a map of every single stroke key: publicMoveId, value: tempPoints
 
 //transmit
-let publicMoveId: string //provides an ID for each full, single stroke for UNDO purposes
-let sendInterval: NodeJS.Timeout | null //stores the interval id of web rtc send interval
-let transmitting: boolean = false
-let watchingForMouseout = false
+let publicMoveId: string; //provides an ID for each full, single stroke for UNDO purposes
+let sendInterval: NodeJS.Timeout | null; //stores the interval id of web rtc send interval
+let transmitting: boolean = false;
+let watchingForMouseout = false;
 
 let oldRaster: string | null = null; // dataURL for a canvas taken/captured on pointerdown
-let currentCanvas: string = ""; //dataURL for a canvas in the most current state 
+let currentCanvas: string = ""; //dataURL for a canvas in the most current state
 
 let color = "";
 
-const DRAW_SEND_INTERVAL = 20 //milliseconds
+const DRAW_SEND_INTERVAL = 20; //milliseconds
 
 export function InitCtx(context: CanvasRenderingContext2D) {
   ctx = context;
@@ -74,7 +78,6 @@ export function DrawImageFromDataURL(
 
     img.onerror = (error) => {
       console.error("Error loading image:", error);
-      console.log("here is the data url: ", dataURL)
       reject(error);
     };
 
@@ -94,39 +97,36 @@ export function SaveOriginalRaster() {
     return;
   }
 
-  console.log('saving raster')
-
   //@ts-ignore
   oldRaster = canvas.toDataURL("image/png");
 }
 
 export function ReceiveNewPointsMap(value: PointsMap) {
-  pointsMap = value
+  pointsMap = value;
 }
 
 function startTransmitting() {
-  publicMoveId = uuidv4()
+  publicMoveId = uuidv4();
   sendInterval = setInterval(() => {
     const brushData = {
       size: get(brush_size_store),
       color: get(active_color_store),
-      type: get(event_state_store)
-    }
+      type: get(event_state_store),
+    };
     const sendData: DrawSendData = {
       end: null,
       brush: brushData,
-      array: pointsToSend
-    }
+      array: pointsToSend,
+    };
 
-    SendToAll(`points&*^${JSON.stringify(sendData)}`)
-  }, DRAW_SEND_INTERVAL)
-
+    SendToAll(`points&*^${JSON.stringify(sendData)}`);
+  }, DRAW_SEND_INTERVAL);
 }
 
 function stopTransmitting() {
-  transmitting = false
+  transmitting = false;
   if (sendInterval) {
-    clearInterval(sendInterval)
+    clearInterval(sendInterval);
   }
 }
 
@@ -153,16 +153,15 @@ export function DrawBrushStroke(
     ctx.globalCompositeOperation = "destination-out";
   }
 
-
   if (get(drawing_room_id)) {
     if (!transmitting) {
-      startTransmitting()
-      transmitting = true
+      startTransmitting();
+      transmitting = true;
     }
   }
 
   tempPoints.push([x, y, e.pressure]);
-  pointsToSend.push([x, y, e.pressure])
+  pointsToSend.push([x, y, e.pressure]);
 
   const stroke = getStroke(tempPoints, {
     size: get(brush_size_store),
@@ -179,7 +178,6 @@ export function DrawBrushStroke(
   context.fillStyle = color;
 
   paths.push({ color, pathData });
-
 }
 
 export function EndBrushStroke() {
@@ -188,11 +186,15 @@ export function EndBrushStroke() {
 
   const eventState = get(event_state_store);
 
-  if (canvas) { currentCanvas = canvas.toDataURL(); }
-  if (watchingForMouseout) { watchingForMouseout = false; }
+  if (canvas) {
+    currentCanvas = canvas.toDataURL();
+  }
+  if (watchingForMouseout) {
+    watchingForMouseout = false;
+  }
 
-
-  if (!get(drawing_room_id)) { //not in drawing room:
+  if (!get(drawing_room_id)) {
+    //not in drawing room:
     if (eventState === "drawing") {
       AddUndoItem({
         action: "drewBrush",
@@ -204,7 +206,8 @@ export function EndBrushStroke() {
         data: { oldRaster },
       });
     }
-  } else { //in drawing room:
+  } else {
+    //in drawing room:
     if (transmitting) {
       stopTransmitting();
     }
@@ -212,33 +215,33 @@ export function EndBrushStroke() {
     const brushData = {
       size: get(brush_size_store),
       color: get(active_color_store),
-      type: get(event_state_store)
-    }
+      type: get(event_state_store),
+    };
 
     const sendData: DrawSendData = {
       end: publicMoveId,
       brush: brushData,
-      array: pointsToSend
-    }
+      array: pointsToSend,
+    };
 
-    SendToAll(`points&*^${JSON.stringify(sendData)}`)
+    SendToAll(`points&*^${JSON.stringify(sendData)}`);
 
     AddUndoItem({
       action: "drewBrushPublic",
-      data: { publicMoveId }
-    })
+      data: { publicMoveId },
+    });
 
     pointsMap[publicMoveId] = {
       id: publicMoveId,
       size: get(brush_size_store),
       color: get(active_color_store),
-      array: tempPoints
-    }
-    publicMoveId = ""
+      array: tempPoints,
+    };
+    publicMoveId = "";
   }
 
-  tempPoints = []
-  pointsToSend = []
+  tempPoints = [];
+  pointsToSend = [];
   paths = [];
 }
 
@@ -251,9 +254,9 @@ export function DrawOtherPersonsPoints(msg: DrawSendData) {
   });
   const pathData = getSvgPathFromStroke(stroke);
   const canvasPath = new Path2D(pathData);
-  color = msg.brush.color
+  color = msg.brush.color;
   if (!color) {
-    color = "rgb(255, 255, 255)"
+    color = "rgb(255, 255, 255)";
   }
   paths.push({ color, pathData });
 
@@ -283,8 +286,7 @@ export function GetVectorPaths() {
 }
 
 export function RebuildCanvasAfterUndo() {
-
-  ctx.clearRect(0, 0, 2000, 3000)
+  ctx.clearRect(0, 0, 2000, 3000);
 
   Object.values(pointsMap).forEach((object: PointsObject) => {
     const stroke = getStroke(object.array, {
@@ -299,5 +301,5 @@ export function RebuildCanvasAfterUndo() {
 
     ctx.fillStyle = object.color;
     ctx.fill(canvasPath);
-  })
+  });
 }

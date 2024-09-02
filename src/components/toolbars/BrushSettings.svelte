@@ -29,7 +29,10 @@
   $: sidebarHidden = $side_bar_hidden_store;
 
   $: {
-    if (eventState.includes("drawing")) {
+    if (
+      eventState.includes("drawing") ||
+      eventState.includes("color_palette_edit_form")
+    ) {
       isVisible = true;
     } else {
       isVisible = false;

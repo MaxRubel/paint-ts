@@ -19,6 +19,13 @@
   } from "../../../stores/drawingRoomStore";
   import { v4 as uuidv4 } from "uuid";
   import { navigate } from "svelte-routing";
+  import Folder from "../../graphics/NavMenu/Folder.svelte";
+  import SaveIcon from "../../graphics/NavMenu/SaveIcon.svelte";
+  import Palette from "../../graphics/NavMenu/Palette.svelte";
+  import StarsIcon from "../../graphics/NavMenu/StarsIcon.svelte";
+  import PeopleIcon from "../../graphics/NavMenu/PeopleIcon.svelte";
+  import NewFileIcon from "../../graphics/NavMenu/NewFileIcon.svelte";
+  import ShareIcon from "../../graphics/NavMenu/ShareIcon.svelte";
 
   export let handleClear: Function;
 
@@ -83,8 +90,10 @@
   }
 
   function clearDoodle() {
-    handleClear();
     menuOpen = false;
+    if (window.confirm("Are you sure you want to clear this drawing?")) {
+      handleClear();
+    }
   }
 
   function openViewLargePalettes() {
@@ -134,6 +143,7 @@
       setTimeout(() => {
         document.addEventListener("click", handleUnfocus);
       }, 1);
+      16;
     } else {
       document.removeEventListener("click", handleUnfocus);
     }
@@ -149,60 +159,60 @@
 </div>
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
-  <button class="clear-button nav-button-btn divide-bottom" id="dd-menu"
-    >About Us
+  <button class="clear-button nav-button-btn divide-bottom" id="dd-menu">
+    About Us
   </button>
   {#if !authState}
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}>
       Clear drawing
     </button>
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleSignIn}>
-      Sign in
+      Sign in16
     </button>
   {:else}
+    <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}>
+      <StarsIcon /> Clear Drawing
+    </button>
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleNew}>
-      New
+      <NewFileIcon /> New
     </button>
     <button
       class="clear-button nav-button-btn"
       id="dd-menu"
       on:click={handleViewDoodles}
     >
-      Open
+      <Folder /> Open
     </button>
     <button
       class="clear-button nav-button-btn"
       id="dd-menu"
       on:click={handleSaveDoodle}
     >
-      Save
+      <SaveIcon /> Save
     </button>
     {#if loadedDrawing.id}
       <button
-        class="clear-button nav-button-btn divide-bottom"
+        class="clear-button nav-button-btn"
         id="dd-menu"
         on:click={openShareMenu}
       >
-        Share
+        <ShareIcon /> Share Drawing
       </button>
     {/if}
-    <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}>
-      Clear Drawing
-    </button>
     <button
-      class="clear-button nav-button-btn"
+      class="clear-button nav-button-btn divide-bottom"
       id="dd-menu"
       on:click={openViewLargePalettes}
     >
-      View Color Palettes
+      <Palette /> View Color Palettes
     </button>
     {#if !userInDrawingRoom}
       <button
-        class="clear-button nav-button-btn"
+        class="clear-button nav-button-btn large"
         id="dd-menu"
         on:click={handleCreateDrawingRoom}
       >
-        Create Drawing Room
+        <PeopleIcon />Create Drawing Room
       </button>
     {:else}
       <button
@@ -225,6 +235,8 @@
   button {
     cursor: pointer;
     width: 100%;
+    display: flex;
+    gap: 8px;
   }
 
   .nav-button {
@@ -264,6 +276,12 @@
   .divide-bottom {
     border-radius: 0px;
     border-bottom: 2px solid rgba(255, 255, 255, 0.198);
+  }
+
+  .large {
+    padding-top: 25px;
+    padding-bottom: 25px;
+    border-radius: 0px;
   }
 
   .signout {

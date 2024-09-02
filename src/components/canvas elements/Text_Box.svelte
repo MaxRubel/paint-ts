@@ -203,8 +203,6 @@
     }
   }
 
-  $: console.log("typing", typing);
-
   function handleBlur() {
     if (iAmNew) return;
     if (eventState.includes("typing")) {

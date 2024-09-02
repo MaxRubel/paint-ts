@@ -26,7 +26,6 @@
   let edittingTile: number | null;
   let activeColor: string;
   let draggingColor = false;
-  let creatingNew = false;
   let mouseHasLeftWhileDragging = false;
   let eventState: string;
 
@@ -56,6 +55,7 @@
       layoutDirection: location === "text-color-picker" ? "horizontal" : "vertical",
     });
   });
+
   function handleChangeColor() {
     //format the color
     const newColor = colorPicker.color.rgb;
@@ -85,9 +85,8 @@
           }
         }
       });
-      if (draggingColor) {
-        return;
-      } else {
+
+      if (!draggingColor) {
         AddUndoItem({
           action: "changedManyFontColors",
           data: undoArray,
@@ -130,15 +129,12 @@
     class="color-picker"
     id={location}
     on:pointerdown={() => {
-      draggingColor = true;
-      if (edittingTile === null) {
-        creatingNew = true;
-      }
       if (edittingTile === null && eventState.includes("color_palette_edit_form")) {
         editting_tile_store.set(activePalette.colors.length);
       }
       border_index_store.set(edittingTile);
       handleChangeColor();
+      draggingColor = true;
     }}
     on:mousemove={() => {
       if (draggingColor) {
@@ -167,11 +163,11 @@
       }
       if (!eventState.includes("color_palette_edit_form")) {
         editting_tile_store.set(null);
+        active_color_store.set(activeColor);
       }
       draggingColor = false;
-      creatingNew = false;
 
-      handleChangeColor();
+      // handleChangeColor();
     }}
   />
 </div>

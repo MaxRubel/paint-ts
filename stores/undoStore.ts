@@ -1,5 +1,10 @@
 import { get, writable } from "svelte/store";
-import { DrawImageFromDataURL, GetCanvasContext, pointsMap, RebuildCanvasAfterUndo } from "../utils/drawBrushStroke";
+import {
+  DrawImageFromDataURL,
+  GetCanvasContext,
+  pointsMap,
+  RebuildCanvasAfterUndo,
+} from "../utils/drawBrushStroke";
 import type {
   UndoBrushStroke,
   UndoDragSingle,
@@ -22,11 +27,10 @@ export const undo_store = writable<UndoType[]>([]);
 export function ClearUndoStore() {
   undo_store.set([]);
 }
-// Function to add a new Undo Item
+
 export function AddUndoItem(newItem: UndoType, fromRedo = false) {
-  console.log("new undo: ", newItem)
   if (!fromRedo) {
-    redo_store.set([])
+    redo_store.set([]);
   }
   undo_store.update((oldItems) => {
     return [...oldItems, newItem];
@@ -44,55 +48,54 @@ export function HandleUndo() {
   }
   const lastAction = arr[arr.length - 1];
 
-  console.log(lastAction.action)
   switch (lastAction.action) {
-    case "drewBrush": //
+    case "drewBrush":
       undoBrushStroke(lastAction);
       break;
     case "erased":
       undoEraser(lastAction);
       break;
-    case "created_text_box": //
+    case "created_text_box":
       undoCreatedTextBox(lastAction);
       break;
-    case "typed": //
+    case "typed":
       undoTyping(lastAction);
       break;
-    case "draggedSingle": //
+    case "draggedSingle":
       undoDragSingle(lastAction);
       break;
-    case "draggedMultiple": //
+    case "draggedMultiple":
       handleUndoDragMultiple(lastAction);
       break;
-    case "expanded": //
+    case "expanded":
       undoExpand(lastAction);
       break;
-    case "deleted": //
+    case "deleted":
       undoDeletedTextBoxes(lastAction);
       break;
-    case "textBoxAligned": //
+    case "textBoxAligned":
       undoTextBoxAlignChange(lastAction);
       break;
-    case "changedFontColor": //
+    case "changedFontColor":
       undoChangedFontColor(lastAction);
       break;
-    case "changedFontSingle": //
+    case "changedFontSingle":
       undoChangedFont(lastAction);
       break;
-    case "changedManyFonts": //
+    case "changedManyFonts":
       undoChangedManyFonts(lastAction);
       break;
-    case "changedManyFontColors": //
+    case "changedManyFontColors":
       undoChangedManyFontColors(lastAction);
       break;
-    case "changedFontSizes": //
+    case "changedFontSizes":
       undoChangedFontSizes(lastAction);
       break;
     case "manyTextBoxAligned":
       undoManyTextBoxAligned(lastAction);
       break;
     case "drewBrushPublic":
-      undoBrushPublic(lastAction)
+      undoBrushPublic(lastAction);
       break;
   }
   popLastItem();
@@ -110,8 +113,8 @@ function undoBrushStroke(lastAction: UndoBrushStroke) {
 
   const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
   if (!canvas) {
-    console.error('oopsies-no canvas')
-    return
+    console.error("oopsies-no canvas");
+    return;
   }
   const currentRaster = canvas.toDataURL();
 
@@ -128,13 +131,19 @@ function undoBrushStroke(lastAction: UndoBrushStroke) {
 
 export function undoEraser(lastAction: any) {
   const ctx = GetCanvasContext();
-  if (!ctx) { console.error("Canvas context not available"); return; }
+  if (!ctx) {
+    console.error("Canvas context not available");
+    return;
+  }
 
   const { oldRaster } = lastAction.data;
   DrawImageFromDataURL(ctx, oldRaster);
 
   const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
-  if (!ctx) { console.error("Canvas context not available"); return; }
+  if (!ctx) {
+    console.error("Canvas context not available");
+    return;
+  }
   const currentRaster = canvas.toDataURL();
 
   AddRedoItem({
@@ -327,7 +336,7 @@ function undoBrushPublic(lastAction: any) {
   AddRedoItem({
     action: "undidpublicbrushstroke",
     data: item,
-    undoItem: lastAction
+    undoItem: lastAction,
   });
 
   delete pointsMap[publicMoveId];

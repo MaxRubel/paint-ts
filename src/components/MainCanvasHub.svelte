@@ -62,9 +62,7 @@
   $: event_state = $event_state_store as string;
   $: locked = $locked_store as boolean;
 
-  $: {
-    cursor = handleCursor(event_state, cursor);
-  }
+  $: cursor = handleCursor(event_state, cursor);
 
   const handleClick = (e: MouseEvent) => {
     switch (event_state) {
@@ -96,6 +94,7 @@
         deleteTextBox(id);
         ClearSelection();
       });
+
       event_state_store.set("arrow");
     } else {
       const thisTextbox = get(textBoxesStore)[selected];
@@ -156,10 +155,6 @@
     oldState = event_state;
     mouseHasLeft = false;
 
-    if (e.buttons === 2) {
-      event_state_store.set("erasing");
-    }
-
     function startSelecting() {
       xStart = e.clientX;
       yStart = e.clientY;
@@ -198,10 +193,10 @@
     }
 
     if (event_state === "typing") {
-      console.log("typing");
       return;
     }
   }
+
   function handlePointerMove(e: PointerEvent) {
     if (e.buttons !== 1) return; //stop right click from drawing
     switch (event_state) {
@@ -270,6 +265,7 @@
   }
 
   let colorBarisOpen = false;
+
   $: {
     if (
       event_state === "drawing" ||
