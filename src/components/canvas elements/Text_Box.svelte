@@ -18,6 +18,7 @@
   import { updateTextBox } from "../../../stores/textBoxStore";
   import { get } from "svelte/store";
   import { active_color_store } from "../../../stores/paletteStore";
+
   export let data: TextBoxType;
 
   const { id } = data;
@@ -56,6 +57,9 @@
 
   const unsubcribe2 = event_state_store.subscribe((value: string) => {
     eventState = value;
+    if (eventState !== "typing") {
+      textareaElement?.blur();
+    }
   });
 
   const unsubscribe3 = locked_store.subscribe((value: boolean) => {
@@ -180,7 +184,7 @@
     updateTextBox(id, { x, y });
   }
 
-  function handleMouseUp(event: MouseEvent): void {
+  function handleMouseUp(): void {
     if (isDragging) {
       isDragging = false;
       document.removeEventListener("mousemove", handleMouseMove);
@@ -199,7 +203,7 @@
     }
   }
 
-  $: console.log("new ", iAmNew);
+  $: console.log("typing", typing);
 
   function handleBlur() {
     if (iAmNew) return;
@@ -219,10 +223,9 @@
   function handleSingleClick() {
     if (eventState === "arrow") {
       selected_store.set([textareaElement]);
+      event_state_store.set("selected");
+      textareaElement.focus();
     }
-
-    event_state_store.set("selected");
-    textareaElement.focus();
   }
 
   function handleDoubeClick() {
@@ -498,6 +501,9 @@
       typing = false;
     }
   }
+
+  let noHighlighting = false;
+  $: if (!typing) noHighlighting = true;
 </script>
 
 <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -549,8 +555,8 @@
   <textarea
     bind:this={textareaElement}
     class="text-box"
-    class:non-selectable={true}
-    class:no-select={true}
+    class:non-selectable={!typing}
+    class:no-select={!typing}
     class:active-background={expanding}
     style="
       cursor: {cursorStyle};
@@ -558,6 +564,7 @@
       text-align: {align};
       font-family: {fontFamily};
       font-size: {fontSize}px;
+      user-select: {typing ? 'text' : 'none'};
     "
     id="textbox&{id}"
     on:input={handleChange}
