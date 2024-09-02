@@ -196,10 +196,14 @@
         startSelecting();
         break;
     }
+
+    if (event_state === "typing") {
+      console.log("typing");
+      return;
+    }
   }
   function handlePointerMove(e: PointerEvent) {
     if (e.buttons !== 1) return; //stop right click from drawing
-
     switch (event_state) {
       case "drawing":
         if (mouseHasLeft) return;
@@ -239,6 +243,7 @@
         break;
       case "erasing":
         event_state_store.set(oldState);
+        break;
     }
   }
 
