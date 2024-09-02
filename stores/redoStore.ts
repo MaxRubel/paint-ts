@@ -25,9 +25,11 @@ export function ClearRedoItems() {
 
 export function HandleRedo() {
   const redoArray = get(redo_store);
+
   if (redoArray.length === 0) return;
+
   const redoItem: RedoItem = redoArray[redoArray.length - 1];
-  console.log("firing redo")
+
   switch (redoItem.action) {
     case "drawBushStroke":
       redoDrawBrushStrokes(redoItem);

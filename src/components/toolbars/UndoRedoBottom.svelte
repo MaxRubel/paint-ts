@@ -1,12 +1,13 @@
 <script lang="ts">
   import { HandleRedo } from "../../../stores/redoStore";
-  import { HandleUndo } from "../../../stores/undoStore";
+  import { HandleUndo, undo_store } from "../../../stores/undoStore";
   import Redo from "../../graphics/Redo.svelte";
   import Undo from "../../graphics/Undo.svelte";
   import { redo_store } from "../../../stores/redoStore";
   import { onDestroy } from "svelte";
 
   let canRedo: boolean;
+  let canUndo: boolean;
 
   const unsubcribe = redo_store.subscribe((value) => {
     if (value.length > 0) {
@@ -16,12 +17,23 @@
     }
   });
 
-  onDestroy(unsubcribe);
+  const unsubcribe2 = undo_store.subscribe((value) => {
+    if (value.length > 0) {
+      canUndo = true;
+    } else {
+      canUndo = false;
+    }
+  });
+
+  onDestroy(() => {
+    unsubcribe();
+    unsubcribe2();
+  });
 </script>
 
 <div class="page-turn">
-  <button on:click={HandleUndo}> <Undo /> </button>
-  <button on:click={HandleRedo} class="redo" class:canRedo> <Redo /> </button>
+  <button on:click={HandleUndo} class:canUndo> <Undo /> </button>
+  <button on:click={HandleRedo} class:canRedo> <Redo /> </button>
 </div>
 
 <style>
@@ -40,11 +52,12 @@
     border-radius: 9px;
   }
 
-  .redo {
+  button {
     color: rgb(86, 86, 86);
   }
 
-  .canRedo {
+  .canRedo,
+  .canUndo {
     color: white;
   }
 </style>

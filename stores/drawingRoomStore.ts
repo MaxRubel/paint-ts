@@ -1,20 +1,9 @@
 import { get, writable } from "svelte/store";
 import { fetched_single, type ProjectType } from "./fetchDataStore";
-import type { RedoType, TextBoxType, UndoType } from "../utils/types/app_types";
 import { textBoxesStore } from "./textBoxStore";
-import { undo_store } from "./undoStore";
-import { redo_store } from "./redoStore";
 import { ClearCurrentCanvas, GetCanvasContext } from "../utils/drawBrushStroke";
 
-interface undosType {
-  undos: UndoType[];
-  redos: RedoType[];
-}
-
-export interface DataTransitionType {
-  drawingData: ProjectType;
-  undos: undosType;
-}
+export type DataTransitionType = { drawingData: ProjectType };
 
 export const drawing_room_store = writable(false);
 export const drawing_room_id = writable("");
@@ -31,7 +20,9 @@ export function TransitionToDrawingRoom() {
     console.error("Oopsies, canvas was not initialized properly");
     return;
   }
+
   ClearCurrentCanvas();
+
   const dataURL = canvas.toDataURL("image/png");
   const canvasImage = dataURL.split(",")[1];
   const rectangles = get(textBoxesStore);
@@ -56,17 +47,12 @@ export function TransitionToDrawingRoom() {
     drawingData.date_created = doodleFetched.date_created;
   }
 
-  const undos = { undos: get(undo_store), redos: get(redo_store) };
-
-  data_transition.set({ drawingData, undos });
+  data_transition.set({ drawingData });
 }
 
 export function UnpackTransition() {
-  const { drawingData, undos } = get(data_transition);
+  const { drawingData } = get(data_transition);
   const { collaborators, data, date_created, id, name, owner } = drawingData;
-  undo_store.set(undos.undos);
-  //@ts-ignore
-  redo_store.set(undos.redos);
 
   if (id) {
     fetched_single.set({
@@ -81,14 +67,15 @@ export function UnpackTransition() {
       },
     });
   }
+
   fetched_single.update((preVal) => ({
     ...preVal,
     data: { rectangles: data.rectangles, canvasImage: data.canvasImage },
   }));
 
-  const dataURL = "data:image/png;base64," + data.canvasImage;
-
   textBoxesStore.set(data.rectangles);
+
+  const dataURL = "data:image/png;base64," + data.canvasImage;
   const img = new Image();
 
   img.onload = function () {
@@ -100,12 +87,13 @@ export function UnpackTransition() {
         );
         return;
       }
+
       requestAnimationFrame(() => {
         ctx.drawImage(img, 0, 0);
       });
     }, 1);
+
   };
 
-  //@ts-ignore
   img.src = dataURL;
 }

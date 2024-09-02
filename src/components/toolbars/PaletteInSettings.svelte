@@ -24,46 +24,15 @@
   let borderIndex: number | null;
   let selected: number | null;
 
-  const unsubscribe = active_palette_store.subscribe((value) => {
-    activePalette = value;
-  });
-
-  const unsubcribe2 = event_state_store.subscribe((value) => {
-    eventState = value;
-  });
-
-  const unsubscribe3 = authStore.subscribe((value) => {
-    auth = value.user;
-  });
-
-  const unsubscribe4 = editting_tile_store.subscribe((value) => {
-    edittingTile = value;
-  });
-
-  const unsubscribe5 = active_color_store.subscribe((value) => {
-    activeColor = value;
-  });
-
-  const unsubscribe6 = editting_tile_store.subscribe((value) => {
-    edittingTile = value;
-  });
-
-  const unsubcribe7 = border_index_store.subscribe((value) => {
-    borderIndex = value;
-  });
-
-  onDestroy(() => {
-    unsubscribe();
-    unsubcribe2();
-    unsubscribe3();
-    unsubscribe4();
-    unsubscribe5();
-    unsubscribe6();
-    unsubcribe7();
-  });
-
   let dropArrow = false;
   let smallPaletteMenu = false;
+
+  $: activePalette = $active_palette_store;
+  $: eventState = $event_state_store;
+  $: auth = $authStore.user;
+  $: edittingTile = $editting_tile_store;
+  $: activeColor = $active_color_store;
+  $: borderIndex = $border_index_store;
 
   function toggleOnDrop() {
     dropArrow = true;

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
   import { event_state_store } from "../../../stores/eventState";
   import Slider from "./Slider.svelte";
   import { authStore } from "../../../utils/auth/auth_store";
@@ -22,38 +21,12 @@
   let activeColor: string;
   let sidebarHidden: boolean;
 
-  const unsubcribe = event_state_store.subscribe((value: string) => {
-    eventState = value;
-  });
-
-  const unsubcribe2 = authStore.subscribe((value) => {
-    auth = value.user;
-  });
-
-  const unsubscribe3 = active_palette_store.subscribe((value: PaletteType) => {
-    activePalette = value;
-  });
-
-  const unsubscribe4 = editting_tile_store.subscribe((value: number | null) => {
-    edittingTile = value;
-  });
-
-  const unsubscribe5 = active_color_store.subscribe((value: string) => {
-    activeColor = value;
-  });
-
-  const unsubscribe6 = side_bar_hidden_store.subscribe((value: boolean) => {
-    sidebarHidden = value;
-  });
-
-  onDestroy(() => {
-    unsubcribe();
-    unsubcribe2();
-    unsubscribe3();
-    unsubscribe4();
-    unsubscribe5();
-    unsubscribe6();
-  });
+  $: eventState = $event_state_store;
+  $: auth = $authStore.user;
+  $: activePalette = $active_palette_store;
+  $: edittingTile = $editting_tile_store;
+  $: activeColor = $active_color_store;
+  $: sidebarHidden = $side_bar_hidden_store;
 
   $: {
     if (eventState.includes("drawing")) {

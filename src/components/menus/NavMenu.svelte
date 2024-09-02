@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
   import NavButton from "../../graphics/NavButton.svelte";
   import { event_state_store } from "../../../stores/eventState";
   import { signIn, signOut } from "../../../utils/auth/firebase";
@@ -29,26 +28,10 @@
   let loadedDrawing: ProjectType;
   let userInDrawingRoom: boolean;
 
-  const unsubscribe = event_state_store.subscribe((value) => {
-    eventState = value;
-  });
-
-  const unsubscribe2 = authStore.subscribe((value) => (authState = value.user));
-
-  const unsubscribe3 = fetched_single.subscribe((value) => {
-    loadedDrawing = value;
-  });
-
-  const unsubscribe4 = drawing_room_store.subscribe((value) => {
-    userInDrawingRoom = value;
-  });
-
-  onDestroy(() => {
-    unsubscribe();
-    unsubscribe2();
-    unsubscribe3();
-    unsubscribe4();
-  });
+  $: eventState = $event_state_store;
+  $: authState = $authStore.user;
+  $: loadedDrawing = $fetched_single;
+  $: userInDrawingRoom = $drawing_room_store;
 
   function handleNew() {
     const undoHistory = get(undo_store).length;
