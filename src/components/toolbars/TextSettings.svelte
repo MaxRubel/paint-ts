@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
   import { event_state_store, selected_store } from "../../../stores/eventState";
   import {
     ChangeTextFont,
@@ -28,38 +27,12 @@
   let auth: any;
   let sidebarHidden: boolean;
 
-  const unsubcribe = event_state_store.subscribe((value) => {
-    eventState = value;
-  });
-
-  const unsubcribe2 = font_size_store.subscribe((value) => {
-    fontSize = value;
-  });
-
-  const unsubscribe3 = text_alignment.subscribe((value) => {
-    textAlignment = value;
-  });
-
-  const unsubscribe4 = font_family_store.subscribe((value) => {
-    fontFamily = value;
-  });
-
-  const unsubscribe5 = authStore.subscribe((value) => {
-    auth = value.user;
-  });
-
-  const unsubscribe6 = side_bar_hidden_store.subscribe((value) => {
-    sidebarHidden = value;
-  });
-
-  onDestroy(() => {
-    unsubcribe();
-    unsubcribe2();
-    unsubscribe3();
-    unsubscribe4();
-    unsubscribe5();
-    unsubscribe6();
-  });
+  $: eventState = $event_state_store;
+  $: fontSize = $font_size_store;
+  $: textAlignment = $text_alignment;
+  $: fontFamily = $font_family_store;
+  $: auth = $authStore.user;
+  $: sidebarHidden = $side_bar_hidden_store;
 
   function handleFontChange(e: any) {
     ChangeTextFont(e.target.value);
@@ -127,10 +100,6 @@
     oldFontSize = value;
   }
 
-  onMount(() => {
-    // @ts-ignore
-  });
-
   $: {
     if (
       eventState.includes("creating_text") ||
@@ -142,6 +111,7 @@
       isVisible = false;
     }
   }
+
   let left: number;
   $: {
     if (sidebarHidden) {

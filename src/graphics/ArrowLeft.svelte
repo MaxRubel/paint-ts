@@ -14,9 +14,9 @@
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  width="16"
-  height="16"
-  fill="white"
+  width="18"
+  height="20"
+  fill="currentcolor"
   class="arrowLeft"
   viewBox="0 0 16 16"
   style="transform: rotate({transform}deg)"

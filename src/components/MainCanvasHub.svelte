@@ -45,6 +45,7 @@
 
   let canvas: any;
   let ctx: CanvasRenderingContext2D;
+
   let textBoxes: TextBoxMap;
   let cursor = "arrow";
   let event_state: string;
@@ -57,17 +58,9 @@
   let iAmDrawing = false;
   let mouseHasLeft = false;
 
-  const unsubcribe = textBoxesStore.subscribe((value) => {
-    textBoxes = value;
-  });
-
-  const unsubcribe2 = event_state_store.subscribe((value: string) => {
-    event_state = value;
-  });
-
-  const unsubscribe3 = locked_store.subscribe((value: boolean) => {
-    locked = value;
-  });
+  $: textBoxes = $textBoxesStore;
+  $: event_state = $event_state_store as string;
+  $: locked = $locked_store as boolean;
 
   $: {
     cursor = handleCursor(event_state, cursor);
@@ -91,8 +84,10 @@
 
   function handle_delete() {
     if (event_state.includes("typing")) return;
+
     const selectedArray = get(selected_store);
     const undoArray = [];
+
     if (selectedArray.length > 0) {
       selectedArray.forEach((textElement) => {
         const [_, id] = textElement.id.split("&");
@@ -107,12 +102,14 @@
       undoArray.push(thisTextbox);
       deleteTextBox(selected);
     }
+
     AddUndoItem({ action: "deleted", data: undoArray });
   }
 
   function handleKeyup(e: KeyboardEvent) {
     if (event_state.includes("typing") || event_state.includes("form")) return;
     if ((e.target as HTMLInputElement).id === "font-size-input-box") return;
+
     switch (e.key) {
       case "d":
         handle_drawing_mode();
@@ -136,7 +133,6 @@
     ctx = canvas.getContext("2d", { alpha: true });
     InitCtx(ctx);
     window.addEventListener("keyup", handleKeyup);
-    canvas?.addEventListener("click", handleClick);
     canvas.width = 3000;
     canvas.height = 2000;
   });
@@ -145,13 +141,7 @@
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-
-    unsubcribe();
-    unsubcribe2();
-    unsubscribe3();
-
     window.removeEventListener("keyup", handleKeyup);
-    canvas?.removeEventListener("click", handleClick);
   });
 
   export function handleClear(): void {
@@ -165,15 +155,18 @@
   function handlePointerDown(e: PointerEvent): void {
     oldState = event_state;
     mouseHasLeft = false;
+
     if (e.buttons === 2) {
       event_state_store.set("erasing");
     }
+
     function startSelecting() {
       xStart = e.clientX;
       yStart = e.clientY;
       event_state_store.set("selecting");
       initializeSelectBox(canvas);
     }
+
     if (event_state.includes("typing")) {
       event_state_store.set("arrow");
     }
@@ -323,6 +316,7 @@
       style="cursor: {cursor}"
       class="full-size"
       bind:this={canvas}
+      on:click={handleClick}
       on:pointerdown={handlePointerDown}
       on:pointerup={handlePointerUp}
       on:pointermove={handlePointerMove}

@@ -12,23 +12,9 @@
   let brushStroke: number;
   let sidebarHidden: boolean;
 
-  const unsubcribe = event_state_store.subscribe((value) => {
-    eventState = value;
-  });
-
-  const unsubscribe2 = brush_size_store.subscribe((value) => {
-    brushStroke = value;
-  });
-
-  const unsubcribe3 = side_bar_hidden_store.subscribe((value) => {
-    sidebarHidden = value;
-  });
-
-  onDestroy(() => {
-    unsubcribe();
-    unsubscribe2();
-    unsubcribe3();
-  });
+  $: eventState = $event_state_store;
+  $: brushStroke = $brush_size_store;
+  $: sidebarHidden = $side_bar_hidden_store;
 
   $: {
     if (eventState === "erasing") {

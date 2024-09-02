@@ -37,29 +37,15 @@
   let peerMice: { [key: string]: mousePos };
   let interval: NodeJS.Timeout | null = null;
 
-  const unsubscribe = i_have_joined.subscribe((value) => {
-    iHaveJoined = value;
-  });
+  $: iHaveJoined = $i_have_joined;
+  $: myId = $myPublicId;
+  $: peerIdArray = $peerIds;
+  $: peerStateMap = $peerStates;
+  $: peerMice = $mousePositions;
 
-  const unsubscribe2 = myPublicId.subscribe((value) => {
-    myId = value;
-  });
-
-  const unsubscribe3 = peerIds.subscribe((value) => {
-    peerIdArray = value;
-  });
-
-  const unsubscribe4 = peerStates.subscribe((value) => {
-    peerStateMap = value;
-  });
-
-  const unsubscribe5 = textBoxesStore.subscribe((value) => {
+  const unsubscribe = textBoxesStore.subscribe((value) => {
     textboxes = value;
     SendToAll(`changingTextbox&*^${JSON.stringify(value)}`);
-  });
-
-  const unsubscribe7 = mousePositions.subscribe((value) => {
-    peerMice = value;
   });
 
   $: {
@@ -117,11 +103,6 @@
     drawing_room_store.set(false);
 
     unsubscribe();
-    unsubscribe2();
-    unsubscribe3();
-    unsubscribe4();
-    unsubscribe5();
-    unsubscribe7();
     CloseWebsocket();
     stopMouseTracker();
   });

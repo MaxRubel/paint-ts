@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import {
     active_color_store,
     active_palette_store,
@@ -30,33 +30,11 @@
   let mouseHasLeftWhileDragging = false;
   let eventState: string;
 
-  const unsubcribe = event_state_store.subscribe((value: string) => {
-    eventState = value;
-  });
-
-  const unsubcribe2 = authStore.subscribe((value) => {
-    auth = value.user;
-  });
-
-  const unsubscribe3 = active_palette_store.subscribe((value: PaletteType) => {
-    activePalette = value;
-  });
-
-  const unsubscribe4 = editting_tile_store.subscribe((value) => {
-    edittingTile = value;
-  });
-
-  const unsubscribe5 = active_color_store.subscribe((value) => {
-    activeColor = value;
-  });
-
-  onDestroy(() => {
-    unsubcribe();
-    unsubcribe2();
-    unsubscribe3();
-    unsubscribe4();
-    unsubscribe5();
-  });
+  $: eventState = $event_state_store;
+  $: auth = $authStore.user;
+  $: activePalette = $active_palette_store;
+  $: edittingTile = $editting_tile_store;
+  $: activeColor = $active_color_store;
 
   onMount(() => {
     // @ts-ignore

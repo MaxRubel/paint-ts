@@ -1,9 +1,4 @@
 <script lang="ts">
-  export let handleLock;
-  export let handle_arrow_mode;
-  export let handle_drawing_mode;
-  export let handle_textbox_mode;
-
   import Lock from "../../graphics/Lock.svelte";
   import Unlock from "../../graphics/Unlock.svelte";
   import CursorPointer from "../../graphics/CursorPointer.svelte";
@@ -15,8 +10,12 @@
     selected_store,
     theme_store,
   } from "../../../stores/eventState";
-  import { onDestroy } from "svelte";
   import Eraser from "../../graphics/Eraser.svelte";
+
+  export let handleLock;
+  export let handle_arrow_mode;
+  export let handle_drawing_mode;
+  export let handle_textbox_mode;
 
   let mode = "";
   let locked = true;
@@ -24,21 +23,10 @@
   let arrow = true;
   let selected = [];
 
-  const unsubscribe = theme_store.subscribe((value) => {
-    mode = value;
-  });
-
-  const unsubscribe2 = locked_store.subscribe((value) => {
-    locked = value;
-  });
-
-  const unsubscribe3 = event_state_store.subscribe((value) => {
-    event_state = value;
-  });
-
-  const unsubscribe4 = selected_store.subscribe((value) => {
-    selected = value;
-  });
+  $: mode = $theme_store;
+  $: locked = $locked_store;
+  $: event_state = $event_state_store;
+  $: selected = $selected_store;
 
   function handle_eraser_mode() {
     event_state_store.set("erasing");
@@ -55,13 +43,6 @@
       arrow = false;
     }
   }
-
-  onDestroy(() => {
-    unsubscribe();
-    unsubscribe2();
-    unsubscribe3();
-    unsubscribe4();
-  });
 </script>
 
 <div class="tool-bar">
@@ -115,10 +96,7 @@
     gap: 5px;
     top: 15px;
     left: 50%;
-    /* width: 200px; */
     transform: translateX(-50%);
-
     z-index: 1000;
-    /* background-color: aqua; */
   }
 </style>

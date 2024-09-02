@@ -73,14 +73,18 @@ export function FetchAndLoadDoodle(id: number) {
     const ctx = GetCanvasContext()
     GetSingleDoodle(id).then((resp: any) => {
         ctx?.clearRect(0, 0, canvas?.width, canvas?.height);
+
         clearAllTextBoxes();
         ClearOldPathData();
         ClearUndoStore();
         ClearCurrentCanvas();
+
         const { id, name, date_created, collaborators, data, owner } = resp
         fetched_single.set({ id, name, date_created, collaborators, data, owner })
         textBoxesStore.set(data.rectangles)
+
         DrawImage();
+
         event_state_store.set("arrow")
         selected_store.set([])
     })

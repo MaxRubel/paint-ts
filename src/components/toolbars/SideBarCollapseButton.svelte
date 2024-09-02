@@ -29,5 +29,6 @@
     padding: 0px;
     top: 15px;
     transition: left 0.8s ease;
+    color: rgb(255, 171, 251);
   }
 </style>
