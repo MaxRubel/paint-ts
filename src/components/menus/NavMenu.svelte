@@ -165,7 +165,7 @@
 <div class="nav-button">
   <button
     class="nav-button-btn-main"
-    style:color={menuOpen ? "#535bf2" : ""}
+    style:color={menuOpen ? "rgb(255, 53, 235)" : ""}
     on:click={toggleNavMenu}><NavButton /></button
   >
 </div>
