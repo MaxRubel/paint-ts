@@ -18,7 +18,7 @@ function createAuthStore() {
       });
     },
     clearUser: () => {
-      set({ user: initialUser });
+      set({ user: null });
       localStorage.removeItem("user");
     },
   };
