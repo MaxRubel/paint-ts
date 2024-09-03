@@ -42,7 +42,6 @@
 
   const unsubscribe = authStore.subscribe((value) => {
     authState = value.user;
-    console.log(value.user);
   });
 
   function handleNew() {

@@ -14,8 +14,6 @@
     }
   });
 
-  $: console.log("amount: ", amount);
-
   onDestroy(() => {
     unsubscribe();
   });
