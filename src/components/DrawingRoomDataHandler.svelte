@@ -14,6 +14,7 @@
     InitWebsockets,
   } from "../../utils/websockets/websocketHub";
   import {
+    GracefulRTCExit,
     peerIds,
     peerStates,
     SendToAll,
@@ -28,7 +29,6 @@
   import { redo_store } from "../../stores/redoStore";
 
   let iHaveJoined: boolean;
-  let myId: string;
   let peerIdArray: string[];
   let peerStateMap: { [key: string]: boolean };
   let textboxes: { [key: string]: TextBoxType };
@@ -38,7 +38,6 @@
   let interval: NodeJS.Timeout | null = null;
 
   $: iHaveJoined = $i_have_joined;
-  $: myId = $myPublicId;
   $: peerIdArray = $peerIds;
   $: peerStateMap = $peerStates;
   $: peerMice = $mousePositions;
@@ -50,7 +49,8 @@
 
   $: {
     if (iHaveJoined) {
-      InitWebsockets();
+      const id = InitWebsockets();
+      startMouseTracker(id);
     }
   }
 
@@ -61,7 +61,7 @@
 
   let oldMousepos: mousePos = { id: "", x: 0, y: 0 };
 
-  function startMouseTracker() {
+  function startMouseTracker(id: string) {
     document.addEventListener("mousemove", updateMousePosition);
 
     interval = setInterval(() => {
@@ -71,7 +71,7 @@
       }
 
       if (mouseX !== undefined && mouseY !== undefined) {
-        const data = { id: myId, x: mouseX, y: mouseY };
+        const data = { id, x: mouseX, y: mouseY };
         oldMousepos = data;
         SendToAll(`mousepos&*^${JSON.stringify(data)}`);
       }
@@ -88,11 +88,12 @@
 
   onMount(() => {
     if (get(i_am_hosting)) {
-      InitWebsockets();
+      const id = InitWebsockets();
+      startMouseTracker(id);
     } else {
       event_state_store.set("confirm_join_drawing_room_form");
     }
-    startMouseTracker();
+
     undo_store.set([]);
     redo_store.set([]);
   });
@@ -103,6 +104,7 @@
     drawing_room_store.set(false);
 
     unsubscribe();
+    GracefulRTCExit();
     CloseWebsocket();
     stopMouseTracker();
   });

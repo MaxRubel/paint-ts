@@ -1,6 +1,10 @@
 import { get, writable } from "svelte/store";
-import { drawing_room_id, i_am_hosting, myPublicId } from "../../stores/drawingRoomStore"
-import { SendInitialRoomData, SendWSMessage } from "../websockets/websocketHub"
+import {
+  drawing_room_id,
+  i_am_hosting,
+  myPublicId,
+} from "../../stores/drawingRoomStore";
+import { SendInitialRoomData, SendWSMessage } from "../websockets/websocketHub";
 import { textBoxesStore } from "../../stores/textBoxStore";
 import { ParseMessage, type mousePos } from "../webRTC/webRTCDataMessages";
 import { alert_store } from "../../stores/alertStore";
@@ -132,13 +136,13 @@ export async function ReceiveOffer(incoming: any) {
       const textboxes = get(textBoxesStore);
       sendSingleDataMessage(from, `userjoined&*^${JSON.stringify(textboxes)}`);
       if (get(i_am_hosting)) {
-        SendInitialRoomData(from)
+        SendInitialRoomData(from);
       }
     };
 
     dataChannel.onclose = () => {
-      peerConnection.close()
-    }
+      peerConnection.close();
+    };
   };
 
   peerConnection.onicecandidate = (event) => {
@@ -184,25 +188,24 @@ export function HandleRemovePeer(incoming: any) {
   const PCs = get(peerConnections);
   const peerSts = get(peerStates);
   const peerIs = get(peerIds);
-  const datachans = get(dataChannels)
-  const mice = get(mousePositions)
-
+  const datachans = get(dataChannels);
+  const mice = get(mousePositions);
 
   PCs[cliendId].close();
 
   delete PCs[cliendId];
   delete peerSts[cliendId];
-  delete datachans[cliendId]
-  delete mice[cliendId]
+  delete datachans[cliendId];
+  delete mice[cliendId];
   const filtered = peerIs.filter((item) => item !== cliendId);
 
   peerConnections.set(PCs);
   peerStates.set(peerSts);
   peerIds.set(filtered);
-  dataChannels.set(datachans)
-  mousePositions.set(mice)
+  dataChannels.set(datachans);
+  mousePositions.set(mice);
 
-  alert_store.set("alert:Someone left!")
+  alert_store.set("alert:Someone left!");
 }
 
 export async function HandleIceCandidate(incoming: any) {
@@ -226,4 +229,19 @@ export function BroadcastToAll(msg: string) {
   for (const channel of Object.values(channels)) {
     channel.send(msg);
   }
+}
+
+export function GracefulRTCExit() {
+  Object.values(get(peerConnections)).forEach((conn) => {
+    if (conn) conn.close();
+  });
+  Object.values(get(dataChannels)).forEach((chan) => {
+    if (chan) chan.close();
+  });
+
+  dataChannels.set({});
+  peerConnections.set({});
+  peerStates.set({});
+  peerIds.set([]);
+  mousePositions.set({});
 }

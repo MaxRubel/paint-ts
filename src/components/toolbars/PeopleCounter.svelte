@@ -3,16 +3,18 @@
   import { peerStates } from "../../../utils/webRTC/webRTCNegotiate";
   import PeopleIcon from "../../graphics/PeopleIcon.svelte";
 
-  let amount = 0;
+  let amount = 1;
 
   const unsubscribe = peerStates.subscribe((peerStates) => {
-    amount = 0;
+    amount = 1;
     for (const status of Object.values(peerStates)) {
       if (status) {
         amount = amount + 1;
       }
     }
   });
+
+  $: console.log("amount: ", amount);
 
   onDestroy(() => {
     unsubscribe();

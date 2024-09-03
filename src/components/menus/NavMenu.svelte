@@ -26,6 +26,7 @@
   import PeopleIcon from "../../graphics/NavMenu/PeopleIcon.svelte";
   import NewFileIcon from "../../graphics/NavMenu/NewFileIcon.svelte";
   import ShareIcon from "../../graphics/NavMenu/ShareIcon.svelte";
+  import { onDestroy } from "svelte";
 
   export let handleClear: Function;
 
@@ -36,9 +37,13 @@
   let userInDrawingRoom: boolean;
 
   $: eventState = $event_state_store;
-  $: authState = $authStore.user;
   $: loadedDrawing = $fetched_single;
   $: userInDrawingRoom = $drawing_room_store;
+
+  const unsubscribe = authStore.subscribe((value) => {
+    authState = value.user;
+    console.log(value.user);
+  });
 
   function handleNew() {
     const undoHistory = get(undo_store).length;
@@ -148,6 +153,10 @@
       document.removeEventListener("click", handleUnfocus);
     }
   }
+
+  onDestroy(() => {
+    unsubscribe();
+  });
 </script>
 
 <div class="nav-button">
@@ -167,7 +176,7 @@
       Clear drawing
     </button>
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={handleSignIn}>
-      Sign in16
+      Sign in
     </button>
   {:else}
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}>

@@ -18,7 +18,11 @@ import {
   ReceiveOffer,
 } from "../webRTC/webRTCNegotiate";
 import { textBoxesStore } from "../../stores/textBoxStore";
-import { GetCanvasContext, pointsMap, ReceiveNewPointsMap } from "../drawBrushStroke";
+import {
+  GetCanvasContext,
+  pointsMap,
+  ReceiveNewPointsMap,
+} from "../drawBrushStroke";
 
 type outgoingMessage = {
   type: string;
@@ -99,12 +103,12 @@ function startNegotiations() {
   });
 }
 
-function parseInitialRoomData(msg) {
-  const { canvasImage, textboxes } = msg.data
-  const newPointsMap = msg.data.pointsMap
+function parseInitialRoomData(msg: any) {
+  const { canvasImage, textboxes } = msg.data;
+  const newPointsMap = msg.data.pointsMap;
 
   //set text boxes:
-  textBoxesStore.set(textboxes)
+  textBoxesStore.set(textboxes);
 
   //draw canvas:
   const ctx = GetCanvasContext();
@@ -112,10 +116,10 @@ function parseInitialRoomData(msg) {
   img.onload = () => {
     requestAnimationFrame(() => {
       ctx?.drawImage(img, 0, 0);
-    })
+    });
   };
   img.src = `data:image/png;base64,${canvasImage}`;
-  ReceiveNewPointsMap(newPointsMap)
+  ReceiveNewPointsMap(newPointsMap);
 }
 
 function parseMessage(e: any) {
@@ -150,17 +154,26 @@ function parseMessage(e: any) {
   }
 }
 
-export function InitWebsockets() {
+export function InitWebsockets(): string {
   const { socket, userId } = InitWShandshake();
   myPublicId.set(userId);
   ws = socket;
   ws.onmessage = (e) => {
     parseMessage(e);
   };
+  return userId;
 }
 
 export function CloseWebsocket() {
   if (ws) {
+    // const msg: outgoingMessage = {
+    //   type: "leaving",
+    //   to: "",
+    //   from: get(myPublicId),
+    //   room: get(drawing_room_id),
+    //   data: {},
+    // };
+    // ws.send(JSON.stringify(msg));
     ws.close();
   }
 }
@@ -170,21 +183,22 @@ export function SendWSMessage(message: outgoingMessage) {
 }
 
 export function SendInitialRoomData(id: string) {
-  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
-  const dataURL = canvas.toDataURL('image/png');
-  const canvasImage = dataURL.split(',')[1];
+  const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
+  const dataURL = canvas.toDataURL("image/png");
+  const canvasImage = dataURL.split(",")[1];
 
   const data = {
     textboxes: get(textBoxesStore),
-    canvasImage, pointsMap
-  }
+    canvasImage,
+    pointsMap,
+  };
   const msg: outgoingMessage = {
     type: "initalJoinData",
     to: id,
     from: get(myPublicId),
     room: get(drawing_room_id),
-    data
-  }
+    data,
+  };
 
-  ws?.send(JSON.stringify(msg))
+  ws?.send(JSON.stringify(msg));
 }
