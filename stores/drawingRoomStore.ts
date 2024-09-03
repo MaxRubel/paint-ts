@@ -1,7 +1,7 @@
 import { get, writable } from "svelte/store";
 import { fetched_single, type ProjectType } from "./fetchDataStore";
 import { textBoxesStore } from "./textBoxStore";
-import { ClearCurrentCanvas, GetCanvasContext } from "../utils/drawBrushStroke";
+import { ClearCurrentCanvas, GetCanvasContext, SetOgCanvas } from "../utils/drawBrushStroke";
 
 export type DataTransitionType = { drawingData: ProjectType };
 
@@ -96,4 +96,5 @@ export function UnpackTransition() {
   };
 
   img.src = dataURL;
+  SetOgCanvas(dataURL)
 }

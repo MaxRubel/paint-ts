@@ -37,6 +37,8 @@ let currentCanvas: string = ""; //dataURL for a canvas in the most current state
 
 let color = "";
 
+let ogCanvas: string = ""
+
 const DRAW_SEND_INTERVAL = 20; //milliseconds
 
 export function InitCtx(context: CanvasRenderingContext2D) {
@@ -302,4 +304,13 @@ export function RebuildCanvasAfterUndo() {
     ctx.fillStyle = object.color;
     ctx.fill(canvasPath);
   });
+
+}
+
+export function SetOgCanvas(value: string) {
+  ogCanvas = value
+}
+
+export function GetOgCanvas(): string {
+  return ogCanvas
 }
