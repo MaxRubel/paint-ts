@@ -121,6 +121,26 @@
         });
       }
     }
+
+    if (eventState.includes("typing")) {
+      const textBoxId = eventState.split("&")[1];
+      const ogTextbox = get(textBoxesStore)[textBoxId];
+      const oldColor = ogTextbox.fontColor;
+      if (oldColor !== newColor) {
+        updateTextBox(textBoxId, { fontColor: newColor });
+        AddUndoItem({
+          action: "changedFontColor",
+          data: {
+            id: textBoxId,
+            oldColor,
+          },
+        });
+      }
+      event_state_store.set(`typing&${textBoxId}`);
+      const element = document.getElementById(`textbox&${textBoxId}`);
+      if (!element) return;
+      element.focus();
+    }
   }
 
   $: if (edittingTile !== null) {

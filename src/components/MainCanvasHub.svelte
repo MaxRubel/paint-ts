@@ -297,7 +297,7 @@
   {#if drawingRoomId}
     <DrawingRoomDataHandler />
   {/if}
-  <DebugMenu />
+  <!-- <DebugMenu /> -->
   <NavMenu {handleClear} />
   <MultiplayerDebug />
   <TopToolBar
