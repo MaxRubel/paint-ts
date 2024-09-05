@@ -298,6 +298,8 @@
   {#if drawingRoomId}
     <DrawingRoomDataHandler />
   {/if}
+  <!-- <DebugMenu /> -->
+
   <NavMenu {handleClear} />
   <MultiplayerDebug />
   <TopToolBar
