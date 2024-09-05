@@ -1,3 +1,3 @@
 import { writable } from "svelte/store";
 
-export const brush_size_store = writable(13)
+export const brush_size_store = writable(10)

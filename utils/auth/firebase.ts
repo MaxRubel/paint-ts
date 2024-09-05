@@ -21,8 +21,8 @@ export const signIn = async () => {
   try {
     const googleUser = await signInWithPopup(auth, provider);
     const djangoUser = await CheckUser(googleUser.user.uid)
-    if(djangoUser?.id){
-      authStore.setUser({...googleUser.user, ...djangoUser})
+    if (djangoUser?.id) {
+      authStore.setUser({ ...googleUser.user, ...djangoUser })
     } else {
       authStore.setUser(googleUser.user)
     }

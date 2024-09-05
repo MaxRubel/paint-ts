@@ -9,6 +9,7 @@
     SetPaletteById,
   } from "../../../stores/paletteStore";
   import TinyPaletteMenu from "./TinyPaletteMenu.svelte";
+  import { side_bar_hidden_store } from "../../../stores/userPrefsStore";
 
   export let palette: PaletteType;
 
@@ -21,9 +22,10 @@
     }
     SetPaletteById(palette.id);
     if (!e.target.id.includes("delete-palette-button-small")) {
-      event_state_store.set("drawing");
       border_index_store.set(0);
     }
+    event_state_store.set("drawing");
+    side_bar_hidden_store.set(false);
   }
 </script>
 

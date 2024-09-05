@@ -9,6 +9,7 @@
   import Alert from "./components/alerts/Alert.svelte";
   import { Route, Router } from "svelte-routing";
   import { drawing_room_store } from "../stores/drawingRoomStore";
+  import DebugMenu from "./components/menus/DebugMenu.svelte";
 
   let user: any;
   let eventState: string;
@@ -40,6 +41,7 @@
 {#if eventState === "needs_registration_form"}
   <UserRegistrationForm />
 {/if}
+<!-- <DebugMenu /> -->
 <FormRouter />
 <Alert />
 <Router>

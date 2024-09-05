@@ -340,8 +340,10 @@ function undoBrushPublic(lastAction: any) {
   });
 
   delete pointsMap[publicMoveId];
-  SendToAll(`undobrushstroke&*^${JSON.stringify({ publicMoveId })}`);
+
   RebuildCanvasAfterUndo();
+
+  SendToAll(`undobrushstroke&*^${JSON.stringify({ publicMoveId })}`);
 }
 
 function popLastItem() {

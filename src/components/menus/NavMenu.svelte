@@ -16,6 +16,8 @@
     drawing_room_id,
     drawing_room_store,
     i_am_hosting,
+    TransitionToDrawingRoom,
+    UnpackTransition,
   } from "../../../stores/drawingRoomStore";
   import { v4 as uuidv4 } from "uuid";
   import { navigate } from "svelte-routing";
@@ -126,9 +128,11 @@
   }
 
   function handleExitDrawingRoom() {
+    TransitionToDrawingRoom();
     drawing_room_store.set(false);
     i_am_hosting.set(false);
     navigate("/");
+    UnpackTransition();
     menuOpen = false;
   }
 
@@ -161,7 +165,7 @@
 <div class="nav-button">
   <button
     class="nav-button-btn-main"
-    style:color={menuOpen ? "#535bf2" : ""}
+    style:color={menuOpen ? "rgb(255, 53, 235)" : ""}
     on:click={toggleNavMenu}><NavButton /></button
   >
 </div>
