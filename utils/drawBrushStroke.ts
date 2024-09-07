@@ -8,7 +8,7 @@ import { active_color_store } from "../stores/paletteStore";
 import { drawing_room_id } from "../stores/drawingRoomStore";
 import { SendToAll } from "./webRTC/webRTCNegotiate";
 import { v4 as uuidv4 } from "uuid";
-import type { PointsMap, PointsObject } from "./webRTC/webRTCDataMessages";
+import type { PointsMap } from "./webRTC/webRTCDataMessages";
 
 type sendArray = [number, number, number][];
 
@@ -53,10 +53,7 @@ export function GetCanvasContext() {
   }
 }
 
-export function DrawImageFromDataURL(
-  ctx: CanvasRenderingContext2D,
-  dataURL: string,
-) {
+export function DrawImageFromDataURL(dataURL: string) {
   return new Promise((resolve: any, reject) => {
     const img = new Image();
 
@@ -233,6 +230,8 @@ export function EndBrushStroke() {
       data: { publicMoveId },
     });
 
+    const pointsMap = GetPointsMap()
+
     pointsMap[publicMoveId] = {
       id: publicMoveId,
       size: get(brush_size_store),
@@ -241,6 +240,7 @@ export function EndBrushStroke() {
     };
     publicMoveId = "";
   }
+  SyncPointsMap(pointsMap)
 
   tempPoints = [];
   pointsToSend = [];
@@ -287,23 +287,37 @@ export function GetVectorPaths() {
   return paths;
 }
 
-export function RebuildCanvasAfterUndo() {
+export async function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
   ctx.clearRect(0, 0, 2000, 3000);
 
-  Object.values(pointsMap).forEach((object: PointsObject) => {
-    const stroke = getStroke(object.array, {
-      size: object.size,
-      thinning: 0.5,
-      smoothing: 0.5,
-      streamline: 0.5,
-    });
+  await DrawImageFromDataURL(ogCanvas);
 
-    const pathData = getSvgPathFromStroke(stroke);
-    const canvasPath = new Path2D(pathData);
 
-    ctx.fillStyle = object.color;
-    ctx.fill(canvasPath);
-  });
+  const CHUNK_SIZE = 60;
+
+  for (const entry of Object.values(pointsMap)) {
+    requestAnimationFrame(() => {
+      for (let startIndex = 0; startIndex < entry.array.length; startIndex += CHUNK_SIZE) {
+        const endIndex = Math.min(startIndex + CHUNK_SIZE, entry.array.length);
+        const chunk = entry.array.slice(startIndex, endIndex);
+
+        const stroke = getStroke(chunk, {
+          size: entry.size,
+          thinning: 0.5,
+          smoothing: 0.5,
+          streamline: 0.5,
+        });
+
+        const pathData = getSvgPathFromStroke(stroke);
+        ctx.beginPath();
+        ctx.fillStyle = entry.color;
+        ctx.fill(new Path2D(pathData));
+        ctx.closePath();
+
+      }
+    })
+
+  }
 
 }
 
@@ -313,4 +327,17 @@ export function SetOgCanvas(value: string) {
 
 export function GetOgCanvas(): string {
   return ogCanvas
+}
+
+export function GetPointsMap(): PointsMap {
+  return pointsMap
+}
+
+export function SyncPointsMap(map: PointsMap) {
+  pointsMap = map
+  console.log("points map length: ", Object.values(pointsMap).length)
+}
+
+export function ClearPointsMap() {
+  pointsMap = {}
 }

@@ -27,6 +27,7 @@
   import PeopleCounter from "./toolbars/PeopleCounter.svelte";
   import { undo_store } from "../../stores/undoStore";
   import { redo_store } from "../../stores/redoStore";
+  import { ClearPointsMap } from "../../utils/drawBrushStroke";
 
   let iHaveJoined: boolean;
   let peerIdArray: string[];
@@ -118,6 +119,7 @@
     GracefulRTCExit();
     CloseWebsocket();
     stopMouseTracker();
+    ClearPointsMap();
   });
 </script>
 

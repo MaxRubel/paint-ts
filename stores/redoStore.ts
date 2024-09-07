@@ -1,7 +1,7 @@
 import { get, writable } from "svelte/store";
-import { DrawImageFromDataURL, GetCanvasContext, pointsMap, RebuildCanvasAfterUndo } from "../utils/drawBrushStroke";
+import { DrawImageFromDataURL, GetCanvasContext, GetPointsMap, RebuildCanvasAfterUndo, SyncPointsMap } from "../utils/drawBrushStroke";
 import { AddUndoItem } from "./undoStore";
-import { createNewTextBox, deleteTextBox, textBoxesStore, updateTextBox } from "./textBoxStore";
+import { deleteTextBox, textBoxesStore, updateTextBox } from "./textBoxStore";
 import type { TextBoxType, UndoType } from "../utils/types/app_types";
 import { SendToAll } from "../utils/webRTC/webRTCNegotiate";
 
@@ -83,11 +83,10 @@ function redoDrawBrushStrokes(lastAction: RedoItem) {
     console.error("error redrawing brush strokes onto uninit canvas context");
     return;
   }
-  DrawImageFromDataURL(ctx, lastAction.data.currentRaster);
+  DrawImageFromDataURL(lastAction.data.currentRaster);
 }
 
 function createOldTextBox(undoItem: any) {
-  console.log({ undoItem })
   textBoxesStore.update((prevVal) => ({
     ...prevVal,
     [undoItem.data.id]: undoItem.data,
@@ -148,10 +147,12 @@ function resetManyTextBoxes(redoItem: any) {
 }
 
 function redoPublicBrushStroke(redoItem: any) {
+  const pointsMap = GetPointsMap()
   const { data } = redoItem
   pointsMap[data.id] = data
   SendToAll(`redopublicbrush&*^${JSON.stringify(data)}`)
-  RebuildCanvasAfterUndo()
+  RebuildCanvasAfterUndo(pointsMap)
+  SyncPointsMap(pointsMap)
 }
 
 function popLastItem() {

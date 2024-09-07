@@ -3,8 +3,6 @@
   import MouseCursor from "../../graphics/MouseCursor.svelte";
 
   export let mouseData: mousePos;
-
-  $: console.log({ x: mouseData.x, y: mouseData.y });
 </script>
 
 <div class="peer-mouse" style="top: {mouseData.y}px; left: {mouseData.x}px">

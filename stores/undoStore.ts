@@ -2,8 +2,9 @@ import { get, writable } from "svelte/store";
 import {
   DrawImageFromDataURL,
   GetCanvasContext,
-  pointsMap,
+  GetPointsMap,
   RebuildCanvasAfterUndo,
+  SyncPointsMap,
 } from "../utils/drawBrushStroke";
 import type {
   UndoBrushStroke,
@@ -109,24 +110,24 @@ function undoBrushStroke(lastAction: UndoBrushStroke) {
     console.error("no context found error undoing brush stroke");
     return;
   }
-  DrawImageFromDataURL(ctx, oldRaster);
+  DrawImageFromDataURL(oldRaster).then(() => {
+    const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
+    if (!canvas) {
+      console.error("oopsies-no canvas");
+      return;
+    }
+    const currentRaster = canvas.toDataURL();
 
-  const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
-  if (!canvas) {
-    console.error("oopsies-no canvas");
-    return;
-  }
-  const currentRaster = canvas.toDataURL();
-
-  AddRedoItem({
-    action: "drawBushStroke",
-    data: {
-      currentRaster,
-      start,
-      end,
-    },
-    undoItem: lastAction,
-  });
+    AddRedoItem({
+      action: "drawBushStroke",
+      data: {
+        currentRaster,
+        start,
+        end,
+      },
+      undoItem: lastAction,
+    });
+  })
 }
 
 export function undoEraser(lastAction: any) {
@@ -137,7 +138,7 @@ export function undoEraser(lastAction: any) {
   }
 
   const { oldRaster } = lastAction.data;
-  DrawImageFromDataURL(ctx, oldRaster);
+  DrawImageFromDataURL(oldRaster);
 
   const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
   if (!ctx) {
@@ -154,7 +155,6 @@ export function undoEraser(lastAction: any) {
 }
 
 function undoCreatedTextBox(lastAction: any) {
-  console.log("undo textbox")
   const textBoxID = lastAction.data;
   AddRedoItem({
     action: "createTextBox",
@@ -331,6 +331,8 @@ function packageMultipleRedos(action: string, undoItem: any) {
 }
 
 function undoBrushPublic(lastAction: any) {
+  const pointsMap = GetPointsMap()
+
   const { publicMoveId } = lastAction.data;
   const item = pointsMap[publicMoveId];
 
@@ -342,8 +344,8 @@ function undoBrushPublic(lastAction: any) {
 
   delete pointsMap[publicMoveId];
 
-  RebuildCanvasAfterUndo();
-
+  SyncPointsMap(pointsMap)
+  RebuildCanvasAfterUndo(pointsMap);
   SendToAll(`undobrushstroke&*^${JSON.stringify({ publicMoveId })}`);
 }
 
