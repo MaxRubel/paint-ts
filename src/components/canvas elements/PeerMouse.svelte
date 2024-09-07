@@ -1,8 +1,10 @@
 <script lang="ts">
-  import type { mousePos } from "../../../utils/webRTCDataMessages";
+  import type { mousePos } from "../../../utils/webRTC/webRTCDataMessages";
   import MouseCursor from "../../graphics/MouseCursor.svelte";
 
   export let mouseData: mousePos;
+
+  $: console.log({ x: mouseData.x, y: mouseData.y });
 </script>
 
 <div class="peer-mouse" style="top: {mouseData.y}px; left: {mouseData.x}px">
@@ -11,7 +13,7 @@
 
 <style>
   .peer-mouse {
-    position: fixed;
+    position: absolute;
     z-index: 700;
     color: white;
     rotate: -70deg;
