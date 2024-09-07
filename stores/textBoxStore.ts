@@ -30,12 +30,19 @@ export function createNewTextBox(
   let x = 0;
   let y = 0;
 
+  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
+  if (!canvas) {
+    console.error("no canvas found")
+    return
+  }
+  const canvasRect = canvas?.getBoundingClientRect()
+
   if (get(locked_store)) {
-    x = Math.round((e.clientX - 133) / 20) * 20;
-    y = Math.round((e.clientY - 40) / 20) * 20;
+    x = Math.round((e.clientX - canvasRect.left - 133) / 20) * 20;
+    y = Math.round((e.clientY - canvasRect.top - 40) / 20) * 20;
   } else {
-    x = e.clientX - 133;
-    y = e.clientY - 40;
+    x = e.clientX - canvasRect.left - 133;
+    y = e.clientY - canvasRect.top - 40;
   }
   const fontColor = get(active_color_store);
   const align = get(text_alignment);
@@ -68,6 +75,9 @@ export function createNewTextBox(
 }
 
 export function updateTextBox(id: string, updates: any) {
+  console.log("yes")
+  console.log({ id, updates }
+  )
   textBoxesStore.update((boxes) => {
     if (boxes[id]) {
       boxes = { ...boxes, [id]: { ...boxes[id], ...updates } };

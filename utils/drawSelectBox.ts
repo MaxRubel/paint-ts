@@ -49,8 +49,10 @@ export function DrawSelectBox(
     console.error("no canvas initialized");
     return;
   }
-  const xCurrent = e.clientX - overlayCanvas.offsetLeft;
-  const yCurrent = e.clientY - overlayCanvas.offsetTop;
+
+  const xCurrent = e.clientX - overlayCanvas.getBoundingClientRect().left;
+  const yCurrent = e.clientY - overlayCanvas.getBoundingClientRect().top;
+
 
   let width = xCurrent - xStart;
   let height = yCurrent - yStart;

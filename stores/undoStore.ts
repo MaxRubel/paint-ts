@@ -154,6 +154,7 @@ export function undoEraser(lastAction: any) {
 }
 
 function undoCreatedTextBox(lastAction: any) {
+  console.log("undo textbox")
   const textBoxID = lastAction.data;
   AddRedoItem({
     action: "createTextBox",

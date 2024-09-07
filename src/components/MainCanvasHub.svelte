@@ -12,7 +12,6 @@
     locked_store,
     selected_store,
   } from "../../stores/eventState";
-  import { DrawRectangle } from "../../utils/drawRectangle";
   import {
     ClearOldPathData,
     DrawBrushStroke,
@@ -43,7 +42,7 @@
 
   export let drawingRoomId = null;
 
-  let canvas: any;
+  let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
 
   let textBoxes: TextBoxMap;
@@ -129,6 +128,7 @@
   }
 
   onMount(() => {
+    //@ts-ignore
     ctx = canvas.getContext("2d", { alpha: true });
     InitCtx(ctx);
     window.addEventListener("keyup", handleKeyup);
@@ -156,8 +156,8 @@
     mouseHasLeft = false;
 
     function startSelecting() {
-      xStart = e.clientX;
-      yStart = e.clientY;
+      xStart = e.clientX - canvas.getBoundingClientRect().left;
+      yStart = e.clientY - canvas.getBoundingClientRect().top;
       event_state_store.set("selecting");
       initializeSelectBox(canvas);
     }
@@ -207,9 +207,6 @@
       case "erasing":
         if (mouseHasLeft) return;
         DrawBrushStroke(ctx, e);
-        break;
-      case "rectangle-draw":
-        DrawRectangle(ctx, canvas, e, xStart, yStart);
         break;
       case "selecting":
         DrawSelectBox(e, xStart, yStart);

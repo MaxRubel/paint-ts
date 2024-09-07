@@ -1,7 +1,7 @@
 import { get, writable } from "svelte/store";
 import { DrawImageFromDataURL, GetCanvasContext, pointsMap, RebuildCanvasAfterUndo } from "../utils/drawBrushStroke";
 import { AddUndoItem } from "./undoStore";
-import { deleteTextBox, textBoxesStore, updateTextBox } from "./textBoxStore";
+import { createNewTextBox, deleteTextBox, textBoxesStore, updateTextBox } from "./textBoxStore";
 import type { TextBoxType, UndoType } from "../utils/types/app_types";
 import { SendToAll } from "../utils/webRTC/webRTCNegotiate";
 
@@ -87,7 +87,11 @@ function redoDrawBrushStrokes(lastAction: RedoItem) {
 }
 
 function createOldTextBox(undoItem: any) {
-  updateTextBox(undoItem.data.id, undoItem.data);
+  console.log({ undoItem })
+  textBoxesStore.update((prevVal) => ({
+    ...prevVal,
+    [undoItem.data.id]: undoItem.data,
+  }));
 }
 
 function addOldText(undoItem: any) {

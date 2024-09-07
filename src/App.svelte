@@ -41,7 +41,7 @@
 {#if eventState === "needs_registration_form"}
   <UserRegistrationForm />
 {/if}
-<!-- <DebugMenu /> -->
+
 <FormRouter />
 <Alert />
 <Router>
