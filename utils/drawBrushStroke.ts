@@ -322,15 +322,14 @@ export function GetPointsMap(): PointsMap {
 }
 
 export function SyncPointsMap(map: PointsMap) {
-  const arrays: any = [];
-  Object.values(map).forEach((item) => {
-    arrays.push(item.array.length);
-  });
-  console.clear();
-  console.log(arrays);
+  // const arrays: any = [];
+  // Object.values(map).forEach((item) => {
+  //   arrays.push(item.array.length);
+  // });
+  // console.clear();
+  // console.log(arrays);
 
   pointsMap = map;
-  // console.log("points map length: ", Object.values(pointsMap).length);
 }
 
 export function ClearPointsMap() {

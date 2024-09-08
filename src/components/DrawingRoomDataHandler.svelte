@@ -5,7 +5,6 @@
     drawing_room_store,
     i_am_hosting,
     i_have_joined,
-    myPublicId,
   } from "../../stores/drawingRoomStore";
   import { get } from "svelte/store";
   import { event_state_store } from "../../stores/eventState";
@@ -47,7 +46,8 @@
 
   const unsubscribe = textBoxesStore.subscribe((value) => {
     textboxes = value;
-    SendToAll(`changingTextbox&*^${JSON.stringify(value)}`);
+    // console.log("undid ", value);
+    // SendToAll(`changingTextbox&*^${JSON.stringify(value)}`);
   });
 
   $: {

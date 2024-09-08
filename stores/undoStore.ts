@@ -227,7 +227,6 @@ function undoExpand(lastAction: UndoExpand) {
 
 function undoDeletedTextBoxes(lastAction: any) {
   const array = lastAction.data;
-
   AddRedoItem({
     action: "redoDelete",
     data: "",
@@ -239,7 +238,14 @@ function undoDeletedTextBoxes(lastAction: any) {
       ...boxes,
       [item.id]: item,
     }));
+    const { align, fontColor, fontFamily, fontSize, height, id, text, width, type, x, y } = item
+
+    const textbox: TextBoxType = {
+      align, fontColor, fontFamily, fontSize, height, id, text, width, type, x, y
+    }
+    SendToAll(`newtextbox&*^${JSON.stringify(textbox)}`)
   });
+
 }
 
 function undoTextBoxAlignChange(lastAction: any) {

@@ -96,7 +96,6 @@ function handleRedoPublicBrush(msgData: PointsObject) {
 export function ParseMessage(msg: string) {
   const [msgType, msgData] = msg.split("&*^");
   const msgJson = JSON.parse(msgData);
-
   switch (msgType) {
     case "newtextbox":
       handleNewTextBox(msgJson);
