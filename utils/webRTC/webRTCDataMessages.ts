@@ -61,37 +61,35 @@ let tempArray: pointsArray = [];
 
 function handleDrawPointsOnCanvas(msgData: DrawSendData) {
   DrawOtherPersonsPoints(msgData);
-
   tempArray.push(...msgData.array);
-  const pointsMap = GetPointsMap()
+  const pointsMap = GetPointsMap();
   if (msgData.end) {
     //store the whole stroke in the pointsMap
     pointsMap[msgData.end] = {
       id: msgData.end,
       size: msgData.brush.size,
       color: msgData.brush.color,
-      array: tempArray,
+      array: msgData.array,
     };
-    SyncPointsMap(pointsMap)
+    SyncPointsMap(pointsMap);
     tempArray = [];
-    console.log("END OF POINTS")
-    console.log({ pointsMap })
+    // console.log("yesh");
+    // RebuildCanvasAfterUndo(pointsMap);
   }
-
 }
 
 function handleUndoBrushStroke(msgData: { ["publicMoveId"]: string }) {
   const { publicMoveId } = msgData;
-  const pointsMap = GetPointsMap()
+  const pointsMap = GetPointsMap();
   delete pointsMap[publicMoveId];
-  SyncPointsMap(pointsMap)
+  SyncPointsMap(pointsMap);
   RebuildCanvasAfterUndo(pointsMap);
 }
 
 function handleRedoPublicBrush(msgData: PointsObject) {
-  const pointsMap = GetPointsMap()
+  const pointsMap = GetPointsMap();
   pointsMap[msgData.id] = msgData;
-  SyncPointsMap(pointsMap)
+  SyncPointsMap(pointsMap);
   RebuildCanvasAfterUndo(pointsMap);
 }
 

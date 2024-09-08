@@ -127,7 +127,7 @@ function undoBrushStroke(lastAction: UndoBrushStroke) {
       },
       undoItem: lastAction,
     });
-  })
+  });
 }
 
 export function undoEraser(lastAction: any) {
@@ -331,9 +331,10 @@ function packageMultipleRedos(action: string, undoItem: any) {
 }
 
 function undoBrushPublic(lastAction: any) {
-  const pointsMap = GetPointsMap()
+  const pointsMap = GetPointsMap();
 
   const { publicMoveId } = lastAction.data;
+
   const item = pointsMap[publicMoveId];
 
   AddRedoItem({
@@ -344,8 +345,8 @@ function undoBrushPublic(lastAction: any) {
 
   delete pointsMap[publicMoveId];
 
-  SyncPointsMap(pointsMap)
   RebuildCanvasAfterUndo(pointsMap);
+  SyncPointsMap(pointsMap);
   SendToAll(`undobrushstroke&*^${JSON.stringify({ publicMoveId })}`);
 }
 

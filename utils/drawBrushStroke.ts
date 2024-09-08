@@ -37,7 +37,7 @@ let currentCanvas: string = ""; //dataURL for a canvas in the most current state
 
 let color = "";
 
-let ogCanvas: string = ""
+let ogCanvas: string = "";
 
 const DRAW_SEND_INTERVAL = 20; //milliseconds
 
@@ -104,8 +104,11 @@ export function ReceiveNewPointsMap(value: PointsMap) {
   pointsMap = value;
 }
 
+let slicePoint = 0;
+
 function startTransmitting() {
   publicMoveId = uuidv4();
+
   sendInterval = setInterval(() => {
     const brushData = {
       size: get(brush_size_store),
@@ -115,7 +118,7 @@ function startTransmitting() {
     const sendData: DrawSendData = {
       end: null,
       brush: brushData,
-      array: pointsToSend,
+      array: tempPoints,
     };
 
     SendToAll(`points&*^${JSON.stringify(sendData)}`);
@@ -220,7 +223,7 @@ export function EndBrushStroke() {
     const sendData: DrawSendData = {
       end: publicMoveId,
       brush: brushData,
-      array: pointsToSend,
+      array: tempPoints,
     };
 
     SendToAll(`points&*^${JSON.stringify(sendData)}`);
@@ -230,7 +233,7 @@ export function EndBrushStroke() {
       data: { publicMoveId },
     });
 
-    const pointsMap = GetPointsMap()
+    const pointsMap = GetPointsMap();
 
     pointsMap[publicMoveId] = {
       id: publicMoveId,
@@ -240,7 +243,7 @@ export function EndBrushStroke() {
     };
     publicMoveId = "";
   }
-  SyncPointsMap(pointsMap)
+  SyncPointsMap(pointsMap);
 
   tempPoints = [];
   pointsToSend = [];
@@ -287,57 +290,49 @@ export function GetVectorPaths() {
   return paths;
 }
 
-export async function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
+export function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
   ctx.clearRect(0, 0, 2000, 3000);
 
-  await DrawImageFromDataURL(ogCanvas);
+  Object.values(pointsMap).forEach((object) => {
+    const stroke = getStroke(object.array, {
+      size: object.size,
+      thinning: 0.5,
+      smoothing: 0.5,
+      streamline: 0.5,
+    });
 
+    const pathData = getSvgPathFromStroke(stroke);
+    const canvasPath = new Path2D(pathData);
 
-  const CHUNK_SIZE = 60;
-
-  for (const entry of Object.values(pointsMap)) {
-    requestAnimationFrame(() => {
-      for (let startIndex = 0; startIndex < entry.array.length; startIndex += CHUNK_SIZE) {
-        const endIndex = Math.min(startIndex + CHUNK_SIZE, entry.array.length);
-        const chunk = entry.array.slice(startIndex, endIndex);
-
-        const stroke = getStroke(chunk, {
-          size: entry.size,
-          thinning: 0.5,
-          smoothing: 0.5,
-          streamline: 0.5,
-        });
-
-        const pathData = getSvgPathFromStroke(stroke);
-        ctx.beginPath();
-        ctx.fillStyle = entry.color;
-        ctx.fill(new Path2D(pathData));
-        ctx.closePath();
-
-      }
-    })
-
-  }
-
+    ctx.fillStyle = object.color;
+    ctx.fill(canvasPath);
+  });
 }
 
 export function SetOgCanvas(value: string) {
-  ogCanvas = value
+  ogCanvas = value;
 }
 
 export function GetOgCanvas(): string {
-  return ogCanvas
+  return ogCanvas;
 }
 
 export function GetPointsMap(): PointsMap {
-  return pointsMap
+  return pointsMap;
 }
 
 export function SyncPointsMap(map: PointsMap) {
-  pointsMap = map
-  console.log("points map length: ", Object.values(pointsMap).length)
+  const arrays: any = [];
+  Object.values(map).forEach((item) => {
+    arrays.push(item.array.length);
+  });
+  console.clear();
+  console.log(arrays);
+
+  pointsMap = map;
+  // console.log("points map length: ", Object.values(pointsMap).length);
 }
 
 export function ClearPointsMap() {
-  pointsMap = {}
+  pointsMap = {};
 }
