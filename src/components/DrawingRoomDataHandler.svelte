@@ -27,6 +27,7 @@
   import PeopleCounter from "./toolbars/PeopleCounter.svelte";
   import { undo_store } from "../../stores/undoStore";
   import { redo_store } from "../../stores/redoStore";
+  import { ClearPointsMap } from "../../utils/drawBrushStroke";
 
   let iHaveJoined: boolean;
   let peerIdArray: string[];
@@ -42,6 +43,8 @@
   $: peerStateMap = $peerStates;
   $: peerMice = $mousePositions;
 
+  let canvas: HTMLCanvasElement;
+
   const unsubscribe = textBoxesStore.subscribe((value) => {
     textboxes = value;
     SendToAll(`changingTextbox&*^${JSON.stringify(value)}`);
@@ -55,11 +58,13 @@
   }
 
   function updateMousePosition(e: MouseEvent) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
+    mouseX = e.clientX + window.scrollX;
+    mouseY = e.clientY + window.scrollY;
   }
 
   let oldMousepos: mousePos = { id: "", x: 0, y: 0 };
+
+  function handleMouse(e: any) {}
 
   function startMouseTracker(id: string) {
     document.addEventListener("mousemove", updateMousePosition);
@@ -96,6 +101,13 @@
 
     undo_store.set([]);
     redo_store.set([]);
+
+    canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
+
+    window.addEventListener("scroll", handleMouse);
+    return () => {
+      window.removeEventListener("scroll", handleMouse);
+    };
   });
 
   onDestroy(() => {
@@ -107,6 +119,7 @@
     GracefulRTCExit();
     CloseWebsocket();
     stopMouseTracker();
+    ClearPointsMap();
   });
 </script>
 

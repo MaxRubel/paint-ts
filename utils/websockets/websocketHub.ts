@@ -22,6 +22,7 @@ import {
   GetCanvasContext,
   pointsMap,
   ReceiveNewPointsMap,
+  SetOgCanvas,
 } from "../drawBrushStroke";
 
 type outgoingMessage = {
@@ -106,6 +107,9 @@ function startNegotiations() {
 function parseInitialRoomData(msg: any) {
   const { canvasImage, textboxes } = msg.data;
   const newPointsMap = msg.data.pointsMap;
+  const dataURL = `data:image/png;base64,${canvasImage}`
+
+  SetOgCanvas(dataURL)
 
   //set text boxes:
   textBoxesStore.set(textboxes);
@@ -118,7 +122,7 @@ function parseInitialRoomData(msg: any) {
       ctx?.drawImage(img, 0, 0);
     });
   };
-  img.src = `data:image/png;base64,${canvasImage}`;
+  img.src = dataURL;
   ReceiveNewPointsMap(newPointsMap);
 }
 

@@ -2,6 +2,8 @@ import { get, writable } from "svelte/store";
 import { fetched_single, type ProjectType } from "./fetchDataStore";
 import { textBoxesStore } from "./textBoxStore";
 import { ClearCurrentCanvas, GetCanvasContext, SetOgCanvas } from "../utils/drawBrushStroke";
+import { undo_store } from "./undoStore";
+import { redo_store } from "./redoStore";
 
 export type DataTransitionType = { drawingData: ProjectType };
 
@@ -46,7 +48,8 @@ export function TransitionToDrawingRoom() {
     drawingData.collaborators = doodleFetched.collaborators;
     drawingData.date_created = doodleFetched.date_created;
   }
-
+  undo_store.set([])
+  redo_store.set([])
   data_transition.set({ drawingData });
 }
 
@@ -76,6 +79,7 @@ export function UnpackTransition() {
   textBoxesStore.set(data.rectangles);
 
   const dataURL = "data:image/png;base64," + data.canvasImage;
+  SetOgCanvas(dataURL)
   const img = new Image();
 
   img.onload = function () {

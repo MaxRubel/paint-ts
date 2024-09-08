@@ -3,8 +3,9 @@ import type { TextBoxType } from "../types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
 import {
   DrawOtherPersonsPoints,
-  pointsMap,
+  GetPointsMap,
   RebuildCanvasAfterUndo,
+  SyncPointsMap,
 } from "../drawBrushStroke";
 import type { DrawSendData } from "../drawBrushStroke";
 
@@ -34,8 +35,6 @@ export type PointsObject = {
   array: pointsArray;
 };
 
-let tempArray: pointsArray = [];
-
 function handleUpdateTextBoxes(msgJson: updateTextBox) {
   textBoxesStore.update((current) => ({
     ...current,
@@ -58,32 +57,40 @@ function handleDeleteTextBoxes(msgJson: deleteTextbox) {
   });
 }
 
+let tempArray: pointsArray = [];
+
 function handleDrawPointsOnCanvas(msgData: DrawSendData) {
   DrawOtherPersonsPoints(msgData);
-
   tempArray.push(...msgData.array);
+  const pointsMap = GetPointsMap();
   if (msgData.end) {
     //store the whole stroke in the pointsMap
     pointsMap[msgData.end] = {
       id: msgData.end,
       size: msgData.brush.size,
       color: msgData.brush.color,
-      array: tempArray,
+      array: msgData.array,
     };
+    SyncPointsMap(pointsMap);
     tempArray = [];
+    // console.log("yesh");
+    // RebuildCanvasAfterUndo(pointsMap);
   }
 }
 
 function handleUndoBrushStroke(msgData: { ["publicMoveId"]: string }) {
   const { publicMoveId } = msgData;
-
+  const pointsMap = GetPointsMap();
   delete pointsMap[publicMoveId];
-  RebuildCanvasAfterUndo();
+  SyncPointsMap(pointsMap);
+  RebuildCanvasAfterUndo(pointsMap);
 }
 
 function handleRedoPublicBrush(msgData: PointsObject) {
+  const pointsMap = GetPointsMap();
   pointsMap[msgData.id] = msgData;
-  RebuildCanvasAfterUndo();
+  SyncPointsMap(pointsMap);
+  RebuildCanvasAfterUndo(pointsMap);
 }
 
 export function ParseMessage(msg: string) {

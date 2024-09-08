@@ -8,7 +8,7 @@ import { active_color_store } from "../stores/paletteStore";
 import { drawing_room_id } from "../stores/drawingRoomStore";
 import { SendToAll } from "./webRTC/webRTCNegotiate";
 import { v4 as uuidv4 } from "uuid";
-import type { PointsMap, PointsObject } from "./webRTC/webRTCDataMessages";
+import type { PointsMap } from "./webRTC/webRTCDataMessages";
 
 type sendArray = [number, number, number][];
 
@@ -37,7 +37,7 @@ let currentCanvas: string = ""; //dataURL for a canvas in the most current state
 
 let color = "";
 
-let ogCanvas: string = ""
+let ogCanvas: string = "";
 
 const DRAW_SEND_INTERVAL = 20; //milliseconds
 
@@ -53,10 +53,7 @@ export function GetCanvasContext() {
   }
 }
 
-export function DrawImageFromDataURL(
-  ctx: CanvasRenderingContext2D,
-  dataURL: string,
-) {
+export function DrawImageFromDataURL(dataURL: string) {
   return new Promise((resolve: any, reject) => {
     const img = new Image();
 
@@ -107,8 +104,11 @@ export function ReceiveNewPointsMap(value: PointsMap) {
   pointsMap = value;
 }
 
+let slicePoint = 0;
+
 function startTransmitting() {
   publicMoveId = uuidv4();
+
   sendInterval = setInterval(() => {
     const brushData = {
       size: get(brush_size_store),
@@ -118,7 +118,7 @@ function startTransmitting() {
     const sendData: DrawSendData = {
       end: null,
       brush: brushData,
-      array: pointsToSend,
+      array: tempPoints,
     };
 
     SendToAll(`points&*^${JSON.stringify(sendData)}`);
@@ -223,7 +223,7 @@ export function EndBrushStroke() {
     const sendData: DrawSendData = {
       end: publicMoveId,
       brush: brushData,
-      array: pointsToSend,
+      array: tempPoints,
     };
 
     SendToAll(`points&*^${JSON.stringify(sendData)}`);
@@ -233,6 +233,8 @@ export function EndBrushStroke() {
       data: { publicMoveId },
     });
 
+    const pointsMap = GetPointsMap();
+
     pointsMap[publicMoveId] = {
       id: publicMoveId,
       size: get(brush_size_store),
@@ -241,6 +243,7 @@ export function EndBrushStroke() {
     };
     publicMoveId = "";
   }
+  SyncPointsMap(pointsMap);
 
   tempPoints = [];
   pointsToSend = [];
@@ -287,10 +290,10 @@ export function GetVectorPaths() {
   return paths;
 }
 
-export function RebuildCanvasAfterUndo() {
+export function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
   ctx.clearRect(0, 0, 2000, 3000);
 
-  Object.values(pointsMap).forEach((object: PointsObject) => {
+  Object.values(pointsMap).forEach((object) => {
     const stroke = getStroke(object.array, {
       size: object.size,
       thinning: 0.5,
@@ -304,13 +307,32 @@ export function RebuildCanvasAfterUndo() {
     ctx.fillStyle = object.color;
     ctx.fill(canvasPath);
   });
-
 }
 
 export function SetOgCanvas(value: string) {
-  ogCanvas = value
+  ogCanvas = value;
 }
 
 export function GetOgCanvas(): string {
-  return ogCanvas
+  return ogCanvas;
+}
+
+export function GetPointsMap(): PointsMap {
+  return pointsMap;
+}
+
+export function SyncPointsMap(map: PointsMap) {
+  const arrays: any = [];
+  Object.values(map).forEach((item) => {
+    arrays.push(item.array.length);
+  });
+  console.clear();
+  console.log(arrays);
+
+  pointsMap = map;
+  // console.log("points map length: ", Object.values(pointsMap).length);
+}
+
+export function ClearPointsMap() {
+  pointsMap = {};
 }
