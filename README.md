@@ -9,6 +9,7 @@ GroupDoodles is an interactive HTML canvas application that allows users to crea
 - Drawing Management: Create, save, and organize your drawings.
 - Color Palette System: Create and save custom color palettes for easy access during drawing sessions.
 - Backend Integration: Powered by Python/Django and GO for robust server-side functionality.
+- Multiplayer Collaboration: Using peer-to-peer data transferring
 
 ## Technology Stack
 
