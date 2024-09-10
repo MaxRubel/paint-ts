@@ -172,9 +172,7 @@
       </div>
     </div>
     <ColorPickerInSettings location={"text-color-picker"} width={100} />
-    {#if auth?.id}
-      <PaletteInSettings />
-    {/if}
+    <PaletteInSettings />
   </div>
 </div>
 

@@ -95,13 +95,6 @@
       }
     }
 
-    if (eventState.includes("typing")) {
-      const undos = get(undo_store);
-      if (undos[undos.length - 1].action === "changedFontColor") {
-        return;
-      }
-    }
-
     //just change the color that is selected
     if (edittingTile !== null) {
       if (edittingTile > 15) {
@@ -123,6 +116,7 @@
     }
 
     if (activePalette.id) return;
+    console.log("hehehehe");
     PushColorIntoActivePalette(newColorF);
   }
 </script>
@@ -160,7 +154,6 @@
       }
     }}
     on:pointerup={() => {
-      //@ts-ignore
       border_index_store.set(edittingTile);
       if (edittingTile) {
         active_color_store.set(activePalette.colors[edittingTile]);
@@ -173,9 +166,10 @@
         editting_tile_store.set(null);
         active_color_store.set(activeColor);
       }
+      if (eventState === "selected" || eventState.includes("typing")) {
+        handleChangeColor();
+      }
       draggingColor = false;
-
-      // handleChangeColor();
     }}
   />
 </div>
