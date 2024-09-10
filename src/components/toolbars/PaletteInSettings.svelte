@@ -11,7 +11,7 @@
   import { authStore } from "../../../utils/auth/auth_store";
   import { get } from "svelte/store";
   import { textBoxesStore, updateTextBox } from "../../../stores/textBoxStore";
-  import { AddUndoItem } from "../../../stores/undoStore";
+  import { AddUndoItem, undo_store } from "../../../stores/undoStore";
   import SmallViewPalettes from "../menus/SmallViewPalettes.svelte";
 
   let activePalette: any = {
@@ -126,6 +126,7 @@
       const textBoxId = eventState.split("&")[1];
       const ogTextbox = get(textBoxesStore)[textBoxId];
       const oldColor = ogTextbox.fontColor;
+      const undos = get(undo_store);
       if (oldColor !== newColor) {
         updateTextBox(textBoxId, { fontColor: newColor });
         AddUndoItem({

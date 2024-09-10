@@ -44,6 +44,7 @@ export function PushColorIntoActivePalette(newValue: string) {
     if (updatedColors.length >= 16) {
       updatedColors.shift();
     }
+
     updatedColors.push(newValue);
 
     return {
@@ -94,7 +95,10 @@ export async function SaveColorPalette(event: SubmitEvent) {
   }
   if (!activePalette.id) {
     //@ts-ignore
-    const resp: PaletteType = await CreateNewPalette(activePalette);
+    const resp: PaletteType = await CreateNewPalette({
+      ...activePalette,
+      user_id: get(authStore).user.id,
+    });
     active_palette_store.set({
       ...resp,
       user_id: resp.owner.id,

@@ -14,7 +14,7 @@
   } from "../../../stores/textBoxStore";
   import type { TextBoxType } from "../../../utils/types/app_types";
   import { StartDragMany, DragMany, EndDragMany } from "../../../utils/dragMultiple";
-  import { AddUndoItem } from "../../../stores/undoStore";
+  import { AddUndoItem, undo_store } from "../../../stores/undoStore";
   import { updateTextBox } from "../../../stores/textBoxStore";
   import { get } from "svelte/store";
   import { active_color_store } from "../../../stores/paletteStore";
@@ -85,14 +85,18 @@
   const unsubscribe5 = active_color_store.subscribe((value) => {
     if (!value) return;
     if (eventState.includes("typing")) {
+      const undos = get(undo_store);
+      const lastUndo = undos[undos.length - 1];
       const [, boxId] = eventState.split("&");
       if (value !== fontColor && boxId === id && !iAmNew) {
+        fontColor = value;
+        updateTextBox(id, { fontColor: value });
+      }
+      if (lastUndo.action !== "changedFontColor") {
         AddUndoItem({
           action: "changedFontColor",
           data: { id, oldColor: fontColor },
         });
-        fontColor = value;
-        updateTextBox(id, { fontColor: value });
       }
     }
   });

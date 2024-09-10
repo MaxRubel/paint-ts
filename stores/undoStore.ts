@@ -105,31 +105,27 @@ export function HandleUndo() {
 
 function undoBrushStroke(lastAction: UndoBrushStroke) {
   const { start, end, oldRaster } = lastAction.data;
-
   const ctx = GetCanvasContext();
   if (!ctx) {
     console.error("no context found error undoing brush stroke");
     return;
   }
+  DrawImageFromDataURL(oldRaster);
 
-  const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
-  const currentRaster = canvas.toDataURL();
-
-  DrawImageFromDataURL(oldRaster).then(() => {
-    if (!canvas) {
-      console.error("oopsies-no canvas");
-      return;
-    }
-
-    AddRedoItem({
-      action: "drawBushStroke",
-      data: {
-        currentRaster,
-        start,
-        end,
-      },
-      undoItem: lastAction,
-    });
+  const canvas = document.getElementById("main-canvas");
+  let currentRaster;
+  if (canvas) {
+    //@ts-ignore
+    currentRaster = canvas.toDataURL();
+  }
+  AddRedoItem({
+    action: "drawBushStroke",
+    data: {
+      currentRaster,
+      start,
+      end,
+    },
+    undoItem: lastAction,
   });
 }
 

@@ -12,7 +12,7 @@
   import { get } from "svelte/store";
   import { event_state_store, selected_store } from "../../../stores/eventState";
   import { textBoxesStore, updateTextBox } from "../../../stores/textBoxStore";
-  import { AddUndoItem } from "../../../stores/undoStore";
+  import { AddUndoItem, undo_store } from "../../../stores/undoStore";
   import { authStore } from "../../../utils/auth/auth_store";
   import type { TextBoxType } from "../../../utils/types/app_types";
   import iro from "@jaames/iro";
@@ -75,6 +75,7 @@
     if (eventState === "selected") {
       const selectedArray = get(selected_store);
       const undoArray: any[] = [];
+
       selectedArray.forEach((item: TextBoxType) => {
         const [, id] = item.id.split("&");
         if (item.id.includes("textbox")) {
@@ -115,6 +116,7 @@
     }
 
     if (activePalette.id) return;
+    console.log("hehehehe");
     PushColorIntoActivePalette(newColorF);
   }
 </script>
@@ -152,7 +154,6 @@
       }
     }}
     on:pointerup={() => {
-      //@ts-ignore
       border_index_store.set(edittingTile);
       if (edittingTile) {
         active_color_store.set(activePalette.colors[edittingTile]);
@@ -165,9 +166,10 @@
         editting_tile_store.set(null);
         active_color_store.set(activeColor);
       }
+      if (eventState === "selected" || eventState.includes("typing")) {
+        handleChangeColor();
+      }
       draggingColor = false;
-
-      // handleChangeColor();
     }}
   />
 </div>
