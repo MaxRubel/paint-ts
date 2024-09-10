@@ -70,9 +70,9 @@
     selected = value;
     if (selected.some((item) => item?.id === `textbox&${id}`)) {
       iAmSelected = true;
-      font_size_store.set(fontSize);
+      if (fontSize) font_size_store.set(fontSize);
       text_alignment.set(align);
-      font_family_store.set(fontFamily);
+      if (fontFamily) font_family_store.set(fontFamily);
       if (selected.length > 0) {
         hidden = false;
       }
@@ -92,12 +92,12 @@
         fontColor = value;
         updateTextBox(id, { fontColor: value });
       }
-      if (lastUndo.action !== "changedFontColor") {
-        AddUndoItem({
-          action: "changedFontColor",
-          data: { id, oldColor: fontColor },
-        });
-      }
+      // if (lastUndo.action !== "changedFontColor") {
+      //   AddUndoItem({
+      //     action: "changedFontColor",
+      //     data: { id, oldColor: fontColor },
+      //   });
+      // }
     }
   });
 

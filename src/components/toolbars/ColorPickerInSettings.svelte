@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import {
     active_color_store,
     active_palette_store,
@@ -12,10 +12,15 @@
   import { get } from "svelte/store";
   import { event_state_store, selected_store } from "../../../stores/eventState";
   import { textBoxesStore, updateTextBox } from "../../../stores/textBoxStore";
-  import { AddUndoItem, undo_store } from "../../../stores/undoStore";
+  import { AddUndoItem } from "../../../stores/undoStore";
   import { authStore } from "../../../utils/auth/auth_store";
   import type { TextBoxType } from "../../../utils/types/app_types";
   import iro from "@jaames/iro";
+
+  type OldColor = {
+    id: string;
+    fontColor: string;
+  };
 
   export let location;
   export let width;
@@ -26,14 +31,39 @@
   let edittingTile: number | null;
   let activeColor: string;
   let draggingColor = false;
+  let creatingNew = false;
   let mouseHasLeftWhileDragging = false;
   let eventState: string;
 
-  $: eventState = $event_state_store;
-  $: auth = $authStore.user;
-  $: activePalette = $active_palette_store;
-  $: edittingTile = $editting_tile_store;
-  $: activeColor = $active_color_store;
+  let oldColors: OldColor[] = [];
+
+  const unsubcribe = event_state_store.subscribe((value: string) => {
+    eventState = value;
+  });
+
+  const unsubcribe2 = authStore.subscribe((value) => {
+    auth = value.user;
+  });
+
+  const unsubscribe3 = active_palette_store.subscribe((value: PaletteType) => {
+    activePalette = value;
+  });
+
+  const unsubscribe4 = editting_tile_store.subscribe((value) => {
+    edittingTile = value;
+  });
+
+  const unsubscribe5 = active_color_store.subscribe((value) => {
+    activeColor = value;
+  });
+
+  onDestroy(() => {
+    unsubcribe();
+    unsubcribe2();
+    unsubscribe3();
+    unsubscribe4();
+    unsubscribe5();
+  });
 
   onMount(() => {
     // @ts-ignore
@@ -49,13 +79,14 @@
             sliderType: "hue",
             direction: "vertical",
             width,
+            // width: 200,
+            // height: 20,
           },
         },
       ],
       layoutDirection: location === "text-color-picker" ? "horizontal" : "vertical",
     });
   });
-
   function handleChangeColor() {
     //format the color
     const newColor = colorPicker.color.rgb;
@@ -70,12 +101,10 @@
     active_color_store.set(newColorF);
 
     const eventState = get(event_state_store);
-
     //change color of selected items
     if (eventState === "selected") {
       const selectedArray = get(selected_store);
       const undoArray: any[] = [];
-
       selectedArray.forEach((item: TextBoxType) => {
         const [, id] = item.id.split("&");
         if (item.id.includes("textbox")) {
@@ -87,8 +116,12 @@
         }
       });
 
-      if (!draggingColor) {
+      if (undoArray.length > 0 && !draggingColor) {
         AddUndoItem({
+          action: "changedManyFontColors",
+          data: undoArray,
+        });
+        console.log({
           action: "changedManyFontColors",
           data: undoArray,
         });
@@ -118,6 +151,33 @@
     if (activePalette.id) return;
     PushColorIntoActivePalette(newColorF);
   }
+
+  function setOldColors() {
+    $selected_store.forEach((item: HTMLElement) => {
+      const [, id] = item.id.split("&");
+      const { fontColor } = $textBoxesStore[id];
+      oldColors.push({ id, fontColor });
+    });
+  }
+
+  function compareChanges() {
+    const undoArray: OldColor[] = [];
+
+    oldColors.forEach((item: OldColor) => {
+      if ($textBoxesStore[item.id].fontColor !== item.fontColor) {
+        undoArray.push({ id: item.id, fontColor: item.fontColor });
+      }
+    });
+
+    if (undoArray.length > 0) {
+      AddUndoItem({
+        action: "changedManyFontColors",
+        data: undoArray,
+      });
+    }
+
+    oldColors = [];
+  }
 </script>
 
 <div
@@ -130,12 +190,16 @@
     class="color-picker"
     id={location}
     on:pointerdown={() => {
+      if (edittingTile === null) {
+        creatingNew = true;
+      }
       if (edittingTile === null && eventState.includes("color_palette_edit_form")) {
         editting_tile_store.set(activePalette.colors.length);
       }
       border_index_store.set(edittingTile);
       handleChangeColor();
       draggingColor = true;
+      if ($selected_store.length > 0) setOldColors();
     }}
     on:mousemove={() => {
       if (draggingColor) {
@@ -153,22 +217,25 @@
       }
     }}
     on:pointerup={() => {
+      draggingColor = false;
+      if (eventState === "selected") {
+        compareChanges();
+      }
+      handleChangeColor();
+      //@ts-ignore
       border_index_store.set(edittingTile);
       if (edittingTile) {
         active_color_store.set(activePalette.colors[edittingTile]);
       }
-      if (draggingColor || mouseHasLeftWhileDragging) {
-        draggingColor = false;
-        mouseHasLeftWhileDragging = false;
-      }
+      // if (draggingColor || mouseHasLeftWhileDragging) {
+      //   draggingColor = false;
+      //   mouseHasLeftWhileDragging = false;
+      // }
       if (!eventState.includes("color_palette_edit_form")) {
         editting_tile_store.set(null);
-        active_color_store.set(activeColor);
-      }
-      if (eventState === "selected" || eventState.includes("typing")) {
-        handleChangeColor();
       }
       draggingColor = false;
+      creatingNew = false;
     }}
   />
 </div>

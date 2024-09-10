@@ -291,7 +291,7 @@
 </script>
 
 <main>
-  <DebugMenu />
+  <!-- <DebugMenu /> -->
   {#if drawingRoomId}
     <DrawingRoomDataHandler />
   {/if}

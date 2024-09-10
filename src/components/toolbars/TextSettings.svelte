@@ -21,7 +21,7 @@
 
   let isVisible = false;
   let eventState: string;
-  let fontSize: number;
+  let fontSize: number = 22;
   let textAlignment: string;
   let fontFamily = "";
   let auth: any;
