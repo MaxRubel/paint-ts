@@ -104,6 +104,8 @@
         const [, id] = item.id.split("&");
         if (item.id.includes("textbox")) {
           const ogTextbox = get(textBoxesStore)[id];
+          if (!ogTextbox) return;
+          if (!ogTextbox.fontColor) return;
           const oldColor = ogTextbox.fontColor;
           if (oldColor !== newColor) {
             undoArray.push({

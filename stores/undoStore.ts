@@ -31,6 +31,7 @@ export function ClearUndoStore() {
 }
 
 export function AddUndoItem(newItem: UndoType, fromRedo = false) {
+  console.log("new undo item: ", newItem)
   if (!fromRedo) {
     redo_store.set([]);
   }
@@ -154,6 +155,7 @@ export function undoEraser(lastAction: any) {
 }
 
 function undoCreatedTextBox(lastAction: any) {
+  console.log("here")
   const textBoxID = lastAction.data;
   AddRedoItem({
     action: "createTextBox",

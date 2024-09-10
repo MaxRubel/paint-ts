@@ -20,6 +20,7 @@ type RedoItem = {
 export const redo_store = writable<RedoItem[]>([]);
 
 export function AddRedoItem(redoItem: RedoItem) {
+  console.log("new redo item: ", redoItem)
   redo_store.update((oldItems) => {
     return [...oldItems, redoItem];
   });
@@ -93,6 +94,7 @@ function redoDrawBrushStrokes(lastAction: RedoItem) {
 }
 
 function createOldTextBox(undoItem: any) {
+  console.log("about to send: ", undoItem)
   textBoxesStore.update((prevVal) => ({
     ...prevVal,
     [undoItem.data.id]: undoItem.data,

@@ -1,4 +1,4 @@
-export interface TextBoxType {
+export type TextBoxType = {
   type: 'textbox'
   id: string;
   text: string;
@@ -27,7 +27,7 @@ export interface UndoType {
   data: any
 }
 
-export interface RedoType{
+export interface RedoType {
   action: string
   data: any
 }
