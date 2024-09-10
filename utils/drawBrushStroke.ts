@@ -16,6 +16,7 @@ export type DrawSendData = {
   end: string | null;
   brush: { size: number; color: string; type: string };
   array: sendArray;
+  eventState: "drawing" | "erasing";
 };
 
 let ctx: CanvasRenderingContext2D;
@@ -105,6 +106,8 @@ export function ReceiveNewPointsMap(value: PointsMap) {
 function startTransmitting() {
   publicMoveId = uuidv4();
 
+  const eventState = get(event_state_store);
+
   sendInterval = setInterval(() => {
     const brushData = {
       size: get(brush_size_store),
@@ -115,6 +118,7 @@ function startTransmitting() {
       end: null,
       brush: brushData,
       array: tempPoints,
+      eventState: eventState === "drawing" ? "drawing" : "erasing",
     };
 
     SendToAll(`points&*^${JSON.stringify(sendData)}`);
@@ -220,13 +224,14 @@ export function EndBrushStroke() {
       end: publicMoveId,
       brush: brushData,
       array: tempPoints,
+      eventState: eventState === "drawing" ? "drawing" : "erasing",
     };
 
     SendToAll(`points&*^${JSON.stringify(sendData)}`);
 
     AddUndoItem({
       action: "drewBrushPublic",
-      data: { publicMoveId },
+      data: { publicMoveId, eventState },
     });
 
     const pointsMap = GetPointsMap();
@@ -236,6 +241,7 @@ export function EndBrushStroke() {
       size: get(brush_size_store),
       color: get(active_color_store),
       array: tempPoints,
+      eventState: eventState === "drawing" ? "drawing" : "erasing",
     };
     publicMoveId = "";
     SyncPointsMap(pointsMap);
@@ -302,13 +308,19 @@ export async function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
     const pathData = getSvgPathFromStroke(stroke);
     const canvasPath = new Path2D(pathData);
 
-    ctx.fillStyle = object.color;
-    ctx.fill(canvasPath);
+    if (object.eventState === "drawing") {
+      ctx.fillStyle = object.color;
+      ctx.fill(canvasPath);
+      ``;
+    } else if (object.eventState === "erasing") {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.fill(canvasPath);
+      ctx.globalCompositeOperation = "source-over";
+    }
   });
 }
 
 export function SetOgCanvas(value: string) {
-  console.log("setting og canvas");
   ogCanvas = value;
 }
 
