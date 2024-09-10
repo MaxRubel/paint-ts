@@ -1,7 +1,11 @@
 import { get, writable } from "svelte/store";
 import { fetched_single, type ProjectType } from "./fetchDataStore";
 import { textBoxesStore } from "./textBoxStore";
-import { ClearCurrentCanvas, GetCanvasContext, SetOgCanvas } from "../utils/drawBrushStroke";
+import {
+  ClearCurrentCanvas,
+  GetCanvasContext,
+  SetOgCanvas,
+} from "../utils/drawBrushStroke";
 import { undo_store } from "./undoStore";
 import { redo_store } from "./redoStore";
 
@@ -12,7 +16,7 @@ export const drawing_room_id = writable("");
 export const data_transition = writable(<DataTransitionType>{});
 export const i_am_hosting = writable(false);
 export const myPublicId = writable("");
-export const i_have_joined = writable(false)
+export const i_have_joined = writable(false);
 
 export function TransitionToDrawingRoom() {
   const canvas: HTMLCanvasElement = document.getElementById(
@@ -48,8 +52,8 @@ export function TransitionToDrawingRoom() {
     drawingData.collaborators = doodleFetched.collaborators;
     drawingData.date_created = doodleFetched.date_created;
   }
-  undo_store.set([])
-  redo_store.set([])
+  undo_store.set([]);
+  redo_store.set([]);
   data_transition.set({ drawingData });
 }
 
@@ -79,7 +83,9 @@ export function UnpackTransition() {
   textBoxesStore.set(data.rectangles);
 
   const dataURL = "data:image/png;base64," + data.canvasImage;
-  SetOgCanvas(dataURL)
+
+  SetOgCanvas(dataURL);
+
   const img = new Image();
 
   img.onload = function () {
@@ -96,9 +102,7 @@ export function UnpackTransition() {
         ctx.drawImage(img, 0, 0);
       });
     }, 1);
-
   };
 
   img.src = dataURL;
-  SetOgCanvas(dataURL)
 }
