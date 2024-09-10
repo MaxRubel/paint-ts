@@ -116,7 +116,6 @@
     }
 
     if (activePalette.id) return;
-    console.log("hehehehe");
     PushColorIntoActivePalette(newColorF);
   }
 </script>

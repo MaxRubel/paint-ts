@@ -33,6 +33,7 @@ export type PointsObject = {
   size: number;
   color: string;
   array: pointsArray;
+  eventState: "drawing" | "erasing";
 };
 
 function handleUpdateTextBoxes(msgJson: updateTextBox) {
@@ -70,6 +71,7 @@ function handleDrawPointsOnCanvas(msgData: DrawSendData) {
       size: msgData.brush.size,
       color: msgData.brush.color,
       array: msgData.array,
+      eventState: msgData.eventState,
     };
     SyncPointsMap(pointsMap);
     tempArray = [];
