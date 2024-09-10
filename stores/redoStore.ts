@@ -1,5 +1,11 @@
 import { get, writable } from "svelte/store";
-import { DrawImageFromDataURL, GetCanvasContext, GetPointsMap, RebuildCanvasAfterUndo, SyncPointsMap } from "../utils/drawBrushStroke";
+import {
+  DrawImageFromDataURL,
+  GetCanvasContext,
+  GetPointsMap,
+  RebuildCanvasAfterUndo,
+  SyncPointsMap,
+} from "../utils/drawBrushStroke";
 import { AddUndoItem } from "./undoStore";
 import { deleteTextBox, textBoxesStore, updateTextBox } from "./textBoxStore";
 import type { TextBoxType, UndoType } from "../utils/types/app_types";
@@ -9,7 +15,7 @@ type RedoItem = {
   action: string;
   data: any;
   undoItem: UndoType;
-}
+};
 
 export const redo_store = writable<RedoItem[]>([]);
 
@@ -147,12 +153,12 @@ function resetManyTextBoxes(redoItem: any) {
 }
 
 function redoPublicBrushStroke(redoItem: any) {
-  const pointsMap = GetPointsMap()
-  const { data } = redoItem
-  pointsMap[data.id] = data
-  SendToAll(`redopublicbrush&*^${JSON.stringify(data)}`)
-  RebuildCanvasAfterUndo(pointsMap)
-  SyncPointsMap(pointsMap)
+  const pointsMap = GetPointsMap();
+  const { data } = redoItem;
+  pointsMap[data.id] = data;
+  SendToAll(`redopublicbrush&*^${JSON.stringify(data)}`);
+  RebuildCanvasAfterUndo(pointsMap);
+  SyncPointsMap(pointsMap);
 }
 
 function popLastItem() {

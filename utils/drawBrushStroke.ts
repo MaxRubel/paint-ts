@@ -242,8 +242,8 @@ export function EndBrushStroke() {
       array: tempPoints,
     };
     publicMoveId = "";
+    SyncPointsMap(pointsMap);
   }
-  SyncPointsMap(pointsMap);
 
   tempPoints = [];
   pointsToSend = [];
@@ -326,11 +326,8 @@ export function SyncPointsMap(map: PointsMap) {
   Object.values(map).forEach((item) => {
     arrays.push(item.array.length);
   });
-  console.clear();
-  console.log(arrays);
 
   pointsMap = map;
-  // console.log("points map length: ", Object.values(pointsMap).length);
 }
 
 export function ClearPointsMap() {
