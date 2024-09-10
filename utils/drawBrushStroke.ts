@@ -59,15 +59,13 @@ export function DrawImageFromDataURL(dataURL: string) {
 
     img.onload = function () {
       requestAnimationFrame(() => {
-        const canvas = document.getElementById("main-canvas");
+        const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
         if (!canvas) {
           reject(new Error("Canvas element not found"));
           return;
         }
 
-        //@ts-ignore
         canvas.width = img.width;
-        //@ts-ignore
         canvas.height = img.height;
 
         ctx.drawImage(img, 0, 0);
@@ -103,8 +101,6 @@ export function SaveOriginalRaster() {
 export function ReceiveNewPointsMap(value: PointsMap) {
   pointsMap = value;
 }
-
-let slicePoint = 0;
 
 function startTransmitting() {
   publicMoveId = uuidv4();
@@ -242,8 +238,8 @@ export function EndBrushStroke() {
       array: tempPoints,
     };
     publicMoveId = "";
+    SyncPointsMap(pointsMap);
   }
-  SyncPointsMap(pointsMap);
 
   tempPoints = [];
   pointsToSend = [];
@@ -290,8 +286,10 @@ export function GetVectorPaths() {
   return paths;
 }
 
-export function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
+export async function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
   ctx.clearRect(0, 0, 2000, 3000);
+
+  await DrawImageFromDataURL(ogCanvas);
 
   Object.values(pointsMap).forEach((object) => {
     const stroke = getStroke(object.array, {
@@ -310,6 +308,7 @@ export function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
 }
 
 export function SetOgCanvas(value: string) {
+  console.log("setting og canvas");
   ogCanvas = value;
 }
 
@@ -326,11 +325,8 @@ export function SyncPointsMap(map: PointsMap) {
   Object.values(map).forEach((item) => {
     arrays.push(item.array.length);
   });
-  console.clear();
-  console.log(arrays);
 
   pointsMap = map;
-  // console.log("points map length: ", Object.values(pointsMap).length);
 }
 
 export function ClearPointsMap() {

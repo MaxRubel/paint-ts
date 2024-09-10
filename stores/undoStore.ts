@@ -22,6 +22,7 @@ import {
 import { event_state_store } from "./eventState";
 import { AddRedoItem, redo_store } from "../stores/redoStore";
 import { SendToAll } from "../utils/webRTC/webRTCNegotiate";
+import { drawing_room_id } from "./drawingRoomStore";
 
 export const undo_store = writable<UndoType[]>([]);
 
@@ -110,13 +111,15 @@ function undoBrushStroke(lastAction: UndoBrushStroke) {
     console.error("no context found error undoing brush stroke");
     return;
   }
+
+  const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
+  const currentRaster = canvas.toDataURL();
+
   DrawImageFromDataURL(oldRaster).then(() => {
-    const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
     if (!canvas) {
       console.error("oopsies-no canvas");
       return;
     }
-    const currentRaster = canvas.toDataURL();
 
     AddRedoItem({
       action: "drawBushStroke",
@@ -239,6 +242,10 @@ function undoDeletedTextBoxes(lastAction: any) {
       ...boxes,
       [item.id]: item,
     }));
+
+    if (get(drawing_room_id)) {
+      SendToAll(`newtextbox&*^${JSON.stringify(item)}`);
+    }
   });
 }
 

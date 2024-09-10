@@ -73,8 +73,6 @@ function handleDrawPointsOnCanvas(msgData: DrawSendData) {
     };
     SyncPointsMap(pointsMap);
     tempArray = [];
-    // console.log("yesh");
-    // RebuildCanvasAfterUndo(pointsMap);
   }
 }
 

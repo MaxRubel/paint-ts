@@ -47,7 +47,7 @@
 
   const unsubscribe = textBoxesStore.subscribe((value) => {
     textboxes = value;
-    SendToAll(`changingTextbox&*^${JSON.stringify(value)}`);
+    // SendToAll(`changingTextbox&*^${JSON.stringify(value)}`);
   });
 
   $: {
