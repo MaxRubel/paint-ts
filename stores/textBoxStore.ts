@@ -9,7 +9,7 @@ import { active_color_store } from "./paletteStore";
 import { SendToAll } from "../utils/webRTC/webRTCNegotiate";
 import { drawing_room_id } from "./drawingRoomStore";
 
-export interface TextBoxMap {
+export type TextBoxMap = {
   [key: string]: TextBoxType;
 }
 
