@@ -17,7 +17,7 @@ Frontend:
 
 - HTML5 Canvas
 - JavaScript
-- perfect-freehand library
+- Perfect-Freehand library
 
 
 Backend:
