@@ -48,7 +48,11 @@
   let iAmNew = true;
 
   onMount(() => {
-    hidden = false;
+    if (eventState.includes("typing")) {
+      hidden = false;
+    } else {
+      hidden = true;
+    }
   });
 
   const unsubcribe = theme_store.subscribe((value: string) => {

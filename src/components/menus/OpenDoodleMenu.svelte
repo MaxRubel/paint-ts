@@ -14,12 +14,6 @@
   import { ClearEverything } from "../../../stores/canvasStore";
   import { navigate } from "svelte-routing";
 
-  let doodlesData: any;
-
-  const unsubcribe = fetched_all.subscribe((value) => {
-    doodlesData = value;
-  });
-
   function handleClose() {
     event_state_store.set("arrow");
   }
@@ -42,10 +36,6 @@
 
   onMount(() => {
     GetAllUserDoodles();
-  });
-
-  onDestroy(() => {
-    unsubcribe();
   });
 </script>
 
@@ -72,7 +62,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each doodlesData.yourDoodles as doodle (doodle.id)}
+        {#each $fetched_all.yourDoodles as doodle (doodle.id)}
           <tr>
             <td>
               <button
