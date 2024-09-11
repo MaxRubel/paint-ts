@@ -1,5 +1,6 @@
 import { get, writable } from "svelte/store";
 import { clearAllTextBoxes, textBoxesStore } from "./textBoxStore";
+import type { TextBoxMap } from "./textBoxStore";
 import { authStore } from "../utils/auth/auth_store";
 import { CreateNewDoodle, GetDoodlesOfUser, GetSingleDoodle, UpdateDoodle } from "../api/doodles"
 import { event_state_store, selected_store } from "./eventState";
@@ -8,16 +9,21 @@ import { ClearUndoStore, undo_store } from "./undoStore";
 import { DrawImage } from "./canvasStore";
 import { alert_store } from "./alertStore";
 
-export interface ProjectType {
+type DrawData = {
+    canvasImage: string,
+    rectangles: TextBoxMap
+}
+
+export type ProjectType = {
     name: string
     id: number
     owner: any
     date_created: string
-    data: any
+    data: DrawData
     collaborators: any[]
 }
 
-interface AllProjects {
+export type AllProjects = {
     yourDoodles: ProjectType[]
     theirDoodles: ProjectType[]
 }
@@ -27,7 +33,7 @@ export const EmptyFetch: ProjectType = {
     id: 0,
     owner: {},
     date_created: "",
-    data: null,
+    data: { canvasImage: "", rectangles: {} },
     collaborators: []
 }
 
@@ -51,7 +57,7 @@ export async function CompileAndSaveDoodle(name: string, update: boolean) {
     }
     const dataURL = canvas.toDataURL('image/png');
     const canvasImage = dataURL.split(',')[1];
-    const data = { canvasImage, rectangles }
+    const data: DrawData = { canvasImage, rectangles }
     const user_id = get(authStore).user.id
 
     if (!update) {
@@ -79,7 +85,7 @@ export function FetchAndLoadDoodle(id: number) {
         ClearUndoStore();
         ClearCurrentCanvas();
 
-        const { id, name, date_created, collaborators, data, owner } = resp
+        const { id, name, date_created, collaborators, data, owner } = resp as ProjectType
         fetched_single.set({ id, name, date_created, collaborators, data, owner })
         textBoxesStore.set(data.rectangles)
 
