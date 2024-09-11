@@ -121,10 +121,6 @@
           action: "changedManyFontColors",
           data: undoArray,
         });
-        console.log({
-          action: "changedManyFontColors",
-          data: undoArray,
-        });
       }
     }
 

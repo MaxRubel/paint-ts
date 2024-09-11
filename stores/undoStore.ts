@@ -31,7 +31,7 @@ export function ClearUndoStore() {
 }
 
 export function AddUndoItem(newItem: UndoType, fromRedo = false) {
-  console.log("new undo item: ", newItem)
+
   if (!fromRedo) {
     redo_store.set([]);
   }
@@ -41,6 +41,14 @@ export function AddUndoItem(newItem: UndoType, fromRedo = false) {
   const undoStore = get(undo_store);
   if (!undoStore[undoStore.length - 1]) {
     console.error("oopsies, an underfined value was pushed into the undo store");
+  }
+}
+
+function textBoxExists(id: string): boolean {
+  if (get(textBoxesStore)[id]?.id) {
+    return true
+  } else {
+    return false
   }
 }
 
@@ -57,6 +65,9 @@ export function HandleUndo() {
       break;
     case "erased":
       undoEraser(lastAction);
+      break;
+    case "drewBrushPublic":
+      undoBrushPublic(lastAction);
       break;
     case "created_text_box":
       undoCreatedTextBox(lastAction);
@@ -96,9 +107,6 @@ export function HandleUndo() {
       break;
     case "manyTextBoxAligned":
       undoManyTextBoxAligned(lastAction);
-      break;
-    case "drewBrushPublic":
-      undoBrushPublic(lastAction);
       break;
   }
   popLastItem();
@@ -155,8 +163,12 @@ export function undoEraser(lastAction: any) {
 }
 
 function undoCreatedTextBox(lastAction: any) {
-  console.log("here")
   const textBoxID = lastAction.data;
+
+  if (!textBoxExists(textBoxID)) {
+    return
+  }
+
   AddRedoItem({
     action: "createTextBox",
     data: get(textBoxesStore)[textBoxID],
@@ -185,6 +197,10 @@ function undoTyping(lastAction: UndoTyping) {
 function undoDragSingle(lastAction: UndoDragSingle) {
   const { id, x, y } = lastAction.data;
 
+  if (!textBoxExists(id)) {
+    return
+  }
+
   AddRedoItem({
     action: "redoDrag",
     data: get(textBoxesStore)[id],
@@ -199,6 +215,9 @@ function handleUndoDragMultiple(lastAction: any) {
   const dataArray: TextBoxType[] = [];
 
   data.forEach((textbox: TextBoxType) => {
+    if (!textBoxExists(textbox.id)) {
+      return
+    }
     const fetched = get(textBoxesStore)[textbox.id];
     dataArray.push(fetched);
   });
@@ -216,6 +235,10 @@ function handleUndoDragMultiple(lastAction: any) {
 
 function undoExpand(lastAction: UndoExpand) {
   const { id, x, y, height, width } = lastAction.data;
+
+  if (!textBoxExists(id)) {
+    return
+  }
 
   AddRedoItem({
     action: "redoExpand",
@@ -250,6 +273,10 @@ function undoDeletedTextBoxes(lastAction: any) {
 function undoTextBoxAlignChange(lastAction: any) {
   const { id, align } = lastAction.data;
 
+  if (!textBoxExists(id)) {
+    return
+  }
+
   AddRedoItem({
     action: "redoSingleAlignChange",
     data: get(textBoxesStore)[id],
@@ -262,6 +289,10 @@ function undoTextBoxAlignChange(lastAction: any) {
 function undoChangedFontColor(lastAction: any) {
   const { id, oldColor } = lastAction.data;
 
+  if (!textBoxExists(id)) {
+    return
+  }
+
   AddRedoItem({
     action: "redoFontChangeColor",
     data: get(textBoxesStore)[id],
@@ -273,6 +304,10 @@ function undoChangedFontColor(lastAction: any) {
 
 function undoChangedFont(lastAction: any) {
   const { id, oldFont } = lastAction.data;
+
+  if (!textBoxExists(id)) {
+    return
+  }
 
   AddRedoItem({
     action: "redoChangedFontSingle",
@@ -289,6 +324,9 @@ function undoChangedManyFonts(lastAction: any) {
   packageMultipleRedos("redoManyFontChanges", lastAction);
 
   undoArray.forEach((item: any) => {
+    if (!textBoxExists(item.id)) {
+      return
+    }
     updateTextBox(item.id, { fontFamily: item.fontFamily });
   });
 }
@@ -299,6 +337,9 @@ function undoChangedManyFontColors(lastAction: any) {
   packageMultipleRedos("redoChangedManyFontColors", lastAction);
 
   undoArray.forEach((item: any) => {
+    if (!textBoxExists(item.id)) {
+      return
+    }
     updateTextBox(item.id, { fontColor: item.fontColor });
   });
 }
@@ -309,6 +350,9 @@ function undoChangedFontSizes(lastAction: any) {
   packageMultipleRedos("redoChangeFontSizes", lastAction);
 
   undoArray.forEach((item: any) => {
+    if (!textBoxExists(item.id)) {
+      return
+    }
     updateTextBox(item.id, { fontSize: item.oldFontSize });
     font_size_store.set(item.oldFontSize);
   });
@@ -320,6 +364,9 @@ function undoManyTextBoxAligned(lastAction: any) {
   packageMultipleRedos("redoManyTextBoxAligned", lastAction);
 
   undoArray.forEach((item: any) => {
+    if (!textBoxExists(item.id)) {
+      return
+    }
     updateTextBox(item.id, { align: item.align });
   });
 }
@@ -329,6 +376,9 @@ function packageMultipleRedos(action: string, undoItem: any) {
   const data: any[] = [];
 
   undoArray.forEach((textBox: TextBoxType) => {
+    if (!textBoxExists(textBox.id)) {
+      return
+    }
     data.push(get(textBoxesStore)[textBox.id]);
   });
 

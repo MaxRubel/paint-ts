@@ -8,6 +8,7 @@ import {
   SyncPointsMap,
 } from "../drawBrushStroke";
 import type { DrawSendData } from "../drawBrushStroke";
+import { get } from "svelte/store";
 
 export type mousePos = {
   id: string;
@@ -37,10 +38,12 @@ export type PointsObject = {
 };
 
 function handleUpdateTextBoxes(msgJson: updateTextBox) {
-  textBoxesStore.update((current) => ({
-    ...current,
-    [msgJson.id]: { ...current[msgJson.id], ...msgJson.updates },
-  }));
+  if (get(textBoxesStore)[msgJson.id]?.id) {
+    textBoxesStore.update((current) => ({
+      ...current,
+      [msgJson.id]: { ...current[msgJson.id], ...msgJson.updates },
+    }));
+  }
 }
 
 function handleMousePos(msgJson: mousePos) {
