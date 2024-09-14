@@ -55,6 +55,7 @@ export function GetCanvasContext() {
 }
 
 export function DrawImageFromDataURL(dataURL: string) {
+  if (!dataURL) return
   return new Promise((resolve: any, reject) => {
     const img = new Image();
 
@@ -322,6 +323,10 @@ export async function RebuildCanvasAfterUndo(pointsMap: PointsMap) {
 
 export function SetOgCanvas(value: string) {
   ogCanvas = value;
+}
+
+export function ClearOGCanvas(): void {
+  ogCanvas = ''
 }
 
 export function GetOgCanvas(): string {
