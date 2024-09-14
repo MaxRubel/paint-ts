@@ -18,6 +18,7 @@
     SaveOriginalRaster,
     EndBrushStroke,
     InitCtx,
+    ClearOGCanvas,
   } from "../../utils/drawBrushStroke";
   import {
     ClearSelectionRect,
@@ -39,8 +40,9 @@
   import EraserSettings from "./toolbars/EraserSettings.svelte";
   import DrawingRoomDataHandler from "./DrawingRoomDataHandler.svelte";
   import DebugMenu from "./menus/DebugMenu.svelte";
+  import { SendToAll } from "../../utils/webRTC/webRTCNegotiate";
 
-  export let drawingRoomId = null;
+  export let drawingRoomId: string | null = null;
 
   let canvas: HTMLCanvasElement;
   let ctx: CanvasRenderingContext2D;
@@ -60,7 +62,6 @@
   $: textBoxes = $textBoxesStore;
   $: event_state = $event_state_store as string;
   $: locked = $locked_store as boolean;
-
   $: cursor = handleCursor(event_state, cursor);
 
   const handleClick = (e: MouseEvent) => {
@@ -149,6 +150,10 @@
     ClearOldPathData();
     ClearUndoStore();
     ClearRedoItems();
+    ClearOGCanvas();
+    if (drawingRoomId) {
+      SendToAll(`clearpalette&*^{}`);
+    }
   }
 
   function handlePointerDown(e: PointerEvent): void {

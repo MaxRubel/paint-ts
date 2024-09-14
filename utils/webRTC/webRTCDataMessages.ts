@@ -1,7 +1,9 @@
-import { textBoxesStore } from "../../stores/textBoxStore";
+import { clearAllTextBoxes, textBoxesStore } from "../../stores/textBoxStore";
 import type { TextBoxType } from "../types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
 import {
+  ClearOGCanvas,
+  ClearOldPathData,
   DrawOtherPersonsPoints,
   GetPointsMap,
   RebuildCanvasAfterUndo,
@@ -9,6 +11,8 @@ import {
 } from "../drawBrushStroke";
 import type { DrawSendData } from "../drawBrushStroke";
 import { get } from "svelte/store";
+import { ClearUndoStore } from "../../stores/undoStore";
+import { ClearRedoItems } from "../../stores/redoStore";
 
 export type mousePos = {
   id: string;
@@ -96,6 +100,17 @@ function handleRedoPublicBrush(msgData: PointsObject) {
   RebuildCanvasAfterUndo(pointsMap);
 }
 
+function handleClear() {
+  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+  ctx.clearRect(0, 0, canvas?.width, canvas?.height);
+  clearAllTextBoxes();
+  ClearOldPathData();
+  ClearUndoStore();
+  ClearRedoItems();
+  ClearOGCanvas();
+}
+
 export function ParseMessage(msg: string) {
   const [msgType, msgData] = msg.split("&*^");
   const msgJson = JSON.parse(msgData);
@@ -121,5 +136,7 @@ export function ParseMessage(msg: string) {
     case "redopublicbrush":
       handleRedoPublicBrush(msgJson);
       break;
+    case "clearpalette":
+      handleClear()
   }
 }
