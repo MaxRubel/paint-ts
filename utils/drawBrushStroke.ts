@@ -324,6 +324,10 @@ export function SetOgCanvas(value: string) {
   ogCanvas = value;
 }
 
+export function ClearOgCanvas() {
+  ogCanvas = "";
+}
+
 export function GetOgCanvas(): string {
   return ogCanvas;
 }

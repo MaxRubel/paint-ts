@@ -18,6 +18,7 @@
     SaveOriginalRaster,
     EndBrushStroke,
     InitCtx,
+    ClearOgCanvas,
   } from "../../utils/drawBrushStroke";
   import {
     ClearSelectionRect,
@@ -149,6 +150,7 @@
     ClearOldPathData();
     ClearUndoStore();
     ClearRedoItems();
+    ClearOgCanvas();
   }
 
   function handlePointerDown(e: PointerEvent): void {

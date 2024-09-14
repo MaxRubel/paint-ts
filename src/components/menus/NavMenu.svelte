@@ -29,6 +29,7 @@
   import NewFileIcon from "../../graphics/NavMenu/NewFileIcon.svelte";
   import ShareIcon from "../../graphics/NavMenu/ShareIcon.svelte";
   import { onDestroy } from "svelte";
+  import { ClearOgCanvas } from "../../../utils/drawBrushStroke";
 
   export let handleClear: Function;
 
@@ -134,6 +135,7 @@
     navigate("/");
     UnpackTransition();
     menuOpen = false;
+    ClearOgCanvas();
   }
 
   function handleSignIn() {
