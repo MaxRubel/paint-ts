@@ -1,4 +1,5 @@
 import { clearAllTextBoxes, textBoxesStore } from "../../stores/textBoxStore";
+import { clearAllTextBoxes, textBoxesStore } from "../../stores/textBoxStore";
 import type { TextBoxType } from "../types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
 import {
@@ -11,6 +12,8 @@ import {
 } from "../drawBrushStroke";
 import type { DrawSendData } from "../drawBrushStroke";
 import { get } from "svelte/store";
+import { ClearUndoStore } from "../../stores/undoStore";
+import { ClearRedoItems } from "../../stores/redoStore";
 import { ClearUndoStore } from "../../stores/undoStore";
 import { ClearRedoItems } from "../../stores/redoStore";
 
