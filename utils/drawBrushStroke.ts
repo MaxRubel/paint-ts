@@ -55,6 +55,7 @@ export function GetCanvasContext() {
 }
 
 export function DrawImageFromDataURL(dataURL: string) {
+  if (!dataURL) return;
   return new Promise((resolve: any, reject) => {
     const img = new Image();
 

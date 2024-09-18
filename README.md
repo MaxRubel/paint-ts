@@ -15,12 +15,11 @@ GroupDoodles is an interactive HTML canvas application that allows users to crea
 
 Frontend:
 
-- HTML5 Canvas
-- JavaScript
+- Typescript
+- Svelte
 - Perfect-Freehand library
-
+- IRO color Picker
 
 Backend:
-
 - Python/Django - Database
 - GO - Websockets
