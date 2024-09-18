@@ -41,9 +41,7 @@
   import DrawingRoomDataHandler from "./DrawingRoomDataHandler.svelte";
   import DebugMenu from "./menus/DebugMenu.svelte";
   import { SendToAll } from "../../utils/webRTC/webRTCNegotiate";
-  import { SendToAll } from "../../utils/webRTC/webRTCNegotiate";
 
-  export let drawingRoomId: string | null = null;
   export let drawingRoomId: string | null = null;
 
   let canvas: HTMLCanvasElement;
