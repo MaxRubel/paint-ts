@@ -103,6 +103,7 @@ function handleRedoPublicBrush(msgData: PointsObject) {
 function handleClear() {
   const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
   const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
   ctx.clearRect(0, 0, canvas?.width, canvas?.height);
   clearAllTextBoxes();
   ClearOldPathData();

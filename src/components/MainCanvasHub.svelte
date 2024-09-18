@@ -151,6 +151,7 @@
     ClearUndoStore();
     ClearRedoItems();
     ClearOgCanvas();
+
     if (drawingRoomId) {
       SendToAll(`clearpalette&*^{}`);
     }
