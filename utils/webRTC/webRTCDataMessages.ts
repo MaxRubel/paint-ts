@@ -2,7 +2,7 @@ import { clearAllTextBoxes, textBoxesStore } from "../../stores/textBoxStore";
 import type { TextBoxType } from "../types/app_types";
 import { mousePositions } from "./webRTCNegotiate";
 import {
-  ClearOGCanvas,
+  ClearOgCanvas,
   ClearOldPathData,
   DrawOtherPersonsPoints,
   GetPointsMap,
@@ -101,14 +101,15 @@ function handleRedoPublicBrush(msgData: PointsObject) {
 }
 
 function handleClear() {
-  const canvas = document.getElementById('main-canvas') as HTMLCanvasElement
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+  const canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
   ctx.clearRect(0, 0, canvas?.width, canvas?.height);
   clearAllTextBoxes();
   ClearOldPathData();
   ClearUndoStore();
   ClearRedoItems();
-  ClearOGCanvas();
+  ClearOgCanvas();
 }
 
 export function ParseMessage(msg: string) {
@@ -137,6 +138,6 @@ export function ParseMessage(msg: string) {
       handleRedoPublicBrush(msgJson);
       break;
     case "clearpalette":
-      handleClear()
+      handleClear();
   }
 }

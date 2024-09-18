@@ -202,12 +202,29 @@
     padding: 5px;
     padding-top: 3px;
     border-radius: 5px;
-    background-color: transparent;
-    color: white;
+    background-color: white;
+    color: black;
     border: 1px solid rgb(255, 255, 255);
     outline: none;
     height: 36px;
     width: 145px;
+  }
+
+  .font-box option {
+    background-color: transparent;
+  }
+
+  select option {
+    background-color: transparent;
+    color: black;
+  }
+
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-color: transparent;
+    /* Other styles... */
   }
 
   .size-box {

@@ -18,7 +18,7 @@
     SaveOriginalRaster,
     EndBrushStroke,
     InitCtx,
-    ClearOGCanvas,
+    ClearOgCanvas,
   } from "../../utils/drawBrushStroke";
   import {
     ClearSelectionRect,
@@ -150,7 +150,8 @@
     ClearOldPathData();
     ClearUndoStore();
     ClearRedoItems();
-    ClearOGCanvas();
+    ClearOgCanvas();
+
     if (drawingRoomId) {
       SendToAll(`clearpalette&*^{}`);
     }
