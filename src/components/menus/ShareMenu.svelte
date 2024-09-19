@@ -115,7 +115,7 @@
           <tbody>
             {#each collaborators as collab}
               <tr>
-                <td class="big">{collab.username}</td>
+                <td class="big">GentleGiant36</td>
                 <td class="big">{collab.email}</td>
                 {#if get(fetched_single).owner.id === get(authStore).user.id}
                   <td class="big">
