@@ -38,6 +38,9 @@
   let peerMice: { [key: string]: mousePos };
   let interval: NodeJS.Timeout | null = null;
 
+  let scrollLeft = window.scrollX;
+  let scrollTop = window.scrollY;
+
   $: iHaveJoined = $i_have_joined;
   $: peerIdArray = $peerIds;
   $: peerStateMap = $peerStates;
@@ -58,13 +61,17 @@
   }
 
   function updateMousePosition(e: MouseEvent) {
-    mouseX = e.clientX + window.scrollX;
-    mouseY = e.clientY + window.scrollY;
+    const rect = canvas.getBoundingClientRect();
+    mouseX = e.clientX - rect.left;
+    mouseY = e.clientY - rect.top;
+  }
+
+  function handleScroll() {
+    scrollLeft = window.scrollX;
+    scrollTop = window.scrollY;
   }
 
   let oldMousepos: mousePos = { id: "", x: 0, y: 0 };
-
-  function handleMouse(e: any) {}
 
   function startMouseTracker(id: string) {
     document.addEventListener("mousemove", updateMousePosition);
@@ -104,9 +111,10 @@
 
     canvas = document.getElementById("main-canvas") as HTMLCanvasElement;
 
-    window.addEventListener("scroll", handleMouse);
+    window.addEventListener("scroll", handleScroll);
+
     return () => {
-      window.removeEventListener("scroll", handleMouse);
+      window.removeEventListener("scroll", handleScroll);
     };
   });
 
@@ -126,7 +134,7 @@
 <PeopleCounter />
 <div class="peer-video-stream-container">
   {#each Object.values(peerMice) as mouseData}
-    <PeerMouse {mouseData} />
+    <PeerMouse {mouseData} {scrollLeft} {scrollTop} />
   {/each}
 </div>
 

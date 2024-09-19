@@ -34,7 +34,7 @@ export function TransitionToDrawingRoom() {
   const rectangles = get(textBoxesStore);
   const doodleFetched = get(fetched_single);
 
-  let drawingData = {
+  let drawingData: any = {
     name: "",
     owner: {},
     id: 0,
