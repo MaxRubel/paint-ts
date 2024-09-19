@@ -3,15 +3,20 @@
   import MouseCursor from "../../graphics/MouseCursor.svelte";
 
   export let mouseData: mousePos;
+  export let scrollLeft: number;
+  export let scrollTop: number;
+
+  $: adjustedX = mouseData.x + scrollLeft;
+  $: adjustedY = mouseData.y - scrollTop;
 </script>
 
-<div class="peer-mouse" style="top: {mouseData.y}px; left: {mouseData.x}px">
+<div class="peer-mouse" style="top: {adjustedY}px; left: {adjustedX}px">
   <MouseCursor />
 </div>
 
 <style>
   .peer-mouse {
-    position: absolute;
+    position: fixed;
     z-index: 700;
     color: white;
     rotate: -70deg;
