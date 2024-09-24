@@ -173,9 +173,11 @@
 </div>
 
 <div class="dropdown-menu" id="dd-menu" class:menuOpen>
-  <button class="clear-button nav-button-btn divide-bottom" id="dd-menu">
-    About Us
-  </button>
+  <a href="https://maxmakesapps.com/" target="_blank">
+    <button class="clear-button nav-button-btn divide-bottom" id="dd-menu">
+      About Me
+    </button>
+  </a>
   {#if !authState}
     <button class="clear-button nav-button-btn" id="dd-menu" on:click={clearDoodle}>
       Clear drawing
