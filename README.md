@@ -17,5 +17,6 @@ Frontend:
 - Svelte / Typsecript
 
 Backend:
+- Firebase (authentication)
 - Django / Postgres
 - Addl. Websockets Server / GO
