@@ -6,7 +6,7 @@
   export let scrollLeft: number;
   export let scrollTop: number;
 
-  $: adjustedX = mouseData.x + scrollLeft;
+  $: adjustedX = mouseData.x - scrollLeft;
   $: adjustedY = mouseData.y - scrollTop;
 </script>
 
