@@ -58,7 +58,7 @@
       <input
         type="text"
         class="url"
-        value={`http://localhost:5173/${drawingRoomId}`}
+        value={`https://paint-ts.netlify.app/${drawingRoomId}`}
       />
       <button style="width: auto;" on:click={handleCopy}>Copy</button>
     </div>
