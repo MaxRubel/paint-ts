@@ -8,7 +8,6 @@ GroupDoodles is a collaborative whiteboarding app.  It uses HTML Canvas and HTML
 - Moveable Textboxes: Add and manipulate text box elements.
 - Drawing Storage: CRUD drawings to the database.
 - Color Palette System: CRUD color palettes to the database.
-- Backend Integration: Django / PostGresSQL backend + GO websocket server
 - Peer to Peer Collaboration: WebRTC connections between broswers.
 
 ## Technology Stack
