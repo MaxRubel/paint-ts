@@ -1,6 +1,6 @@
 ## GroupDoodles
 
-GroupDoodles is an interactive HTML canvas application that allows users to create, save, and collaborate on digital drawings. It combines the power of HTML5 Canvas with the drawing capabilities of the perfect-freehand library to provide an simple drawing experience.  There is also multiplayer functionality that enables multiple users to collaborate in real time by sending their changes across a WebRTC peer-to-peer data channel.
+GroupDoodles is an interactive HTML canvas application that allows users to create, save, and collaborate on digital drawings. It combines the power of HTML5 Canvas with the drawing capabilities of the perfect-freehand library to provide a simple drawing experience.  There is also multiplayer functionality that enables users on different browsers to collaborate in real time by sending their changes across a WebRTC peer-to-peer data channel.
 
 ## Features
 
